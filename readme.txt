@@ -62,6 +62,7 @@ Version history:
 - pre22: cleaner GUI code, all kinds of window handling
 - pre22: catch exceptions like crashing plugs
 - pre23: security measures for open edit window
+- pre24: workarounds for Waves5 strangenesses
 
 0.0.0:
 - version of mark@junklight.com
@@ -70,12 +71,8 @@ Version history:
 
 BUGS:
 - mouse interaction in editor can cause audio dropouts
-- crash when unloading plugin with open window
 
 TODO:
-- examine why Waveshell behaves so strange (vendor string length exceed VST specification)
-- add VSTTimeInfo functionality
-- add Midi out functionality
 - include necessary Steinberg license stuff
-- do name scanning in the background
+- do plugin loading, name scanning in the background
 - translate special characters in strings (like ° as param_label) into system-digestible form
