@@ -38,7 +38,6 @@ CVstApp theApp;
 /* ----- MFC stuff ------------- */
 #endif
 
-
 class vst:
 	public flext_dsp
 {

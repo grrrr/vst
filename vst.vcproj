@@ -29,7 +29,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\packs\pthreads,f:\prog\max\flext\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_NOGLOBALNEW"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
