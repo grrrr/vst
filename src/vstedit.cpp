@@ -33,10 +33,8 @@ void VSTPlugin::StartEditing(WHandle h)
 
 void VSTPlugin::StopEditing() 
 { 
-    if(Is()) {
-	    Dispatch(effEditClose);					
-        hwnd = NULL; 
-    }
+    if(Is() && IsEdited()) 
+        Dispatch(effEditClose);					
 }
 
 void VSTPlugin::Visible(bool vis,bool upd)

@@ -40,19 +40,27 @@ public:
     virtual void Respond(const t_symbol *sym,int argc = 0,const t_atom *argv = NULL) = 0;
 };
 
+
 class VSTPlugin:
     public flext
 {
 public:
+    static VSTPlugin *New(Responder *resp);
+    static void Delete(VSTPlugin *p);
 
     static void Setup();
 
+	bool Instance(const char *plug,const char *subplug = NULL);
+	void DspInit(float samplerate,int blocksize);
+
+private:
 	VSTPlugin(Responder *resp);
 	~VSTPlugin();
 
-	bool Instance(const char *plug,const char *subplug = NULL);
+    static ThrCond thrcond;
+    static void worker(thr_params *p);
+    
 	void Free();
-	void DspInit(float samplerate,int blocksize);
 
     //////////////////////////////////////////////////////////////////////////////
 
@@ -139,10 +147,11 @@ public:
 
 	void Edit(bool open);
 
-	void StartEditing(WHandle h );
+	void StartEditing(WHandle h);
     void StopEditing();
     bool IsEdited() const { return hwnd != NULL; }
     WHandle EditorHandle() const { return hwnd; }
+    void EditingEnded() { hwnd = NULL; thrcond.Signal(); }
 
     void GetEditorRect(ERect &er) const { ERect *r; Dispatch(effEditGetRect,0,0,&r); er = *r; }
     void EditorIdle() { Dispatch(effEditIdle); }

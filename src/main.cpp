@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre22"
+#define VST_VERSION "0.1.0pre23"
 
 
 class vst
@@ -370,9 +370,9 @@ vst::~vst()
 void vst::ClearPlug()
 {
     if(plug) {
-        plug->Edit(false);
         ClearBuf(); // needs valid plug
-        delete plug; plug = NULL;
+        VSTPlugin::Delete(plug); 
+        plug = NULL;
     }
 }
 
@@ -464,15 +464,17 @@ static std::string findFilePath(const std::string &path,const std::string &dllna
     return std::string();
 }
 
-
+// \todo this should be in the background, because it can take some time
+// ideally vst would get a response from VSTPlugin when readily, loaded and
+// vst would dump out a respective signal to the patcher
 bool vst::LoadPlug()
 {
     if(plug) ClearPlug();
 
-    plug = new VSTPlugin(this);
+    VSTPlugin *p = VSTPlugin::New(this);
 
 	// try loading the dll from the raw filename 
-    bool ok = plug->Instance(plugname.c_str(),subplug.c_str());
+    bool ok = p->Instance(plugname.c_str(),subplug.c_str());
 	if(ok) 
         FLEXT_LOG("raw filename loaded fine");
     else { 
@@ -492,7 +494,7 @@ bool vst::LoadPlug()
             dllname += "\\";
             dllname += name;
 
-	        ok = plug->Instance(dllname.c_str());
+	        ok = p->Instance(dllname.c_str());
         }
 #endif
     }
@@ -521,7 +523,7 @@ bool vst::LoadPlug()
 					realpath += plugname;
             		FLEXT_LOG1("trying %s",(const char *)realpath.c_str());
 
-                    ok = plug->Instance(realpath.c_str());
+                    ok = p->Instance(realpath.c_str());
 					if(ok) {
                 		FLEXT_LOG("plugin loaded via VST_PATH");
 						break;
@@ -538,10 +540,12 @@ bool vst::LoadPlug()
 
     if(!ok) {
 		post("%s - unable to load plugin '%s'",thisName(),plugname.c_str());
-		ClearPlug();
+        VSTPlugin::Delete(p);
     }
-    else
+    else {
+        plug = p;
         InitPlug();
+    }
 
     return ok;
 }

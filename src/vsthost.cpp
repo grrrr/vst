@@ -8,7 +8,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 #include "vsthost.h"
-
+#include "editor.h"
+#include <exception>
+#include "flcontainers.h"
 
 const t_symbol 
     *VSTPlugin::sym_param,
@@ -22,8 +24,22 @@ const t_symbol
     *VSTPlugin::sym_ev_,
     *VSTPlugin::sym_midi[8];
 
+
+class DelPlugin
+    : public Fifo::Cell
+{
+public:
+    DelPlugin(VSTPlugin *p): plug(p) {}
+    VSTPlugin *plug;
+};
+
+static TypedLifo<DelPlugin> todel;
+flext::ThrCond VSTPlugin::thrcond;
+
 void VSTPlugin::Setup()
 {
+    LaunchThread(worker);
+
     sym_param = flext::MakeSymbol("param");
     sym_event = flext::MakeSymbol("event");
     sym_evmidi = flext::MakeSymbol("midi");
@@ -68,7 +84,55 @@ VSTPlugin::~VSTPlugin()
 	Free();
 }
 
+VSTPlugin *VSTPlugin::New(Responder *resp)
+{
+    FLEXT_ASSERT(resp);
+    return new VSTPlugin(resp);
+}
 
+void VSTPlugin::Delete(VSTPlugin *p)
+{
+    FLEXT_ASSERT(p);
+
+    // tell plugin to close editor!
+    StopEditor(p);
+    // transfer to deletion thread
+    todel.Push(new DelPlugin(p));
+    thrcond.Signal();
+}
+
+void VSTPlugin::worker(thr_params *)
+{
+    TypedLifo<DelPlugin> tmp;
+    bool again = false;
+    for(;;) {
+        // wait for signal
+        if(again) {
+            thrcond.TimedWait(0.01);
+            again = false;
+        }
+        else
+            thrcond.Wait();
+
+        DelPlugin *p;
+        while((p = todel.Pop()) != NULL) {
+            // see if editing has stopped
+            if(p && p->plug->hwnd == NULL) {
+                // yes, it is now safe to delete the plug
+                delete p->plug;
+                delete p;
+            }
+            else {
+                tmp.Push(p);
+                again = true;
+            }
+        }
+
+        // put back remaining entries
+        while((p = tmp.Pop()) != NULL) todel.Push(p);
+    }
+}
+    
 #if FLEXT_OS == FLEXT_OS_MAC
 OSStatus FSPathMakeFSSpec(const UInt8 *path,FSSpec *spec,Boolean *isDirectory)  /* can be NULL */
 {
@@ -210,6 +274,9 @@ bool VSTPlugin::InstPlugin(long plugid)
 
 	//This calls the "main" function and receives the pointer to the AEffect structure.
     try { effect = pluginmain(audiomaster); }
+    catch(exception &e) {
+        flext::post("vst~ - caught exception while instantiating plugin: %s",e.what());
+    }
     catch(...) {
         flext::post("vst~ - caught exception while instantiating plugin");
     }
@@ -225,15 +292,19 @@ bool VSTPlugin::InstPlugin(long plugid)
 
 bool VSTPlugin::Instance(const char *name,const char *subname)
 {
-    bool ok = effect != NULL;
+    bool ok = false;
+    FLEXT_ASSERT(effect == NULL);
     
     try {
 
+/*
     if(!ok && dllname != name) {
         FreePlugin();
         // freshly load plugin
         ok = NewPlugin(name) && InstPlugin();
     }
+*/
+    ok = NewPlugin(name) && InstPlugin();
 
     if(ok && subname && *subname && Dispatch(effGetPlugCategory) == kPlugCategShell) {
         // sub plugin-name given -> scan plugs
@@ -303,6 +374,10 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
     }
 
     }
+    catch(exception &e) {
+        flext::post("vst~ - caught exception while loading plugin: %s",e.what());
+        ok = false;
+    }
     catch(...) {
         flext::post("vst~ - Caught exception while loading plugin");
         ok = false;
@@ -312,25 +387,20 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
 	return ok;
 }
 
-void VSTPlugin::Free() // Called also in destruction
+void VSTPlugin::Free() 
 {
-    try {
-	if(effect) {
-        Edit(false);
+    // This should only also in destruction
 
-        // shut down plugin
-		Dispatch(effMainsChanged, 0, 0);
-		Dispatch(effClose);
-    }
+    try {
+	    if(effect) {
+            FLEXT_ASSERT(!IsEdited());
+
+            // shut down plugin
+		    Dispatch(effMainsChanged, 0, 0);
+		    Dispatch(effClose);
+        }
     }
     catch(...) {}
-
-    // \TODO
-    // Here, we really have to wait until the editor thread has terminated
-    // otherwise WM_DESTROY etc. messages may still be pending
-    // in other words: this is a design flaw
-    // There should be a data stub accessible from the plugin object and the thread
-    // holding the necessary data, so that both can operate independently
 
     FreePlugin(); 
 }
@@ -344,8 +414,11 @@ void VSTPlugin::DspInit(float sr,int blsz)
         // then signal that mains have changed!
         Dispatch(effMainsChanged,0,1);
     }
+    catch(exception &e) {
+        flext::post("vst~ - caught exception while initializing dsp: %s",e.what());
+    }
     catch(...) {
-        flext::post("vst~ - caught error while initializing dsp");
+        flext::post("vst~ - caught exception while initializing dsp");
     }
 }
 

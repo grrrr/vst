@@ -58,6 +58,10 @@ Version history:
 - pre19: better shell support
 - pre19: restructured code and added time info
 - pre19: support for event processing (like MIDI in)
+- pre21: consistent MIDI handling, correct handling of parameters with spaces
+- pre22: cleaner GUI code, all kinds of window handling
+- pre22: catch exceptions like crashing plugs
+- pre23: security measures for open edit window
 
 0.0.0:
 - version of mark@junklight.com

@@ -42,8 +42,8 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 #ifdef FLEXT_LOGGING
             flext::post("WM_CLOSE");
 #endif
-            // plug could already have been unloaded...
-            plug->StopEditing(); // this sets plug->hwnd = NULL
+            plug->StopEditing();
+
             DestroyWindow(hwnd);
             break; 
         case WM_DESTROY: 
@@ -212,7 +212,8 @@ static void threadfun(flext::thr_params *p)
         else
             ShowWindow(wnd,0);
 
-        try {
+        try 
+        {
 
         // Message loop
         MSG msg;
@@ -229,9 +230,15 @@ static void threadfun(flext::thr_params *p)
         }
 
         }
+
+        catch(exception &e) {
+            flext::post("vst~ - exception caught, exiting: %s",e.what());
+        }
         catch(...) {
             flext::post("vst~ - exception caught, exiting");
         }
+
+        if(plug) plug->EditingEnded();
     }
 
     mapmutex.Lock();
@@ -277,7 +284,7 @@ void StopEditor(VSTPlugin *p)
     flext::post("Stop editor 1");
 #endif
     PostMessage(p->EditorHandle(),WM_CLOSE,0,0); 
-    flext::StopThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
+//    flext::StopThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
 #ifdef FLEXT_LOGGING
     flext::post("Stop editor 2");
 #endif
