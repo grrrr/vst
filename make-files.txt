@@ -2,6 +2,6 @@ NAME=vst~
 
 SRCDIR=src
 
-SRCS= main.cpp vsthost.cpp editor.cpp
-              
-HDRS= main.h vsthost.h editor.h editorwin.hpp editormac.hpp
+SRCS=main.cpp vsthost.cpp editor.cpp
+        
+HDRS=main.h vsthost.h editor.h editorwin.hpp editormac.hpp

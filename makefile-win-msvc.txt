@@ -1,0 +1,13 @@
+# Makefile for MSVC++ 6 and 7
+#
+# usage:
+# to build run "build-max-msvc.bat" or "build-pd-msvc.bat"
+#
+
+# includes
+INCPATH=/I$(VSTSDKPATH)\source\common
+# system libraries
+LIBS=$(LIBS) user32.lib
+
+# multithreaded build
+THREADED=1

@@ -1,0 +1,9 @@
+# Your settings are defined in the file
+# ..\flext\build\config-win-pd-msvc.txt
+#
+# You can override them here.
+
+
+# where is the VST SDK?
+# (at least version 2.3)
+VSTSDKPATH=c:\data\prog\audio\vstsdk2.3
