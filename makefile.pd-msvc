@@ -15,7 +15,7 @@
 !include config-pd-msvc.txt
 
 # includes
-INCPATH=/I"$(MSVCPATH)\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)"
+INCPATH=/I"$(MSVCPATH)\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)" /I"$(VSTSDK)\source\common" 
 LIBPATH=/LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)" /LIBPATH:"$(MSVCPATH)\lib"
 LIBS=pd.lib pthreadVC.lib user32.lib flext_t-pdwin.lib
 

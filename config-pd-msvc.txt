@@ -17,6 +17,8 @@ FLEXTPATH=$(PDPATH)\flext
 # (only necessary if not run from within the build environment)
 # MSVCPATH=c:\programme\prog\microsoft visual studio\VC98
 
+# where is the VST SDK?
+VSTSDK=F:\prog\audio\vstsdk2.3
 
 # where should the external be built?
 OUTPATH=pd-msvc

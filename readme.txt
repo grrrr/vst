@@ -60,6 +60,6 @@ features:
 - include necessary Steinberg license stuff
 
 BUGS:
-- strange: GRM reson stutters when GUI is edited with the mouse (mousedown)
-	-> plug sends (a lot of) idle messages
-	-> no stuttering when a message is posted to the console... ähem
+- Quadrafuzz crashes on closing editor window
+- Waveshell crashes on load
+

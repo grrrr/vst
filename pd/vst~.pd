@@ -1,14 +1,14 @@
-#N canvas 123 23 866 651 12;
+#N canvas 123 23 868 653 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
 -1 -1 0 1;
 #X msg 441 189 param 2 \$1;
 #X obj 133 191 print A;
-#X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 473 vis \$1;
-#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 389 edit \$1;
 #X msg 94 389 getedit;

@@ -20,7 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 using namespace std;
 
 
-#define VST_VERSION "0.1.0pre10"
+#define VST_VERSION "0.1.0pre11"
 
 
 class vst:

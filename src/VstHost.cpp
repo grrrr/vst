@@ -15,7 +15,7 @@ using namespace std;
 
 static VstTimeInfo _timeInfo;
 
-typedef AEffect *(*PVSTMAIN)(audioMasterCallback audioMaster);
+typedef AEffect *(VSTCALLBACK *PVSTMAIN)(audioMasterCallback audioMaster);
 
 
 VSTPlugin::VSTPlugin():
@@ -55,12 +55,28 @@ int VSTPlugin::Instance(const char *dllname)
 	
 	//init plugin 
 	_pEffect->user = this;
-    FLEXT_ASSERT(Dispatch( effOpen ));
-//	Dispatch( effMainsChanged,  0, 1);
+
+	long ret = Dispatch( effOpen );
+    FLEXT_ASSERT(!ret);
+
+	ret = Dispatch( effIdentify);
+	FLEXT_ASSERT(ret == 'NvEf');
 
 	if (!Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f)) {
+		// no product name given by plugin -> extract it from the filename
+
 		string str1(dllname);
-		string str2 = str1.substr(str1.rfind('\\')+1);
+		string::size_type slpos = str1.rfind('\\');
+		if(slpos == string::npos) {
+			slpos = str1.rfind('/');
+			if(slpos == string::npos)
+				slpos = 0;
+			else
+				++slpos;
+		}
+		else
+			++slpos;
+		string str2 = str1.substr(slpos);
 		int snip = str2.find('.');
         if( snip != string::npos )
 			str1 = str2.substr(0,snip);
@@ -73,7 +89,12 @@ int VSTPlugin::Instance(const char *dllname)
 		strcpy(_sVendorName, "Unknown vendor");
 
 	_sDllName = dllname;
-	
+
+/*
+	Dispatch( effMainsChanged,  0, 1);
+	Dispatch( effSetSampleRate,  0, 0,NULL,44100.);
+	Dispatch( effSetBlockSize,  0, 64);
+*/
 	return VSTINSTANCE_NO_ERROR;
 }
 
@@ -324,10 +345,23 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
     switch (opcode) {
-    case audioMasterVersion:
+    case audioMasterAutomate: // 0
+		// index, value given
+		//! \todo set effect parameter
+        return 0;
+    case audioMasterVersion: // 1
         return 2;
-    case audioMasterCurrentId:
-        return 'AASH';
+    case audioMasterCurrentId: // 2
+        return 0;
+	case audioMasterIdle: // 3
+//		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
+		return 0;
+	case audioMasterPinConnected: // 4
+		//! \todo set connection state correctly (if possible..)
+		// index=pin, value=0..input, else..output
+		return 0; // 0 means connected
+	case audioMasterGetTime: // 7
+		return 0; // not supported
     default:
 #ifdef FLEXT_DEBUG
     	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);

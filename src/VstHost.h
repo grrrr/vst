@@ -116,7 +116,7 @@ public:
         return Is()?_pEffect->dispatcher(_pEffect, opCode, index, value, ptr, opt):0;
 	}
 
-	static long Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);
+	static long VSTCALLBACK Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);
 
     void SetPos(int x,int y,bool upd = true);
     void SetX(int x,bool upd = true) { SetPos(x,posy,upd); }

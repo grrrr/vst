@@ -11,17 +11,18 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "VstHost.h"
 #include <flext.h>
 
+#include <map>
+
 #if FLEXT_OS == FLEXT_OS_WIN
 // only Windows code is situated in this file
 
 #include <windows.h>
 
-#include <map>
-
 typedef std::map<flext::thrid_t,VSTPlugin *> WndMap;
 static WndMap wndmap;
 static flext::ThrMutex mapmutex;
 
+#define TIMER_INTERVAL 25
 #define WCLNAME "vst~-class"
 
 
@@ -118,16 +119,27 @@ static void threadfun(flext::thr_params *p)
 //	    plug->Dispatch(effEditTop,0,0, 0,0.0f);			
     //	printf("Dispatched to the top\n");
 
-	    SetTimer(wnd,0,25,NULL);
+	    SetTimer(wnd,0,TIMER_INTERVAL,NULL);
+
+		WINDOWINFO winfo;
+		winfo.cbSize = sizeof(winfo);
+		GetWindowInfo(wnd,&winfo);
+		TITLEBARINFO tinfo;
+		tinfo.cbSize = sizeof(tinfo);
+		GetTitleBarInfo(wnd,&tinfo);
 
 	    ERect r;
         plug->GetEditorRect(r);
-//	    SetWindowPos(wnd,HWND_TOP,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
-	    SetWindowPos(wnd,HWND_TOP,r.left,r.top,(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
+	    SetWindowPos(wnd,HWND_TOP,
+			r.left,
+			r.top,
+			(r.right-r.left)+winfo.cxWindowBorders*2,
+			(r.bottom-r.top)+(tinfo.rcTitleBar.bottom-tinfo.rcTitleBar.top)+winfo.cyWindowBorders*2, 
+			SWP_SHOWWINDOW
+		);
 
-    //	ShowWindow( SW_SHOW );		
-    //  BringWindowToTop(wnd);
-    //	SetFocus();
+    
+	//	SetFocus();
 
         // Message pump
         MSG msg;

@@ -176,7 +176,7 @@
 				OutputFile="$(outdir)/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin;f:\prog\packs\pthreads"
+				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin,f:\prog\packs\pthreads"
 				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
 				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/r/vst~.lib"
@@ -218,108 +218,28 @@
 			Name="vst"
 			Filter="">
 			<File
-				RelativePath="src\vst\AEffect.h">
+				RelativePath="..\..\audio\vstsdk2.3\source\common\AEffect.h">
 			</File>
 			<File
-				RelativePath="src\vst\AEffectx.h">
+				RelativePath="..\..\audio\vstsdk2.3\source\common\aeffectx.h">
 			</File>
 			<File
-				RelativePath="src\vst\AEffEditor.h">
+				RelativePath="..\..\audio\vstsdk2.3\source\common\AEffEditor.hpp">
 			</File>
 			<File
-				RelativePath="src\vst\AudioEffect.hpp">
+				RelativePath="..\..\audio\vstsdk2.3\source\common\AudioEffect.hpp">
 			</File>
 			<File
-				RelativePath="src\vst\audioeffectx.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="alt"
-			Filter="">
-			<File
-				RelativePath="src\vst.cpp">
-				<FileConfiguration
-					Name="PD Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
+				RelativePath="..\..\audio\vstsdk2.3\source\common\audioeffectx.h">
 			</File>
 			<File
-				RelativePath="src\vst~.cpp">
-				<FileConfiguration
-					Name="PD Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
+				RelativePath="..\..\audio\vstsdk2.3\source\common\vstcontrols.h">
 			</File>
 			<File
-				RelativePath="src\vst~.h">
-				<FileConfiguration
-					Name="PD Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCustomBuildTool"/>
-				</FileConfiguration>
+				RelativePath="..\..\audio\vstsdk2.3\source\common\vstfxstore.h">
+			</File>
+			<File
+				RelativePath="..\..\audio\vstsdk2.3\source\common\vstgui.h">
 			</File>
 		</Filter>
 		<Filter
