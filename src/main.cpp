@@ -217,7 +217,7 @@ vst::vst(I argc,const A *argv):
 	    AddInSignal(GetAInt(argv[0]));
         AddOutSignal(GetAInt(argv[1]));     
 
-        if(!ms_plug(argc-2,argv+2)) InitProblem();
+        if(argc >= 3 && !ms_plug(argc-2,argv+2)) InitProblem();
     }
     else {
         post("%s - syntax: vst~ inputs outputs [plug]",thisName());
