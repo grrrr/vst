@@ -305,7 +305,7 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-	//post("VST plugin call to host dispatcher: Eff: 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
+	post("VST plugin call to host dispatcher: Eff: 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
 	//st( "audioMasterWantMidi %d " , audioMasterWantMidi);
 
 	// Support opcodes

@@ -23,7 +23,7 @@ CEditorThread::~CEditorThread() {}
 
 BOOL CEditorThread::InitInstance()
 {
-    SetThreadPriority(THREAD_PRIORITY_LOWEST);
+ //   SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
 	m_pMainWnd = pop = new CPopupWindow;
 	pop->SetPlugin( plug);	// window class, size etc. is set here!
