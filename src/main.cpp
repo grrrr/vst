@@ -65,7 +65,7 @@ protected:
     V mg_winy(I &y) const { y = plug?plug->getY():0; }
     V ms_winx(I x) { if(plug) plug->setX(x); }
     V ms_winy(I y) { if(plug) plug->setY(y); }
-
+ 
     V mg_chnsin(I &c) const { c = plug?plug->getNumInputs():0; }
     V mg_chnsout(I &c) const { c = plug?plug->getNumOutputs():0; }
     V mg_params(I &p) const { p = plug?plug->GetNumParams():0; }
