@@ -6,7 +6,7 @@
 # WARRANTIES, see the file, "license.txt," in this distribution.  
 #
 #
-# Makefile for MSVC++ 6
+# Makefile for MSVC++ 6 or 7
 #
 # usage:
 # to build run "make -f makefile.pd-msvc"
@@ -22,7 +22,8 @@ LIBS=pd.lib pthreadVC.lib user32.lib flext_t-pdwin.lib
 # compiler definitions and flags
 DEFS=/DFLEXT_SYS=2 /DFLEXT_THREADS
 
-CFLAGS=/G6 /Ox /MT /EHsc 
+CFLAGS=/MT /EHsc $(UFLAGS)
+
 
 # the rest can stay untouched
 # ----------------------------------------------
