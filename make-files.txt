@@ -1,0 +1,7 @@
+# all the source files from the package
+SRCS= \
+	main.cpp
+              
+HDRS= \
+	main.h vst~.h 
+

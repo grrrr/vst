@@ -1,0 +1,33 @@
+# FFTease - A set of Live Spectral Processors
+# Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
+# 
+# Copyright (c)Thomas Grill (xovo@gmx.net)
+# For information on usage and redistribution, and for a DISCLAIMER OF ALL
+# WARRANTIES, see the file, "license.txt," in this distribution.  
+#
+
+# your c/c++ compilers (define only if not gcc/g++)
+# C=gcc
+# CXX=g++
+
+# where are the PD header files?
+# leave it blank if it is a system directory (like /usr/local/include), 
+# 	since gcc 3.2 complains about it
+PDPATH=/usr/local/pd/src
+
+# where is the PD executable?
+PD=/usr/local/pd/bin/pd
+
+# where do the flext libraries reside?
+FLEXTPATH=/usr/local/pd/flext
+
+
+# where should flext libraries be built?
+TARGDIR=./pd-darwin
+# where should the external be installed?
+# (leave blank to omit installation)
+INSTPATH=/usr/local/pd/extra
+
+# additional compiler flags
+# (check if they fit for your system!)
+# UFLAGS=-maltivec
