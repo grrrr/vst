@@ -317,7 +317,7 @@ BL vst::ms_plug(I argc,const A *argv)
 
 	// try loading the dll from the raw filename 
 	if (plug->Instance(plugname) == VSTINSTANCE_NO_ERROR) {
-		//post( "it loaded fine ");
+		FLEXT_LOG("raw filename loaded fine");
 		lf = true;
 	}
 
@@ -327,14 +327,17 @@ BL vst::ms_plug(I argc,const A *argv)
 	    if(fd > 0) close(fd);
 	    else name = NULL;
 
-	    // if dir is current working directory... name points to dir
-	    if(dir == name) strcpy(dir,".");
+        if(name) {
+    		FLEXT_LOG("found VST dll on the PD path");
+	        // if dir is current working directory... name points to dir
+	        if(dir == name) strcpy(dir,".");
         
-        CString dllname(dir);
-        dllname += "\\";
-        dllname += name;
+            CString dllname(dir);
+            dllname += "\\";
+            dllname += name;
 
-	    lf = plug->Instance(dllname) == VSTINSTANCE_NO_ERROR;
+	        lf = plug->Instance(dllname) == VSTINSTANCE_NO_ERROR;
+        }
     }
 
     if(!lf) { // try finding it on the VST path
@@ -344,6 +347,7 @@ BL vst::ms_plug(I argc,const A *argv)
 		if(dllname.Find(".dll") == -1) dllname += ".dll";			
 
 		if(vst_path) {
+    		FLEXT_LOG("found VST_PATH env variable");
             char* tok_path = new C[strlen( vst_path)+1];
             strcpy( tok_path , vst_path);
 			char *tok = strtok( tok_path , ";" );
@@ -351,14 +355,16 @@ BL vst::ms_plug(I argc,const A *argv)
 				CString abpath( tok );
 				if( abpath.Right( 1 ) != _T("\\") ) abpath += "\\";
 
+        		FLEXT_LOG1("trying VST_PATH %s",(const C *)abpath);
+
 				const char * realpath = findFilePath( abpath , dllname );				
 				//post( "findFilePath( %s , %s ) = %s\n" , abpath , dllname , realpath );
 				if ( realpath != NULL ) {
 				    CString rpath( realpath );
-					rpath += _T("\\") + plugname;
-					post( "trying %s " , rpath );
+					rpath += plugname;
+            		FLEXT_LOG1("trying %s",(const C *)rpath);
 					if(plug->Instance( rpath ) == VSTINSTANCE_NO_ERROR ) {
-//						post("%s - plugin '%s' loaded ",thisName(),plug->GetName());
+                		FLEXT_LOG("plugin loaded via VST_PATH");
 						lf = true;
 						break;
 					}
