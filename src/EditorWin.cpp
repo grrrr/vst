@@ -136,9 +136,9 @@ static void threadfun(flext::thr_params *p)
 
 
 	    RECT r = plug->GetEditorRect();
-	    SetWindowPos(wnd,HWND_TOP,plug->getX(),plug->getY(),(r.right - r.left) + 10 , r.bottom - r.top + 30 , SWP_SHOWWINDOW);
+	    SetWindowPos(wnd,HWND_TOP,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
     //	ShowWindow( SW_SHOW );		
-    //	BringWindowToTop();
+        BringWindowToTop(wnd);
     //	SetFocus();
 
 
