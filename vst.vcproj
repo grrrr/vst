@@ -245,9 +245,6 @@
 				RelativePath=".\src\editor.cpp">
 			</File>
 			<File
-				RelativePath=".\src\Editor.h">
-			</File>
-			<File
 				RelativePath="src\vst.rc">
 				<FileConfiguration
 					Name="PD Release|Win32">
@@ -272,36 +269,10 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="src\VstHost.cpp">
-				<FileConfiguration
-					Name="PD Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
+				RelativePath=".\src\vsthost.cpp">
 			</File>
 			<File
-				RelativePath="src\VstHost.h">
+				RelativePath=".\src\vsthost.h">
 			</File>
 		</Filter>
 		<Filter

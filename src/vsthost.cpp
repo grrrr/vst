@@ -7,8 +7,8 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#include "Editor.h"
-#include "VstHost.h"
+#include "editor.h"
+#include "vsthost.h"
 #include "AEffectx.h"
 
 #include <ctype.h>
@@ -28,10 +28,10 @@ VSTPlugin::~VSTPlugin()
 	Free();				// Call free
 }
  
-static void FreeVST(void *handle)
+void VSTPlugin::FreeVST(Handle handle)
 {
 #if FLEXT_OS == FLEXT_OS_WIN
-    FreeLibrary(h_dll); 
+    FreeLibrary(handle); 
 #elif FLEXT_OS == FLEXT_OS_MAC
 #else
 #error Platform not supported

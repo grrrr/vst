@@ -142,16 +142,19 @@ public:
 protected:
 
 #if FLEXT_OS == FLEXT_OS_WIN
-	HMODULE h_dll;
+	typedef HMODULE Handle;
 #elif FLEXT_OS == FLEXT_OS_MAC
-	void *h_dll;
+	typedef void *Handle;
 #else
-#error
+#error Platform not supported
 #endif
 
+	Handle h_dll;
     WHandle hwnd;
 
 	AEffect *_pEffect;
+
+    static void FreeVST(Handle handle);
 
     inline long GetFlags() const { return _pEffect?_pEffect->flags:0; } 
     inline bool HasFlags(long msk) const { return _pEffect && (_pEffect->flags&msk); } 

@@ -16,7 +16,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "editorwin.hpp"
 
-#elif FLEXT_OS == FLEXT_OS_MACOS
+#elif FLEXT_OS == FLEXT_OS_MAC
 
 #include "editormac.hpp"
 
