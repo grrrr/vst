@@ -311,7 +311,12 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
 
         long plugid;
 	    char tmp[64];
-	    // scan shell for subplugins
+
+        // Waves5 continues with the next plug after the last loaded
+        // that's not what we want - workaround: swallow all remaining
+        while((plugid = Dispatch(effShellGetNextPlugin,0,0,tmp))) {}
+
+        // restart from the beginning
 	    while((plugid = Dispatch(effShellGetNextPlugin,0,0,tmp))) { 
 		    // subplug needs a name
             FLEXT_LOG1("subplug %s",tmp);

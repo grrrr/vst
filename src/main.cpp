@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre23"
+#define VST_VERSION "0.1.0pre24"
 
 
 class vst
@@ -616,7 +616,7 @@ bool vst::CbDsp()
 
 void vst::CbSignal()
 {
-    if(mute)
+    if(!plug || !plug->UniqueID() || mute)
         flext_dsp::CbSignal();
     else if(bypass) {
         const int n = Blocksize();
@@ -651,55 +651,51 @@ void vst::CbSignal()
         for(; i < CntOutSig(); ++i)
             ZeroSamples(outsigs[i],n);
     }
-    else if(plug) {
-        if(sigmatch)
-            (plug->*vstfun)(const_cast<t_sample **>(InSig()),const_cast<t_sample **>(OutSig()),Blocksize());
+    else if(sigmatch)
+        (plug->*vstfun)(const_cast<t_sample **>(InSig()),const_cast<t_sample **>(OutSig()),Blocksize());
+    else {
+        const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
+        const int cntin = CntInSig(),cntout = CntOutSig();
+        const int n = Blocksize();
+        t_sample *const *insigs = InSig();
+        t_sample *const *outsigs = OutSig();
+        t_sample **inv,**outv;
+
+        if(inputs <= cntin) 
+            inv = const_cast<t_sample **>(insigs);
+        else { // more plug inputs than inlets
+            int i;
+            for(i = 0; i < cntin; ++i) tmpin[i] = const_cast<t_sample *>(insigs[i]);
+
+            // set dangling inputs to zero
+            // according to mode... (e.g. set zero)
+            for(; i < inputs; ++i) ZeroSamples(tmpin[i] = vstin[i],n);
+
+            inv = tmpin;
+        }
+
+        const bool more = outputs <= cntout;
+        if(more) // more outlets than plug outputs 
+            outv = const_cast<t_sample **>(outsigs);
         else {
-            const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
-            const int cntin = CntInSig(),cntout = CntOutSig();
-            const int n = Blocksize();
-            t_sample *const *insigs = InSig();
-            t_sample *const *outsigs = OutSig();
-            t_sample **inv,**outv;
+            int i;
+            for(i = 0; i < cntout; ++i) tmpout[i] = outsigs[i];
+            for(; i < outputs; ++i) tmpout[i] = vstout[i];
 
-            if(inputs <= cntin) 
-                inv = const_cast<t_sample **>(insigs);
-            else { // more plug inputs than inlets
-                int i;
-                for(i = 0; i < cntin; ++i) tmpin[i] = const_cast<t_sample *>(insigs[i]);
+            outv = tmpout;
+        }
 
-                // set dangling inputs to zero
-                // according to mode... (e.g. set zero)
-                for(; i < inputs; ++i) ZeroSamples(tmpin[i] = vstin[i],n);
+        // call plugin DSP function
+        (plug->*vstfun)(inv,outv,n);
 
-                inv = tmpin;
-            }
+        if(more) {
+            // according to mode set dangling output vectors
 
-            const bool more = outputs <= cntout;
-            if(more) // more outlets than plug outputs 
-                outv = const_cast<t_sample **>(outsigs);
-            else {
-                int i;
-                for(i = 0; i < cntout; ++i) tmpout[i] = outsigs[i];
-                for(; i < outputs; ++i) tmpout[i] = vstout[i];
-
-                outv = tmpout;
-            }
-
-            // call plugin DSP function
-            (plug->*vstfun)(inv,outv,n);
-
-            if(more) {
-                // according to mode set dangling output vectors
-
-                // currently simply clear them....
-                for(int i = outputs; i < cntout; ++i)
-                    ZeroSamples(outsigs[i],n);
-            }
+            // currently simply clear them....
+            for(int i = outputs; i < cntout; ++i)
+                ZeroSamples(outsigs[i],n);
         }
     }
-    else  
-        flext_dsp::CbSignal();
 }
 
 void vst::mg_progname(int argc,const t_atom *argv) const

@@ -67,7 +67,7 @@ private:
 public:
     bool Is() const { return effect != NULL; }
 
-    long GetVersion() const { return effect?effect->version:0; }
+    long GetVersion() const { return effect->version; }
 
     bool IsSynth() const { return HasFlags(effFlagsIsSynth); }
     bool IsReplacing() const { return HasFlags(effFlagsCanReplacing); }
@@ -77,8 +77,10 @@ public:
 	const char *GetVendorName() const { return vendorname; }
 	const char *GetDllName() const { return dllname.c_str(); }
 
-    int GetNumInputs() const { return effect?effect->numInputs:0; }
-    int GetNumOutputs() const { return effect?effect->numOutputs:0; }
+    long UniqueID() const { return effect->uniqueID; }
+
+    int GetNumInputs() const { return effect->numInputs; }
+    int GetNumOutputs() const { return effect->numOutputs; }
 
     void ListPlugs(const t_symbol *sym) const;
 
