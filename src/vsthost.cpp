@@ -209,9 +209,14 @@ bool VSTPlugin::InstPlugin(long plugid)
     FLEXT_ASSERT(pluginmain && audiomaster);
 
 	//This calls the "main" function and receives the pointer to the AEffect structure.
-	effect = pluginmain(audiomaster);
-	if(!effect || effect->magic != kEffectMagic) {
-		post("VST plugin : Unable to create effect");
+    try { effect = pluginmain(audiomaster); }
+    catch(...) {
+        flext::post("vst~ - caught exception while instantiating plugin");
+    }
+
+    if(!effect) 
+        return false;
+    else if(effect->magic != kEffectMagic) {
 		effect = NULL; 
 	    return false;
     }
@@ -222,6 +227,8 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
 {
     bool ok = effect != NULL;
     
+    try {
+
     if(!ok && dllname != name) {
         FreePlugin();
         // freshly load plugin
@@ -295,12 +302,19 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
 	    Dispatch(effGetVendorString,0,0,vendorname);
     }
 
+    }
+    catch(...) {
+        flext::post("vst~ - Caught exception while loading plugin");
+        ok = false;
+    }
+
     if(!ok) Free();
 	return ok;
 }
 
 void VSTPlugin::Free() // Called also in destruction
 {
+    try {
 	if(effect) {
         Edit(false);
 
@@ -308,6 +322,8 @@ void VSTPlugin::Free() // Called also in destruction
 		Dispatch(effMainsChanged, 0, 0);
 		Dispatch(effClose);
     }
+    }
+    catch(...) {}
 
     // \TODO
     // Here, we really have to wait until the editor thread has terminated
@@ -321,11 +337,16 @@ void VSTPlugin::Free() // Called also in destruction
 
 void VSTPlugin::DspInit(float sr,int blsz)
 {
-    // sample rate and block size must _first_ be set
-	Dispatch(effSetSampleRate,0,0,NULL,samplerate = sr);
-	Dispatch(effSetBlockSize, 0,blsz);
-    // then signal that mains have changed!
-    Dispatch(effMainsChanged,0,1);
+    try {
+        // sample rate and block size must _first_ be set
+	    Dispatch(effSetSampleRate,0,0,NULL,samplerate = sr);
+	    Dispatch(effSetBlockSize, 0,blsz);
+        // then signal that mains have changed!
+        Dispatch(effMainsChanged,0,1);
+    }
+    catch(...) {
+        flext::post("vst~ - caught error while initializing dsp");
+    }
 }
 
 void VSTPlugin::ListPlugs(const t_symbol *sym) const

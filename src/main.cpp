@@ -529,7 +529,7 @@ bool vst::LoadPlug()
 				}
 
 				tok = strtok( NULL , ";" );
-                if(!tok) post("%s - couldn't find plugin",thisName());
+//                if(!tok) post("%s - couldn't find plugin",thisName());
 			}
 
             delete[] tok_path;

@@ -205,9 +205,6 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 	case audioMasterGetVendorVersion: // 34
 		return VST_VERSION;
 
-    case audioMasterVendorSpecific: // 35
-        return 0;
-
 	case audioMasterCanDo: // 37
 #ifdef FLEXT_LOGGING
     	post("\taudioMasterCanDo PTR = %s",ptr);

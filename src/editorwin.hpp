@@ -58,7 +58,26 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
         case WM_ENTERIDLE:
             plug->EditorIdle();		
             break; 
+#if 0
+        case WM_WINDOWPOSCHANGED: {
+            // ignore after WM_CLOSE so that x,y positions are preserved
+            if(!plug->IsEdited()) break;
 
+            WINDOWPOS *w = (WINDOWPOS *)lp;
+
+	        WINDOWINFO winfo;
+	        winfo.cbSize = sizeof(winfo);
+	        GetWindowInfo(hwnd,&winfo);
+            int cpx = winfo.rcWindow.left-winfo.rcClient.left;
+            int cpy = winfo.rcWindow.top-winfo.rcClient.top;
+            int csx = winfo.rcWindow.right-winfo.rcClient.right-cpx;
+            int csy = winfo.rcWindow.bottom-winfo.rcClient.bottom-cpy;
+            // send normalized coordinates to plugin
+            plug->SetPos(w->x+cpx,w->y+cpy,false);
+            plug->SetSize(w->cx+csx,w->cy+csy,false);
+            return 0; 
+        }
+#else
         case WM_MOVE: {
             // ignore after WM_CLOSE so that x,y positions are preserved
             if(!plug->IsEdited()) break;
@@ -69,7 +88,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 
 	        WINDOWINFO winfo;
 	        winfo.cbSize = sizeof(winfo);
-	        GetWindowInfo(plug->EditorHandle(),&winfo);
+	        GetWindowInfo(hwnd,&winfo);
             int px = winfo.rcWindow.left-winfo.rcClient.left;
             int py = winfo.rcWindow.top-winfo.rcClient.top;
             // send normalized coordinates to plugin
@@ -86,7 +105,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 
 	        WINDOWINFO winfo;
 	        winfo.cbSize = sizeof(winfo);
-	        GetWindowInfo(plug->EditorHandle(),&winfo);
+	        GetWindowInfo(hwnd,&winfo);
             int px = winfo.rcWindow.left-winfo.rcClient.left;
             int py = winfo.rcWindow.top-winfo.rcClient.top;
             int sx = winfo.rcWindow.right-winfo.rcClient.right-px;
@@ -95,6 +114,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             plug->SetSize(x+sx,y+sy,false);
             break; 
         }
+#endif
 
 #if 0 // NOT needed for Windows
         case WM_PAINT: {
@@ -192,6 +212,7 @@ static void threadfun(flext::thr_params *p)
         else
             ShowWindow(wnd,0);
 
+        try {
 
         // Message loop
         MSG msg;
@@ -205,6 +226,11 @@ static void threadfun(flext::thr_params *p)
                 TranslateMessage(&msg); 
                 DispatchMessage(&msg); 
             }
+        }
+
+        }
+        catch(...) {
+            flext::post("vst~ - exception caught, exiting");
         }
     }
 
