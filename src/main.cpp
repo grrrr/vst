@@ -20,7 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 using namespace std;
 
 
-#define VST_VERSION "0.1.0pre8"
+#define VST_VERSION "0.1.0pre9"
 
 
 class vst:
@@ -40,20 +40,22 @@ protected:
     BL ms_plug(const AtomList &args) { return ms_plug(args.Count(),args.Atoms()); }
     V mg_plug(AtomList &sym) const { sym(1); SetString(sym[0],plugname.c_str()); }
 
+    V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
+
     V ms_edit(BL on) { if(plug) plug->edit(on); }
     V mg_edit(BL &ed) { ed = plug && plug->IsEdited(); }
-    V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
-    V ms_vis(BL vis) { if(plug) plug->visible(vis); }
+    V ms_vis(BL vis) { if(plug) plug->Visible(vis); }
+    V mg_vis(BL &vis) { vis = plug && plug->IsVisible(); }
 
-    V mg_winx(I &x) const { x = plug?plug->getX():0; }
-    V mg_winy(I &y) const { y = plug?plug->getY():0; }
-    V ms_winx(I x) { if(plug) plug->setX(x); }
-    V ms_winy(I y) { if(plug) plug->setY(y); }
- 
-    V mg_chnsin(I &c) const { c = plug?plug->getNumInputs():0; }
-    V mg_chnsout(I &c) const { c = plug?plug->getNumOutputs():0; }
+    V mg_winx(I &x) const { x = plug?plug->GetX():0; }
+    V mg_winy(I &y) const { y = plug?plug->GetY():0; }
+    V ms_winx(I x) { if(plug) plug->SetX(x); }
+    V ms_winy(I y) { if(plug) plug->SetY(y); }
+
+    V mg_chnsin(I &c) const { c = plug?plug->GetNumInputs():0; }
+    V mg_chnsout(I &c) const { c = plug?plug->GetNumOutputs():0; }
     V mg_params(I &p) const { p = plug?plug->GetNumParams():0; }
-    V mg_programs(I &p) const { p = plug?plug->NumPrograms():0; }
+    V mg_programs(I &p) const { p = plug?plug->GetNumPrograms():0; }
     V mg_progcats(I &p) const { p = plug?plug->GetNumCategories():0; }
     V mg_plugname(const S *&s) const { s = MakeSymbol(plug?plug->GetName():""); }
     V mg_plugvendor(const S *&s) const { s = MakeSymbol(plug?plug->GetVendorName():""); }
@@ -104,8 +106,7 @@ private:
 
     FLEXT_CALLVAR_B(mg_edit,ms_edit)
     FLEXT_CALLGET_B(mg_editor)
-    FLEXT_CALLSET_B(ms_vis)
-    FLEXT_ATTRGET_B(visible)
+    FLEXT_CALLVAR_B(mg_vis,ms_vis)
 
 //    FLEXT_CALLBACK_2(m_control,t_symptr,int)
     FLEXT_CALLBACK_I(m_pitchbend)
@@ -151,7 +152,7 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);
 	FLEXT_CADDATTR_VAR(c,"edit",mg_edit,ms_edit);
 	FLEXT_CADDATTR_GET(c,"editor",mg_editor);
-	FLEXT_CADDATTR_VAR(c,"vis",visible,ms_vis);
+	FLEXT_CADDATTR_VAR(c,"vis",mg_vis,ms_vis);
 	FLEXT_CADDMETHOD_(c,0,"print",m_print);
 
 	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
@@ -170,10 +171,10 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDMETHOD_I(c,0,"getptext",m_ptext);
 
 	FLEXT_CADDATTR_VAR1(c,"echo",echoparam);
-	FLEXT_CADDATTR_VAR(c,"x",mg_winx,ms_winx);
+    FLEXT_CADDATTR_VAR(c,"x",mg_winx,ms_winx);
 	FLEXT_CADDATTR_VAR(c,"y",mg_winy,ms_winy);
 
-	FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
+    FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
 	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);
 	FLEXT_CADDATTR_GET(c,"params",mg_params);
 	FLEXT_CADDATTR_GET(c,"programs",mg_programs);
@@ -224,8 +225,8 @@ V vst::InitPlug()
 {
     FLEXT_ASSERT(plug);
 
-	vstfun = plug->replace()?VSTPlugin::processReplacing:VSTPlugin::process;
-    sigmatch = plug->getNumInputs() == CntInSig() && plug->getNumOutputs() == CntOutSig();
+	vstfun = plug->IsReplacing()?VSTPlugin::processReplacing:VSTPlugin::process;
+    sigmatch = plug->GetNumInputs() == CntInSig() && plug->GetNumOutputs() == CntOutSig();
 
     InitBuf();
 }
@@ -235,12 +236,12 @@ V vst::ClearBuf()
     if(!plug) return;
 
     if(vstin) {
-        for(I i = 0; i < plug->getNumInputs(); ++i) delete[] vstin[i];
+        for(I i = 0; i < plug->GetNumInputs(); ++i) delete[] vstin[i];
         delete[] vstin; vstin = NULL;
         delete[] tmpin; tmpin = NULL;
     }
     if(vstout) {
-        for(I i = 0; i < plug->getNumOutputs(); ++i) delete[] vstout[i];
+        for(I i = 0; i < plug->GetNumOutputs(); ++i) delete[] vstout[i];
         delete[] vstout; vstout = NULL;
         delete[] tmpout; tmpout = NULL;
     }
@@ -249,16 +250,17 @@ V vst::ClearBuf()
 V vst::InitBuf()
 {
     FLEXT_ASSERT(!vstin && !tmpin && !vstout && !tmpout);
+    const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
 
     I i;
 
-    vstin = new R *[plug->getNumInputs()];
-    tmpin = new R *[plug->getNumInputs()];
-    for(i = 0; i < plug->getNumInputs(); ++i) vstin[i] = new R[Blocksize()];
+    vstin = new R *[inputs];
+    tmpin = new R *[inputs];
+    for(i = 0; i < inputs; ++i) vstin[i] = new R[Blocksize()];
     
-    vstout = new R *[plug->getNumOutputs()];
-    tmpout = new R *[plug->getNumOutputs()];
-    for(i = 0; i < plug->getNumOutputs(); ++i) vstout[i] = new R[Blocksize()];
+    vstout = new R *[outputs];
+    tmpout = new R *[outputs];
+    for(i = 0; i < outputs; ++i) vstout[i] = new R[Blocksize()];
 }
 
 static string findFilePath(const string &path,const string &dllname)
@@ -411,12 +413,14 @@ V vst::m_dsp(I n,t_signalvec const *,t_signalvec const *)
 V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 {
     if(plug) {
+        const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
+
         if(sigmatch)
             (plug->*vstfun)(const_cast<R **>(insigs),const_cast<R **>(outsigs),n);
         else {
             R **inv,**outv;
 
-            if(plug->getNumInputs() <= CntInSig()) 
+            if(inputs <= CntInSig()) 
                 inv = const_cast<R **>(insigs);
             else { // more plug inputs than inlets
                 I i;
@@ -424,18 +428,18 @@ V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 
                 // set dangling inputs to zero
                 // according to mode... (e.g. set zero)
-                for(; i < plug->getNumInputs(); ++i) ZeroSamples(tmpin[i] = vstin[i],n);
+                for(; i < inputs; ++i) ZeroSamples(tmpin[i] = vstin[i],n);
 
                 inv = tmpin;
             }
 
-            const BL more = plug->getNumOutputs() <= CntOutSig();
+            const BL more = outputs <= CntOutSig();
             if(more) // more outlets than plug outputs 
                 outv = const_cast<R **>(outsigs);
             else {
                 I i;
                 for(i = 0; i < CntOutSig(); ++i) tmpout[i] = outsigs[i];
-                for(; i < plug->getNumOutputs(); ++i) tmpout[i] = vstout[i];
+                for(; i < outputs; ++i) tmpout[i] = vstout[i];
 
                 outv = tmpout;
             }
@@ -557,19 +561,15 @@ V vst::m_print(I ac,const A *av)
 	 if ( header ) {
 		post("VST~ plugin: %s " , plug->GetName() );
 		post("made by: %s " , plug->GetVendorName() );
-		post("parameterss %d\naudio: %d in(s)/%d out(s) \nLoaded from library \"%s\".\n",
+		post("parameters %d\naudio: %d in(s)/%d out(s) \nLoaded from library \"%s\".\n",
 			plug->GetNumParams(),
 			CntInSig(),
 			CntOutSig(),
 			plug->GetDllName());
 
 		post("Flags");
-		if ( plug->_pEffect->flags & effFlagsHasEditor ) {
-			post("Has editor");
-		}
-		if ( plug->_pEffect->flags & effFlagsCanReplacing ) {
-			post("Can do replacing");
-		}
+		if ( plug->HasEditor() ) post("Has editor");
+		if ( plug->IsReplacing() ) post("Can do replacing");
 	 }
 
 	 if ( parameters ) {
@@ -609,7 +609,8 @@ V vst::display_parameter(I param,BL showparams)
 
 	if(*name) {
 		if (showparams) {
-			plug->DescribeValue( j , display );		
+//			plug->DescribeValue( j , display );		
+            plug->GetParamValue(j,display);
 			val = plug->GetParamValue( j );
 			post ("parameter[#%d], \"%s\" value=%f (%s) ", j, name,  val,display);			
 		}
@@ -630,7 +631,7 @@ V vst::ms_param(I pnum,F val)
 //    if(xval <= 1.0f) // What's that????
     if(true)
     { 
-		plug->SetParameter( pnum, val );
+		plug->SetParamFloat( pnum, val );
 		if(echoparam) display_parameter(pnum , true );
 	}	
     else
@@ -669,7 +670,8 @@ V vst::m_ptext(I pnum)
 	C display[164];  /* the Steinberg(tm) way... */
 
 	memset(display,0,sizeof(display));
-	plug->DescribeValue(pnum,display);
+//	plug->DescribeValue(pnum,display);
+	plug->GetParamValue(pnum,display);
 
     A at[2];
     SetInt(at[0],pnum);

@@ -16,5 +16,8 @@ void SetupEditor();
 void StartEditor(VSTPlugin *p);
 void StopEditor(VSTPlugin *p);
 void ShowEditor(VSTPlugin *p,bool show);
+void MoveEditor(VSTPlugin *p,int x,int y);
+void SizeEditor(VSTPlugin *p,int x,int y);
+bool IsEditorShown(const VSTPlugin *p);
 
 #endif // __EDITOR_H

@@ -1,19 +1,19 @@
-#N canvas 105 26 856 641 12;
+#N canvas 123 23 866 651 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
 -1 -1 0 1;
 #X msg 441 189 param 2 \$1;
 #X obj 133 191 print A;
-#X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
+#X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
 ;
 #X msg 26 473 vis \$1;
-#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
+#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
 ;
 #X msg 26 389 edit \$1;
 #X msg 94 389 getedit;
 #X msg 89 473 getvis;
-#N canvas 367 122 546 453 info 0;
+#N canvas 367 122 548 455 info 0;
 #X msg 94 130 getversion;
 #X msg 94 75 getname;
 #X msg 95 153 getvendor;
@@ -75,21 +75,21 @@
 #X text 134 53 http://www.parasitaere-kapazitaeten.net;
 #X text 140 169 attribute outlet;
 #X text 143 140 inlets outlets [plugname];
-#N canvas 367 122 480 335 win 0;
+#N canvas 367 122 488 343 win 0;
 #X obj 14 187 s \$0-vst;
-#X msg 94 84 getx;
-#X text 186 84 get window coordinates;
-#X msg 139 84 gety;
+#X msg 94 89 getx;
+#X text 186 89 get window coordinates;
+#X msg 139 89 gety;
 #X msg 93 141 gettitle;
 #X text 273 139 get/set window title;
 #X msg 175 141 title hugo;
-#X obj 94 34 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
+#X obj 94 39 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
 -225271 -1 -1 0 256;
-#X msg 95 54 x \$1;
-#X obj 164 34 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+#X msg 95 59 x \$1;
+#X obj 164 39 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
 10 -225271 -1 -1 0 256;
-#X msg 165 52 y \$1;
-#X text 229 44 set window coordinates;
+#X msg 165 57 y \$1;
+#X text 229 49 set window coordinates;
 #X msg 90 218 getstyle;
 #X text 278 218 get/set window style;
 #X obj 173 193 vradio 15 1 0 3 empty empty empty 0 -6 0 8 -225271 -1
@@ -98,7 +98,7 @@
 #X msg 198 218 style \$1;
 #X msg 168 281 mode 101;
 #X text 253 279 get/set window sys menu;
-#X text 5 2 NOT IMPLEMENTED;
+#X text 10 7 NOT IMPLEMENTED;
 #X connect 1 0 0 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
@@ -129,37 +129,43 @@
 #X obj 27 240 bng 25 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
 -1;
 #X obj 27 271 openpanel;
-#N canvas 0 0 460 310 midi 0;
-#X obj 20 249 s \$0-vst;
-#X msg 32 66 note 10 100;
-#X msg 61 118 ctlchg 3 123;
-#X msg 87 170 pbend 1000;
-#X text 128 65 note on;
-#X msg 49 90 note 10 0;
-#X text 225 89 note off;
-#X text 171 117 control change;
-#X text 179 168 pitch bend;
-#X text 157 144 program change;
-#X msg 75 145 progchg 2;
-#X msg 135 90 noteoff 10;
-#X msg 101 195 atouch 70;
-#X text 180 194 after touch;
+#N canvas 0 0 462 312 midi 0;
+#X obj 20 279 s \$0-vst;
+#X msg 20 29 note 10 100;
+#X msg 156 105 ctlchg 3 123;
+#X text 116 28 note on;
+#X msg 36 59 note 10 0;
+#X text 212 58 note off;
+#X text 266 104 control change;
+#X text 230 191 pitch bend;
+#X text 237 132 program change;
+#X msg 155 133 progchg 2;
+#X msg 122 59 noteoff 10;
+#X text 233 240 after touch;
+#X obj 156 171 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -262144 -1 -1 0 256;
+#X obj 156 222 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -262144 -1 -1 0 256;
+#X msg 155 191 pbend \$1;
+#X msg 154 241 atouch \$1;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
-#X connect 3 0 0 0;
-#X connect 5 0 0 0;
+#X connect 4 0 0 0;
+#X connect 9 0 0 0;
 #X connect 10 0 0 0;
-#X connect 11 0 0 0;
-#X connect 12 0 0 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 0 0;
+#X connect 15 0 0 0;
 #X restore 25 581 pd midi;
 #X text 93 582 midi messages for vst synths;
 #X msg 414 442 getprogcats;
 #X text 509 439 get number of program categories;
 #X text 134 33 based on the work of Jarno Seppanen and Mark Williamson
 ;
-#X obj 26 140 vst~ 1 2;
 #X text 133 14 VST plugins for PD \, (C)2003-04 Thomas Grill;
-#X connect 1 0 55 0;
+#X obj 26 140 vst~ 1 2;
+#X connect 1 0 56 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
 #X connect 5 0 6 0;
@@ -168,7 +174,7 @@
 #X connect 8 0 13 0;
 #X connect 9 0 13 0;
 #X connect 10 0 14 0;
-#X connect 12 0 55 0;
+#X connect 12 0 56 0;
 #X connect 19 0 18 0;
 #X connect 20 0 18 0;
 #X connect 21 0 17 0;
@@ -184,6 +190,6 @@
 #X connect 48 0 49 0;
 #X connect 49 0 47 0;
 #X connect 52 0 18 0;
-#X connect 55 0 0 0;
-#X connect 55 1 0 1;
-#X connect 55 2 4 0;
+#X connect 56 0 0 0;
+#X connect 56 1 0 1;
+#X connect 56 2 4 0;

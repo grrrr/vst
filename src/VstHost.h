@@ -43,6 +43,17 @@ class VSTPlugin:
     public flext
 {
 public:
+	VSTPlugin();
+	~VSTPlugin();
+
+    bool Is() const { return _pEffect != NULL; }
+
+    ULONG GetVersion() const { return _pEffect?_pEffect->version:0; }
+
+    bool IsSynth() const { return HasFlags(effFlagsIsSynth); }
+    bool IsReplacing() const { return HasFlags(effFlagsCanReplacing); }
+    bool HasEditor() const { return HasFlags(effFlagsHasEditor); }
+
 	int GetNumCategories();
 	bool GetProgramName( int cat, int p , char* buf);
 	void AddControlChange( int control , int value );
@@ -53,70 +64,51 @@ public:
 	void SetShowParameters( bool s);
 
 	void SetEditWindow( HWND h );
-	void StopEditing();
+    void StopEditing() { hwnd = NULL; }
+    bool IsEdited() const { return hwnd != NULL; }
+
 	void OnEditorClose();
-    HWND EditorHandle() { return hwnd; }
+    HWND EditorHandle() const { return hwnd; }
 
 	RECT GetEditorRect();
 	void EditorIdle();
 
 	void edit(bool open);
-    void visible(bool vis);
-	bool replace(  );
-
-	VSTPlugin();
-	~VSTPlugin();
+    void Visible(bool vis);
+    bool IsVisible() const;
 
 	void Free();
 	int Instance( const char *dllname);
-	void Create(VSTPlugin *plug);
+//	void Create(VSTPlugin *plug);
 	void Init( float samplerate , float blocksize );
 
-	virtual int GetNumParams(void) { return _pEffect->numParams; }
-	virtual void GetParamName(int numparam,char* name)
-	{
-		if ( numparam < _pEffect->numParams ) Dispatch(effGetParamName,numparam,0,name,0.0f);
-		else strcpy(name,"Out of Range");
-
-	}
-	virtual void GetParamValue(int numparam,char* parval)
-	{
-		if ( numparam < _pEffect->numParams ) DescribeValue(numparam,parval);
-		else strcpy(parval,"Out of Range");
-	}
-	virtual float GetParamValue(int numparam)
-	{
-		if ( numparam < _pEffect->numParams ) return (_pEffect->getParameter(_pEffect, numparam));
-		else return -1.0;
-	}
-
-	int getNumInputs( void );
-	int getNumOutputs( void );
+    int GetNumInputs() const { return _pEffect?_pEffect->numInputs:0; }
+    int GetNumOutputs() const { return _pEffect?_pEffect->numOutputs:0; }
 
 	virtual char* GetName(void) { return _sProductName; }
-	unsigned long  GetVersion() { return _version; }
 	char* GetVendorName(void) { return _sVendorName; }
 	char* GetDllName(void) { return _sDllName; }
 
-	long NumParameters(void) { return _pEffect->numParams; }
-	float GetParameter(long parameter) { return _pEffect->getParameter(_pEffect, parameter); }
-	bool DescribeValue(int parameter,char* psTxt);
-	bool SetParameter(int parameter, float value);
-	bool SetParameter(int parameter, int value);
-	void SetCurrentProgram(int prg);
+	int GetNumParams() { return _pEffect->numParams; }
+
+	void GetParamName(int numparam,char* name);
+//    float GetParameter(long parameter) { return _pEffect->getParameter(_pEffect, parameter); }
+	void GetParamValue(int numparam,char* parval);
+	float GetParamValue(int numparam);
+
+    bool SetParamFloat(int parameter, float value);
+    bool SetParamInt(int parameter, int value) { return SetParamFloat(parameter,value/65535.0f); }
+
+    void SetCurrentProgram(int prg);
 	int GetCurrentProgram();
-	int NumPrograms() { return _pEffect->numPrograms; }
-	bool IsSynth() { return _isSynth; }
-	bool HasEditor() const { return _editor; }
+	int GetNumPrograms() const { return _pEffect->numPrograms; }
 
 	bool AddMIDI(unsigned char data0,unsigned char data1=0,unsigned char data2=0);
 	void SendMidi();
 
-
 	void processReplacing( float **inputs, float **outputs, long sampleframes );
 	void process( float **inputs, float **outputs, long sampleframes );
 
-	AEffect *_pEffect;
 	long Dispatch(long opCode, long index, long value, void *ptr, float opt)
 	{
 		return _pEffect->dispatcher(_pEffect, opCode, index, value, ptr, opt);
@@ -129,44 +121,49 @@ public:
 	
 
 	char _midichannel;
-	bool instantiated;
-	int _instance;		// Remove when Changing the FileFormat.
+//	bool instantiated;
+//	int _instance;		// Remove when Changing the FileFormat.
 
-    void setPos(int x,int y) { posx = x; posy = y; }
-    void setX(int x) { posx = x; }
-    void setY(int y) { posy = y; }
-    int getX() const { return posx; }
-    int getY() const { return posy; }
-
-    bool IsEdited() const { return hwnd != NULL; }
+    void SetPos(int x,int y,bool upd = true);
+    void SetX(int x,bool upd = true) { SetPos(x,posy,upd); }
+    void SetY(int y,bool upd = true) { SetPos(posx,y,upd); }
+    int GetX() const { return posx; }
+    int GetY() const { return posy; }
 
 protected:
 
 	HMODULE h_dll;
-	HMODULE h_winddll;
+//	HMODULE h_winddll;
 	HWND hwnd;
 
+	AEffect *_pEffect;
+
+    inline long GetFlags() const { return _pEffect?_pEffect->flags:0; } 
+    inline bool HasFlags(long msk) const { return _pEffect && (_pEffect->flags&msk); } 
+
+//	bool DescribeValue(int parameter,char* psTxt);
 
 	char _sProductName[64];
 	char _sVendorName[64];
 	char *_sDllName;	// Contains dll name
-	ULONG _version;
-	bool _isSynth,_editor;
+//	bool _isSynth,_editor;
 
 	float * inputs[MAX_INOUTS];
 	float * outputs[MAX_INOUTS];
-	float junk[256];
+//	float junk[256];
 
 	static VstTimeInfo _timeInfo;
 	VstMidiEvent midievent[MAX_EVENTS];
 	VstEvents events;
 	int	queue_size;
-	bool overwrite;
+//	bool overwrite;
+
+    float sample_rate;
 
 private:
     int posx,posy;
-	bool show_params;
-	static float sample_rate;
+//	bool show_params;
+//	static float sample_rate;
 };
 
 #endif // _VSTPLUGIN_HOST

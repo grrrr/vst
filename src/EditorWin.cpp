@@ -54,9 +54,11 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
         case WM_ENTERIDLE:
             plug->EditorIdle();		
             break; 
-        case WM_MOVE:
-            plug->setPos(LOWORD(lp),HIWORD(lp));
+        case WM_MOVE: {
+            WORD x = LOWORD(lp),y = HIWORD(lp);
+            plug->SetPos(reinterpret_cast<short &>(x),reinterpret_cast<short &>(y),false);
             break; 
+        }
 /*
         case WM_PAINT: 
             // Paint the window's client area. 
@@ -113,7 +115,9 @@ static void threadfun(flext::thr_params *p)
 	    SetTimer(wnd,0,25,NULL);
 
 	    RECT r = plug->GetEditorRect();
-	    SetWindowPos(wnd,HWND_TOPMOST,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
+//	    SetWindowPos(wnd,HWND_TOP,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
+	    SetWindowPos(wnd,HWND_TOP,r.left,r.top,(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
+
     //	ShowWindow( SW_SHOW );		
     //  BringWindowToTop(wnd);
     //	SetFocus();
@@ -175,6 +179,22 @@ void StopEditor(VSTPlugin *p)
 void ShowEditor(VSTPlugin *p,bool show) 
 {
     ShowWindow(p->EditorHandle(),show); 
+}
+
+void MoveEditor(VSTPlugin *p,int x,int y) 
+{
+    // the client region must be taken into account
+//    SetWindowPos(p->EditorHandle(),NULL,x,y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+}
+
+void SizeEditor(VSTPlugin *p,int x,int y) 
+{
+    SetWindowPos(p->EditorHandle(),NULL,0,0,x,y,SWP_NOMOVE|SWP_NOZORDER);
+}
+
+bool IsEditorShown(const VSTPlugin *p) 
+{
+    return IsWindowVisible(p->EditorHandle()) != FALSE;
 }
 
 #endif // FLEXT_OS_WIN
