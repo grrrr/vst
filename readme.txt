@@ -53,6 +53,8 @@ Version history:
 - pre12: added "bypass" and "mute" attributes
 - pre13: with flext 0.4.7 no more interruptions on window close
 - pre14: allow window titles with spaces and update it on window startup
+- pre18: open plug interface on Alt-Click
+- pre18: experimental plug shell support
 
 0.0.0:
 - version of mark@junklight.com

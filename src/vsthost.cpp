@@ -13,7 +13,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <ctype.h>
 
+#if FLEXT_OS == FLEXT_OS_WIN
+#include <objbase.h>
+#endif
+
 typedef AEffect *(VSTCALLBACK *PVSTMAIN)(audioMasterCallback audioMaster);
+
 
 
 VSTPlugin::VSTPlugin():
@@ -21,11 +26,18 @@ VSTPlugin::VSTPlugin():
     posx(0),posy(0),caption(true),
 	_midichannel(0),queue_size(0),
     paramnamecnt(0)
-{}
+{
+#if FLEXT_OS == FLEXT_OS_WIN
+    HRESULT result = CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
+#endif
+}
 
 VSTPlugin::~VSTPlugin()
 {
 	Free();				// Call free
+#if FLEXT_OS == FLEXT_OS_WIN
+    CoUninitialize();
+#endif
 }
  
 void VSTPlugin::FreeVST(MHandle handle)
@@ -66,7 +78,9 @@ BadParameter:
 }
 #endif
 
-int VSTPlugin::Instance(const char *dllname)
+static long uniqueid = 0;
+
+int VSTPlugin::Instance(const char *dllname,const char *subname)
 {
 #ifdef FLEXT_DEBUG
         flext::post("New Plugin 1 - %x",this);
@@ -141,17 +155,11 @@ int VSTPlugin::Instance(const char *dllname)
 		return VSTINSTANCE_ERR_NO_VST_PLUGIN;
 	}
 
+
+    uniqueid = 0;
+
 	//This calls the "main" function and receives the pointer to the AEffect structure.
 	_pEffect = pluginmain((audioMasterCallback)audioMasterFPtr);
-	
-#ifdef __MACOSX__
-#ifdef __CFM__
-    DisposeCFMFromMachO(audioMasterFPtr);
-    DisposeMachOFromCFM(pluginmain);
-#endif
-#endif
-
-    
 	if(!_pEffect || _pEffect->magic != kEffectMagic) {
 		post("VST plugin : Unable to create effect");
 
@@ -161,6 +169,39 @@ int VSTPlugin::Instance(const char *dllname)
 	    return VSTINSTANCE_ERR_REJECTED;
     }
 	
+    if(subname && *subname && Dispatch(effGetPlugCategory) == kPlugCategShell) { 
+	    // scan shell for subplugins
+	    char tempName[64];
+   	    char idname[5]; idname[4] = 0;
+	    while((uniqueid = Dispatch(effShellGetNextPlugin,0,0,tempName))) { 
+		    // subplug needs a name
+            *(long *)idname = uniqueid;
+            post("plug %s - %s",idname,tempName);
+            if(!strcmp(subname,tempName) || !strcmp(subname,idname)) break;
+	    }
+    }
+
+    if(uniqueid) {
+        // re-init with uniqueID set
+        _pEffect = pluginmain((audioMasterCallback)audioMasterFPtr);
+	    if(!_pEffect || _pEffect->magic != kEffectMagic) {
+		    post("VST plugin : Unable to create effect");
+
+	        _pEffect = NULL;
+		    FreeVST(h_dll); 
+            h_dll = NULL;
+	        return VSTINSTANCE_ERR_REJECTED;
+        }
+    }
+
+#ifdef __MACOSX__
+#ifdef __CFM__
+    DisposeCFMFromMachO(audioMasterFPtr);
+    DisposeMachOFromCFM(pluginmain);
+#endif
+#endif
+ 
+
 	//init plugin 
 	_pEffect->user = this;
 
@@ -539,8 +580,10 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 #endif
 
 #ifdef FLEXT_DEBUG
-//    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
+    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
 #endif
+
+//    VSTPlugin *th = effect?(VSTPlugin *)effect->user:NULL;
 
 	switch (opcode) {
     case audioMasterAutomate: // 0
@@ -552,10 +595,12 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
         return 0;
     case audioMasterVersion: // 1
         // support VST 2.3
-//        return 2300;
-        return 2;
-    case audioMasterCurrentId: // 2
-        return 0;
+        return 2300;
+//        return 2;
+    case audioMasterCurrentId: { // 2
+        return uniqueid;
+    }
+
 	case audioMasterIdle: // 3
 		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
 		return 0;
@@ -644,11 +689,13 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
         else if(!strcmp((char *)ptr,"sizeWindow"))
             return 1;
         else if(!strcmp((char *)ptr,"supportShell"))
-            return 0; // NOT YET!
+            return 0; // deprecated - new one is shellCategory
         else if(!strcmp((char *)ptr,"offline"))
             return 0; // not supported
         else if(!strcmp((char *)ptr,"asyncProcessing"))
             return 0; // not supported
+        else if(!strcmp((char *)ptr,"shellCategory"))
+            return 1; // supported!
 
 		return 0; // not supported
 	case audioMasterGetLanguage: // 38
@@ -693,7 +740,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 2;		// vst version, currently 7 (0 for older)
 		
 	case audioMasterCurrentId:			
-		return 'AASH';	// returns the unique id of a plug that's currently loading
+		return subplugid;
 
 	case audioMasterIdle:
 		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);

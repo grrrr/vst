@@ -53,8 +53,7 @@ public:
 	VSTPlugin();
 	~VSTPlugin();
 
-	int Instance(const char *dllname);
-//	void Create(VSTPlugin *plug);
+	int Instance(const char *dllname,const char *subplug = NULL);
 	void Free();
 	void DspInit(float samplerate,int blocksize);
 
@@ -166,18 +165,12 @@ protected:
     typedef std::map<std::string,int,NameCmp> NameMap;
     int paramnamecnt;
     NameMap paramnames;
-
-/*
-	float *inputs[MAX_INOUTS];
-	float *outputs[MAX_INOUTS];
-*/
+ 
 
 //	static VstTimeInfo _timeInfo;
 	VstMidiEvent midievent[MAX_EVENTS];
 	VstEvents events;
 	int	queue_size;
-
-//    float sample_rate;
 
 	void SendMidi();
 	char _midichannel;

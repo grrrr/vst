@@ -24,7 +24,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="&quot;c:\data\prog\pd\pd-cvs\src&quot;;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\src;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
@@ -41,7 +41,7 @@
 				OutputFile="./pd-msvc/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;c:\data\prog\pd\pd-cvs\bin&quot;"
+				AdditionalLibraryDirectories="c:\programme\audio\pd\bin"
 				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
 				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/r/vst~.lib"
@@ -86,8 +86,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
+				AdditionalIncludeDirectories="&quot;c:\data\prog\pd\pd-cvs\src&quot;;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0501,WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
@@ -104,7 +104,7 @@
 				OutputFile="$(outdir)/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd\bin"
+				AdditionalLibraryDirectories="&quot;c:\data\prog\pd\pd-cvs\bin&quot;"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/vst~.pdb"
 				OptimizeReferences="2"
@@ -214,28 +214,31 @@
 			Name="vst"
 			Filter="">
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\AEffect.h">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\AEffect.h">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\aeffectx.h">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\aeffectx.h">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\AEffEditor.hpp">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\AudioEffect.hpp">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\AudioEffect.hpp">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\audioeffectx.h">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\audioeffectx.h">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\vstcontrols.h">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\vstcontrols.h">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\vstgui.h">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\vstfxstore.h">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\vstplugscarbon.h">
 			</File>
 			<File
-				RelativePath="..\..\audio\vstsdk2.3\source\common\vstgui.h">
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\vstplugsmac.h">
+			</File>
+			<File
+				RelativePath="..\..\prog\audio\vstsdk2.3\source\common\vstplugsmacho.h">
 			</File>
 		</Filter>
 		<Filter
@@ -243,6 +246,9 @@
 			Filter="">
 			<File
 				RelativePath=".\src\editor.cpp">
+			</File>
+			<File
+				RelativePath=".\src\editorwin.hpp">
 			</File>
 			<File
 				RelativePath="src\vst.rc">

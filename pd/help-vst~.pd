@@ -1,4 +1,4 @@
-#N canvas 146 124 817 543 12;
+#N canvas 146 124 829 555 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 140 192 print A;
@@ -142,8 +142,6 @@
 #X restore 445 208 pd midi;
 #X text 134 33 based on the work of Jarno Seppanen and Mark Williamson
 ;
-#X text 133 14 VST plugins for PD \, (C)2003-04 Thomas Grill;
-#X obj 26 140 vst~ 1 2 @pnames 100;
 #X obj 666 433 loadbang;
 #X msg 666 460 \; pd dsp 1;
 #X obj 230 324 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
@@ -228,25 +226,33 @@
 #X text 513 209 midi messages for VST synths;
 #X text 448 314 Attention: this vst~ version will crash when a plugin
 is unloaded with the editor window open!;
-#X connect 1 0 30 0;
+#X text 133 14 VST plugins for PD \, (C)2003-05 Thomas Grill;
+#X msg 485 429 subplug AudioTrack;
+#X obj 485 479 s \$0-vst;
+#X msg 497 452 getsubplug;
+#X obj 26 140 vst~ 2 2 @pnames 100;
+#X connect 1 0 52 0;
+#X connect 1 0 52 1;
 #X connect 3 0 4 0;
 #X connect 4 0 12 0;
 #X connect 5 0 6 0;
 #X connect 6 0 11 0;
 #X connect 7 0 11 0;
 #X connect 8 0 12 0;
-#X connect 10 0 30 0;
+#X connect 10 0 52 0;
 #X connect 15 0 16 0;
 #X connect 24 0 16 0;
 #X connect 25 0 26 0;
 #X connect 26 0 24 0;
-#X connect 30 0 0 0;
-#X connect 30 1 0 1;
-#X connect 30 2 2 0;
-#X connect 31 0 32 0;
-#X connect 33 0 35 0;
-#X connect 35 0 34 0;
-#X connect 36 0 34 0;
-#X connect 38 0 41 0;
-#X connect 41 0 39 0;
-#X connect 42 0 39 0;
+#X connect 29 0 30 0;
+#X connect 31 0 33 0;
+#X connect 33 0 32 0;
+#X connect 34 0 32 0;
+#X connect 36 0 39 0;
+#X connect 39 0 37 0;
+#X connect 40 0 37 0;
+#X connect 49 0 50 0;
+#X connect 51 0 50 0;
+#X connect 52 0 0 0;
+#X connect 52 1 0 1;
+#X connect 52 2 2 0;
