@@ -1,11 +1,11 @@
-#N canvas 146 124 813 539 12;
+#N canvas 146 124 817 543 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 140 192 print A;
 #X obj 230 433 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X msg 229 455 vis \$1;
-#X obj 25 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 25 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 24 452 edit \$1;
 #X msg 92 452 getedit;
@@ -70,15 +70,15 @@
 #X text 135 77 get window coordinates;
 #X msg 73 84 gety;
 #X obj 25 26 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
--225271 -1 -1 208 256;
+-225271 -1 -1 0 256;
 #X msg 26 44 x \$1;
 #X obj 95 26 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
--225271 -1 -1 42 256;
+-225271 -1 -1 0 256;
 #X msg 96 42 y \$1;
 #X text 165 26 set window coordinates;
 #X text 161 43 (position of the actual VST interface);
 #X text 132 92 (position of the actual VST interface);
-#X obj 67 130 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 67 130 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 66 149 caption \$1;
 #X msg 161 149 getcaption;
@@ -226,6 +226,8 @@
 #X text 562 175 VST programs;
 #X text 134 53 http://grrrr.org;
 #X text 513 209 midi messages for VST synths;
+#X text 448 314 Attention: this vst~ version will crash when a plugin
+is unloaded with the editor window open!;
 #X connect 1 0 30 0;
 #X connect 3 0 4 0;
 #X connect 4 0 12 0;

@@ -254,8 +254,8 @@ vst::~vst()
 V vst::ClearPlug()
 {
     if(plug) {
-        ms_edit(false);
-        ClearBuf();
+        plug->Edit(false);
+        ClearBuf(); // needs valid plug
         delete plug; plug = NULL;
     }
 }

@@ -35,9 +35,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 
     LRESULT res = 0;
 
-//    post("Message %x",msg);
     switch(msg) {
-//        case WM_NCREATE: res = TRUE; break;
         case WM_CREATE: 
             // Initialize the window. 
             plug->StartEditing(hwnd);
@@ -46,7 +44,8 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 #ifdef FLEXT_DEBUG
             flext::post("WM_CLOSE");
 #endif
-	        plug->StopEditing(); // this sets plug->hwnd = NULL
+            // plug could already have been unloaded...
+            plug->StopEditing(); // this sets plug->hwnd = NULL
             DestroyWindow(hwnd);
             break; 
         case WM_DESTROY: 
@@ -84,21 +83,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             break;  
         }
 */
-        case WM_NCCALCSIZE:
-#ifdef FLEXT_DEBUG
-//            flext::post("WM_NCCALCSIZE %i/%x",wp?1:0,lp);
-            if(wp) {
-                NCCALCSIZE_PARAMS *p = (NCCALCSIZE_PARAMS *)lp;
-                flext::post("WM_NCCALCSIZE %i/%i %i/%i",p->lppos->x,p->lppos->y,p->lppos->cx,p->lppos->cy);
-                flext::post("\t1: %i/%i %i/%i",p->rgrc[0].left,p->rgrc[0].top,p->rgrc[0].right,p->rgrc[0].bottom);
-                flext::post("\t2: %i/%i %i/%i",p->rgrc[1].left,p->rgrc[1].top,p->rgrc[1].right,p->rgrc[1].bottom);
-                flext::post("\t3: %i/%i %i/%i",p->rgrc[2].left,p->rgrc[2].top,p->rgrc[2].right,p->rgrc[2].bottom);
-            }
-#endif
-//            if(wp) { res = WVR_ALIGNTOP|WVR_ALIGNLEFT|WVR_REDRAW; }
-            res = DefWindowProc(hwnd,msg,wp,lp); 
-            break;
-#ifdef FLEXT_DEBUG
+#if 0 //def FLEXT_DEBUG
         case WM_SIZE: {
             WORD wx = LOWORD(lp),wy = HIWORD(lp);
             short x = reinterpret_cast<short &>(wx),y = reinterpret_cast<short &>(wy);
@@ -114,23 +99,20 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
     return res;
 }
 
-static void windowsize(HWND wnd,int x,int y,int w,int h,bool caption)
+static void windowsize(HWND wnd,int x,int y,int w,int h,bool caption,LONG flags = 0)
 {
 	WINDOWINFO winfo;
 	winfo.cbSize = sizeof(winfo);
 	GetWindowInfo(wnd,&winfo);
-	TITLEBARINFO tinfo;
-	tinfo.cbSize = sizeof(tinfo);
-    if(!caption || !GetTitleBarInfo(wnd,&tinfo)) 
-        // clear structure
-        memset(&tinfo,0,sizeof(tinfo));
+
+    int cy = caption?GetSystemMetrics(SM_CYCAPTION):0;
 
 	SetWindowPos(wnd,HWND_TOP,
     	x-(winfo.rcClient.left-winfo.rcWindow.left),
         y-(winfo.rcClient.top-winfo.rcWindow.top),
 		w+winfo.cxWindowBorders*2,
-		h+(tinfo.rcTitleBar.bottom-tinfo.rcTitleBar.top)+winfo.cyWindowBorders*2, 
-		SWP_SHOWWINDOW
+		h+cy+winfo.cyWindowBorders*2, 
+        flags
 	);
 
 }
@@ -178,7 +160,7 @@ static void threadfun(flext::thr_params *p)
 
 	    ERect r;
         plug->GetEditorRect(r);
-        windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,plug->GetCaption());
+        windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,plug->GetCaption(),SWP_SHOWWINDOW);
 #ifdef FLEXT_DEBUG
         flext::post("Editor rect left/top=%i/%i, right/bottom=%i/%i",r.left,r.top,r.right,r.bottom);
 #endif
@@ -230,13 +212,25 @@ void SetupEditor()
 
 void StartEditor(VSTPlugin *p)
 {
+#ifdef FLEXT_DEBUG
+    flext::post("Start editor 1");
+#endif
     flext::LaunchThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
+#ifdef FLEXT_DEBUG
+    flext::post("Start editor 2");
+#endif
 }
 
 void StopEditor(VSTPlugin *p) 
 {
+#ifdef FLEXT_DEBUG
+    flext::post("Stop editor 1");
+#endif
     PostMessage(p->EditorHandle(),WM_CLOSE,0,0); 
     flext::StopThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
+#ifdef FLEXT_DEBUG
+    flext::post("Stop editor 2");
+#endif
 }
 
 void ShowEditor(VSTPlugin *p,bool show) 
@@ -273,12 +267,8 @@ void CaptionEditor(VSTPlugin *plug,bool c)
     if(ns != style) {
         SetWindowLong(wnd,GWL_STYLE,ns);
 
-        // maybe resize below is just enough ... SWP_FRAMECHANGED not needed
-//        SetWindowPos(wnd,NULL,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);
-
-        ERect r;
-        plug->GetEditorRect(r);
-        windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,c);
+        ERect r; plug->GetEditorRect(r);
+        windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,c,SWP_FRAMECHANGED);
     }
 }
 
