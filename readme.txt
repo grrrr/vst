@@ -9,10 +9,14 @@ Donations for further development of the package are highly appreciated.
 ----------------------------------------------------------------------------
 
 You will need the flext C++ layer for PD and Max/MSP externals to compile this.
+see http://www.parasitaere-kapazitaeten.net/ext
 
 ----------------------------------------------------------------------------
 
-The package should at least compile (and is tested) with the following compilers:
+
+BUILDING:
+=========
+
 
 pd - Windows:
 -------------
@@ -26,12 +30,18 @@ Max/MSP - MacOS9/X:
 -------------------
 o CodeWarrior: edit "vst.cw" and build 
 
+
 ----------------------------------------------------------------------------
 
 Version history:
 
 0.1.0:
-- first public release
+- fixed crash when there's no "VST_PATH" environment string found
+- included pd path into VST search path
+- made thread of editor window low priority
+
+0.0.0:
+- version of mark@junklight.com
 
 ---------------------------------------------------------------------------
 
