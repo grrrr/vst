@@ -3,11 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="vst"
-	SccProjectName="max/vst"
-	SccAuxPath=""
-	SccLocalPath="."
-	SccProvider="MSSCCI:Jalindi Igloo"
-	Keyword="MFCProj">
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
