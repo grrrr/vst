@@ -8,4 +8,4 @@
 
 # where is the VST SDK?
 # (at least version 2.3)
-VSTSDKPATH=c:\data\prog\audio\vstsdk2.3
+VSTSDKPATH=/Volumes/Daten/Prog/packs/vstsdk2.3

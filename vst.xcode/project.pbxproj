@@ -14,7 +14,6 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "FLEXT_SYS=2 FLEXT_SHARED";
-				LIBRARY_STYLE = DYNAMIC;
 				ZERO_LINK = YES;
 			};
 			isa = PBXBuildStyle;
@@ -80,12 +79,12 @@
 		};
 		0867D691FE84028FC02AAC07 = {
 			children = (
+				E9304A5F07732F1F00EE7812,
 				E9E87848074674890035356B,
 				E9E87845074674560035356B,
 				E9E87713074673750035356B,
 				E9E87710074673590035356B,
 				E9C0C57707461746002B8D0A,
-				E9C0C57807461746002B8D0A,
 				E9C0C57907461746002B8D0A,
 				E9C0C57A07461746002B8D0A,
 				E9C0C57B07461746002B8D0A,
@@ -120,9 +119,9 @@
 		D2AAC0C405546C1D00DB518D = {
 			buildActionMask = 2147483647;
 			files = (
-				E9C0C57E07461746002B8D0A,
 				E9C0C57F07461746002B8D0A,
 				E9C0C58107461746002B8D0A,
+				E9304A6007732F1F00EE7812,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -187,21 +186,27 @@
 //E92
 //E93
 //E94
+		E9304A5F07732F1F00EE7812 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = editor.cpp;
+			path = src/editor.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9304A6007732F1F00EE7812 = {
+			fileRef = E9304A5F07732F1F00EE7812;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		E9C0C57707461746002B8D0A = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = Editor.h;
 			path = src/Editor.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		E9C0C57807461746002B8D0A = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = EditorMac.cpp;
-			path = src/EditorMac.cpp;
 			refType = 4;
 			sourceTree = "<group>";
 		};
@@ -243,12 +248,6 @@
 		};
 		E9C0C57D07461746002B8D0A = {
 			fileRef = E9C0C57707461746002B8D0A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		E9C0C57E07461746002B8D0A = {
-			fileRef = E9C0C57807461746002B8D0A;
 			isa = PBXBuildFile;
 			settings = {
 			};

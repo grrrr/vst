@@ -18,9 +18,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #if FLEXT_OS == FLEXT_OS_WIN
 #include <windows.h>
 typedef HWND WHandle;
+typedef HMODULE MHandle;
 #elif FLEXT_OS == FLEXT_OS_MAC
 #include <CoreServices/CoreServices.h>
 typedef Handle WHandle;
+typedef void *MHandle;
 #else
 #error Platform not supported!
 #endif
@@ -141,20 +143,12 @@ public:
 
 protected:
 
-#if FLEXT_OS == FLEXT_OS_WIN
-	typedef HMODULE Handle;
-#elif FLEXT_OS == FLEXT_OS_MAC
-	typedef void *Handle;
-#else
-#error Platform not supported
-#endif
-
-	Handle h_dll;
+	MHandle h_dll;
     WHandle hwnd;
 
 	AEffect *_pEffect;
 
-    static void FreeVST(Handle handle);
+    static void FreeVST(MHandle handle);
 
     inline long GetFlags() const { return _pEffect?_pEffect->flags:0; } 
     inline bool HasFlags(long msk) const { return _pEffect && (_pEffect->flags&msk); } 

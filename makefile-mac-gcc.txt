@@ -1,0 +1,9 @@
+# usage:
+# to build run "sh build-mac-max-gcc.sh" or "sh build-mac-pd-gcc.sh"
+#
+
+# includes
+INCPATH=-I$(VSTSDKPATH)/source/common
+
+# multithreaded build
+THREADED=1

@@ -1,5 +1,3 @@
-# Makefile for MSVC++ 6 and 7
-#
 # usage:
 # to build run "build-max-msvc.bat" or "build-pd-msvc.bat"
 #

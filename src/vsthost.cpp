@@ -28,7 +28,7 @@ VSTPlugin::~VSTPlugin()
 	Free();				// Call free
 }
  
-void VSTPlugin::FreeVST(Handle handle)
+void VSTPlugin::FreeVST(MHandle handle)
 {
 #if FLEXT_OS == FLEXT_OS_WIN
     FreeLibrary(handle); 
