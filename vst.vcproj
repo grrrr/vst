@@ -84,7 +84,7 @@
 			OutputDirectory=".\pd-msvc/d"
 			IntermediateDirectory=".\pd-msvc/d"
 			ConfigurationType="2"
-			UseOfMFC="2"
+			UseOfMFC="1"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
@@ -93,7 +93,7 @@
 				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				BrowseInformation="1"
 				WarningLevel="3"

@@ -338,13 +338,13 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 			else return 1;
 		}
 		return 0;	// inquire if an input or output is beeing connected;
-
+/*
 	case audioMasterWantMidi:			
 		return 0;
 
 	case audioMasterProcessEvents:		
 		return 0; 	// Support of vst events to host is not available
-
+*/
 	case audioMasterGetTime:
 		memset(&_timeInfo, 0, sizeof(_timeInfo));
 		_timeInfo.samplePos = 0;
