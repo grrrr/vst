@@ -154,10 +154,14 @@ private:
     FLEXT_CALLGET_S(mg_plugdll)
     FLEXT_CALLGET_I(mg_plugversion)
     FLEXT_CALLGET_B(mg_issynth)
+
+    static const t_symbol *sym_progname,*sym_pname,*sym_param,*sym_ptext;
 };
 
 FLEXT_NEW_DSP_V("vst~",vst);
 
+
+const t_symbol *vst::sym_progname,*vst::sym_pname,*vst::sym_param,*vst::sym_ptext;
 
 V vst::Setup(t_classid c)
 {
@@ -208,6 +212,11 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDATTR_GET(c,"dll",mg_plugdll);
 	FLEXT_CADDATTR_GET(c,"version",mg_plugversion);
 	FLEXT_CADDATTR_GET(c,"synth",mg_issynth);
+
+    sym_progname = MakeSymbol("progname");
+    sym_pname = MakeSymbol("pname");
+    sym_param = MakeSymbol("param");
+    sym_ptext = MakeSymbol("ptext");
 
     SetupEditor();
 }
@@ -584,7 +593,7 @@ void vst::mg_progname(int argc,const t_atom *argv) const
             SetInt(at[0],cat);
             SetInt(at[1],pnum);
             SetString(at[2],str);
-	        ToOutAnything(GetOutAttr(),MakeSymbol("progname"),3,at);
+	        ToOutAnything(GetOutAttr(),sym_progname,3,at);
         }
         else 
             post("%s - Syntax: %s [category] program",thisName(),GetString(thisTag()));
@@ -721,7 +730,7 @@ V vst::m_pname(I pnum)
     A at[2];
     SetInt(at[0],pnum);
     SetString(at[1],name);
-	ToOutAnything(GetOutAttr(),MakeSymbol("pname"),2,at);
+	ToOutAnything(GetOutAttr(),sym_pname,2,at);
 }
 
 // set the value of a parameter
@@ -766,7 +775,7 @@ V vst::mg_param(I pnum)
     A at[2];
     SetInt(at[0],pnum);
     SetFloat(at[1],plug->GetParamValue(pnum));
-	ToOutAnything(GetOutAttr(),MakeSymbol("param"),2,at);
+	ToOutAnything(GetOutAttr(),sym_param,2,at);
 }
 
 V vst::mg_params(int argc,const t_atom *argv)
@@ -798,7 +807,7 @@ V vst::m_ptext(I pnum)
     A at[2];
     SetInt(at[0],pnum);
     SetString(at[1],display);
-	ToOutAnything(GetOutAttr(),MakeSymbol("ptext"),2,at);
+	ToOutAnything(GetOutAttr(),sym_ptext,2,at);
 }
 
 V vst::m_ptexts(int argc,const t_atom *argv)

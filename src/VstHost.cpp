@@ -138,17 +138,19 @@ void VSTPlugin::Free() // Called also in destruction
 
 void VSTPlugin::DspInit(float samplerate,int blocksize)
 {
-//	sample_rate = samplerate;
-
-    Dispatch(effMainsChanged,  0, 1);
+    // sample rate and block size must _first_ be set
 	Dispatch(effSetSampleRate, 0, 0,NULL,samplerate);
 	Dispatch(effSetBlockSize,  0, blocksize);
+    // than signal that mains have changed!
+    Dispatch(effMainsChanged,  0, 1);
 }
 
 static void striptrail(char *txt)
 {
     // strip trailing whitespace
-    for(int i = strlen(txt)-1; i >= 0; --i) if(isspace(txt[i])) txt[i] = 0;
+    for(int i = strlen(txt)-1; i >= 0; --i) 
+        // cast to unsigned char since isspace functions don't want characters like 0x80 = -128
+        if(isspace(((unsigned char *)txt)[i])) txt[i] = 0;
 }
 
 void VSTPlugin::GetParamName(int numparam,char *name) const

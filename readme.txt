@@ -64,3 +64,4 @@ BUGS:
 
 TODO:
 - do name scanning in the background
+- translate special characters in strings (like ° as param_label) into system-digestible form
