@@ -1,7 +1,7 @@
-# FFTease - A set of Live Spectral Processors
-# Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
+# vst~ - VST plugin external for PD
+# based on the work of Jarno Seppänen and Mark Williamson
 # 
-# Copyright (c)Thomas Grill (xovo@gmx.net)
+# Copyright (c) Thomas Grill (xovo@gmx.net)
 # For information on usage and redistribution, and for a DISCLAIMER OF ALL
 # WARRANTIES, see the file, "license.txt," in this distribution.  
 #
@@ -16,13 +16,14 @@
 
 # includes
 INCPATH=/I"$(MSVCPATH)\include" /I"$(MSVCPATH)\mfc\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)"
-LIBPATH=/LIBPATH:"$(MSVCPATH)\lib" /LIBPATH:"$(MSVCPATH)\mfc\lib" /LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)"
-LIBS=pd.lib pthreadVC.lib flext_t-pdwin.lib 
+LIBPATH=/LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)" /LIBPATH:"$(MSVCPATH)\lib" /LIBPATH:"$(MSVCPATH)\mfc\lib" 
+LIBS=pd.lib pthreadVC.lib flext_t-pdwin.lib # DelayImp.lib
 
 # compiler definitions and flags
-DEFS=/DFLEXT_SYS=2 /DFLEXT_THREADS
+DEFS=/D_USRDLL /D_WINDLL /D_MBCS /DFLEXT_SYS=2 /DFLEXT_THREADS
 
-CFLAGS=/GR- /GX- /GD /G6 /Ox /MT
+CFLAGS=/G6 /Ox /MT /EHsc 
+# LDFLAGS=/DELAYLOAD:OleAcc.dll
 
 # the rest can stay untouched
 # ----------------------------------------------
@@ -60,7 +61,7 @@ $(OUTPATH):
 
 $(OUTPATH)\$(NAME).dll: $(OBJS)
 	cd $(OUTPATH)
-	link /DLL /out:$(NAME).dll /INCREMENTAL:NO $** $(LIBS) $(LIBPATH)
+	link /DLL $(LDFLAGS) /out:$(NAME).dll /INCREMENTAL:NO $** $(LIBS) $(LIBPATH)
 	@-del *.exp
 	@-del *.lib
 	cd ..
