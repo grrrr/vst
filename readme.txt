@@ -1,35 +1,39 @@
 vst~ - VST plugin external for PD
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003-04 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-05 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 Donations for further development of the package are highly appreciated.
-Visit https://www.paypal.com/xclick/business=t.grill%40gmx.net&item_name=vst&no_note=1&tax=0&currency_code=EUR
+Visit https://www.paypal.com/xclick/business=gr%40grrrr.org&item_name=vst&no_note=1&tax=0&currency_code=EUR
 
 ----------------------------------------------------------------------------
+
+BUILDING from source
+--------------------
 
 You will need the flext C++ layer for PD and Max/MSP externals to compile this.
-see http://www.parasitaere-kapazitaeten.net/ext
-
-----------------------------------------------------------------------------
-
-
-BUILDING:
-=========
+See http://grrrr.org/ext/flext
+Download, install and compile the package.
+Afterwards you can proceed with building this external.
 
 
-pd - Windows:
--------------
-o Microsoft Visual C++ 6 or 7 (.NET): edit "config-pd-msvc.txt" & run "build-pd-msvc.bat"
+pd/Max - Windows - Microsoft Visual C, Borland C++, MinGW:
+----------------------------------------------------------
+Start a command shell with your eventual build environment
+(e.g. run vcvars32.bat for Microsoft Visual Studio)
+
+then run
+ ..\flext\build.bat
+(you would have to substitute ..\flext with the respective path to the flext package)
 
 
-NOT YET:
-
-pd - darwin (MacOSX):
----------------------
-o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
+pd/Max - OSX/Linux - GCC:
+-------------------------
+From a shell run
+bash ../flext/build.sh
+(you would have to substitute ../flext with the respective path to the flext package)
 
 
 ----------------------------------------------------------------------------
