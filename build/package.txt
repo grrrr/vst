@@ -1,0 +1,11 @@
+NAME=vst~
+
+THREADED=1
+HAVECONFIG=1
+HAVEMAKE=1
+
+SRCDIR=src
+
+SRCS=main.cpp vsthost.cpp editor.cpp
+        
+HDRS=main.h vsthost.h editor.h editorwin.hpp editormac.hpp
