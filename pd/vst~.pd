@@ -1,4 +1,4 @@
-#N canvas 75 40 856 638 12;
+#N canvas 108 26 862 644 12;
 #X obj 26 207 dac~;
 #X obj 26 107 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
@@ -8,12 +8,12 @@
 #X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 473 vis \$1;
-#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 389 edit \$1;
 #X msg 94 389 getedit;
 #X msg 89 473 getvis;
-#N canvas 367 122 534 441 info 0;
+#N canvas 367 122 538 445 info 0;
 #X msg 94 130 getversion;
 #X msg 94 75 getname;
 #X msg 95 153 getvendor;
@@ -129,6 +129,25 @@
 #X obj 28 252 bng 15 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
 -1;
 #X obj 27 271 openpanel;
+#N canvas 0 0 456 306 midi 0;
+#X obj 20 249 s \$0-vst;
+#X msg 32 66 note 10 100;
+#X msg 61 118 ctlchg 3 123;
+#X msg 81 144 pbend 1000;
+#X text 128 65 note on;
+#X msg 49 90 note 10 0;
+#X text 145 89 note off;
+#X text 171 117 control change;
+#X text 173 142 pitch bend;
+#X text 173 170 program change;
+#X msg 91 171 progchg 2;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 5 0 0 0;
+#X connect 10 0 0 0;
+#X restore 25 581 pd midi;
+#X text 93 582 midi messages for vst synths;
 #X connect 1 0 48 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;

@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <direct.h>
 #include <io.h>
 
-#define VST_VERSION "0.1.0pre3"
+#define VST_VERSION "0.1.0pre4"
 
 #if 0
 /* ----- MFC stuff ------------- */
@@ -168,10 +168,10 @@ V vst::Setup(t_classid c)
 
 	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
 //	FLEXT_CADDMETHOD_2(c,0,"control",m_control,t_symptr,int);
-	FLEXT_CADDMETHOD_(c,0,"pitchbend",m_pitchbend);
-	FLEXT_CADDMETHOD_II(c,0,"ctrlchange",m_ctrlchange);
+	FLEXT_CADDMETHOD_(c,0,"pbend",m_pitchbend);
+	FLEXT_CADDMETHOD_II(c,0,"ctlchg",m_ctrlchange);
 
-	FLEXT_CADDMETHOD_(c,0,"programchange",m_programchange);
+	FLEXT_CADDMETHOD_(c,0,"progchg",m_programchange);
 	FLEXT_CADDATTR_VAR(c,"program",mg_program,ms_program);
 
 	FLEXT_CADDMETHOD_2(c,0,"param",ms_param,int,float);
