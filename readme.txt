@@ -46,8 +46,8 @@ Version history:
 - fixed crash on destroying vst~ with open editor window
 - stripped all MFC code
 - fixed DSP initialization, zero dangling audio vectors
-- added "bypass" and "mute" attributes
-- with flext 4.7 no more interruptions on window close
+- pre12: added "bypass" and "mute" attributes
+- pre13: with flext 0.4.7 no more interruptions on window close
 
 0.0.0:
 - version of mark@junklight.com
@@ -60,6 +60,7 @@ features:
 
 BUGS:
 - Waveshell crashes on load
+- mouse interaction in editor can cause audio dropouts
 
 TODO:
 - do name scanning in the background
