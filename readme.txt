@@ -49,6 +49,8 @@ Version history:
 - plugin can be changed with plug attribute
 - fixed crash on destroying vst~ with open editor window
 - stripped all MFC code
+- fixed DSP initialization, zero dangling audio vectors
+- added "bypass" and "mute" attributes
 
 0.0.0:
 - version of mark@junklight.com

@@ -20,7 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 using namespace std;
 
 
-#define VST_VERSION "0.1.0pre11"
+#define VST_VERSION "0.1.0pre12"
 
 
 class vst:
@@ -57,9 +57,9 @@ protected:
     V mg_params(I &p) const { p = plug?plug->GetNumParams():0; }
     V mg_programs(I &p) const { p = plug?plug->GetNumPrograms():0; }
     V mg_progcats(I &p) const { p = plug?plug->GetNumCategories():0; }
-    V mg_plugname(const S *&s) const { s = MakeSymbol(plug?plug->GetName():""); }
-    V mg_plugvendor(const S *&s) const { s = MakeSymbol(plug?plug->GetVendorName():""); }
-    V mg_plugdll(const S *&s) const { s = MakeSymbol(plug?plug->GetDllName():""); }
+    V mg_plugname(const S *&s) const { s = plug?MakeSymbol(plug->GetName()):sym__; }
+    V mg_plugvendor(const S *&s) const { s = plug?MakeSymbol(plug->GetVendorName()):sym__; }
+    V mg_plugdll(const S *&s) const { s = plug?MakeSymbol(plug->GetDllName()):sym__; }
     V mg_plugversion(I &v) const { v = plug?plug->GetVersion():0; }
     V mg_issynth(BL &s) const { s = plug && plug->IsSynth(); }
 
@@ -86,7 +86,7 @@ private:
 
     VSTPlugin *plug;
     string plugname;
-    BL echoparam,visible;
+    BL echoparam,visible,bypass,mute;
 
     I blsz;
     V (VSTPlugin::*vstfun)(R **insigs,R **outsigs,L n);
@@ -95,9 +95,11 @@ private:
 
     V InitPlug();
     V ClearPlug();
+    V InitPlugDSP();
     V InitBuf();
     V ClearBuf();
-	static V Setup(t_classid);
+
+    static V Setup(t_classid);
 	
 
     FLEXT_CALLBACK_V(m_print)
@@ -107,6 +109,8 @@ private:
     FLEXT_CALLVAR_B(mg_edit,ms_edit)
     FLEXT_CALLGET_B(mg_editor)
     FLEXT_CALLVAR_B(mg_vis,ms_vis)
+    FLEXT_ATTRVAR_B(bypass)
+    FLEXT_ATTRVAR_B(mute)
 
 //    FLEXT_CALLBACK_2(m_control,t_symptr,int)
     FLEXT_CALLBACK_I(m_pitchbend)
@@ -153,6 +157,8 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDATTR_VAR(c,"edit",mg_edit,ms_edit);
 	FLEXT_CADDATTR_GET(c,"editor",mg_editor);
 	FLEXT_CADDATTR_VAR(c,"vis",mg_vis,ms_vis);
+	FLEXT_CADDATTR_VAR1(c,"bypass",bypass);
+	FLEXT_CADDATTR_VAR1(c,"mute",mute);
 	FLEXT_CADDMETHOD_(c,0,"print",m_print);
 
 	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
@@ -193,7 +199,7 @@ vst::vst(I argc,const A *argv):
     plug(NULL),visible(false),
     blsz(0),
     vstfun(NULL),vstin(NULL),vstout(NULL),tmpin(NULL),tmpout(NULL),
-    echoparam(false)
+    echoparam(false),bypass(false),mute(false)
 {
     if(argc >= 2 && CanbeInt(argv[0]) && CanbeInt(argv[1])) {
 	    AddInSignal(GetAInt(argv[0]));
@@ -201,10 +207,8 @@ vst::vst(I argc,const A *argv):
 
         if(argc >= 3 && !ms_plug(argc-2,argv+2)) InitProblem();
     }
-    else {
-        post("%s - syntax: vst~ inputs outputs [plug]",thisName());
-        InitProblem();
-    }
+    else
+        throw "syntax: vst~ inputs outputs [plug]";
 }
 
 vst::~vst()
@@ -227,8 +231,17 @@ V vst::InitPlug()
 
 	vstfun = plug->IsReplacing()?VSTPlugin::processReplacing:VSTPlugin::process;
     sigmatch = plug->GetNumInputs() == CntInSig() && plug->GetNumOutputs() == CntOutSig();
+    InitPlugDSP();
 
     InitBuf();
+}
+
+V vst::InitPlugDSP()
+{
+    FLEXT_ASSERT(plug);
+    // this might be invalid if DSP is switched off, 
+    // but the plug will get updated settings with m_dsp later
+    plug->DspInit(Samplerate(),Blocksize());
 }
 
 V vst::ClearBuf()
@@ -399,8 +412,9 @@ BL vst::ms_plug(I argc,const A *argv)
 V vst::m_dsp(I n,t_signalvec const *,t_signalvec const *)
 {
     if(plug) {
-        plug->DspInit(Samplerate(),Blocksize());
         FLEXT_ASSERT(vstfun);
+
+        InitPlugDSP();
 
         if(blsz != Blocksize()) {
             blsz = Blocksize();
@@ -412,7 +426,19 @@ V vst::m_dsp(I n,t_signalvec const *,t_signalvec const *)
 
 V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 {
-    if(plug) {
+    if(mute)
+        flext_dsp::m_signal(n,insigs,outsigs);
+    else if(bypass) {
+        // copy as many channels as possible and zero dangling ones
+
+        int i,mx = CntInSig();
+        if(mx > CntOutSig()) mx = CntOutSig();
+        for(i = 0; i < mx; ++i)
+            CopySamples(outsigs[i],insigs[i],n);
+        for(; i < CntOutSig(); ++i)
+            ZeroSamples(outsigs[i],n);
+    }
+    else if(plug) {
         const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
 
         if(sigmatch)
@@ -448,6 +474,10 @@ V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 
             if(more) {
                 // according to mode set dangling output vectors
+
+                // currently simply clear them....
+                for(int i = outputs; i < CntOutSig(); ++i)
+                    ZeroSamples(outsigs[i],n);
             }
         }
     }

@@ -1,4 +1,4 @@
-#N canvas 123 23 868 653 12;
+#N canvas 118 11 818 647 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
@@ -68,7 +68,7 @@
 #X msg 543 190 getparam 2;
 #X msg 105 295 getplug;
 #X obj 26 323 s \$0-vst;
-#X text 175 294 set/get plugin;
+#X text 65 249 set/get plugin;
 #X text 480 561 further information;
 #X obj 23 15 cnv 15 700 58 empty empty vst~ 10 32 0 24 -260818 -1 0
 ;
@@ -129,34 +129,42 @@
 #X obj 27 240 bng 25 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
 -1;
 #X obj 27 271 openpanel;
-#N canvas 0 0 462 312 midi 0;
+#N canvas 461 281 486 331 midi 0;
 #X obj 20 279 s \$0-vst;
-#X msg 20 29 note 10 100;
-#X msg 156 105 ctlchg 3 123;
+#X msg 238 147 ctlchg 3 123;
 #X text 116 28 note on;
-#X msg 36 59 note 10 0;
-#X text 212 58 note off;
-#X text 266 104 control change;
-#X text 230 191 pitch bend;
-#X text 237 132 program change;
-#X msg 155 133 progchg 2;
-#X msg 122 59 noteoff 10;
-#X text 233 240 after touch;
-#X obj 156 171 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+#X text 287 29 note off;
+#X text 348 146 control change;
+#X text 312 233 pitch bend;
+#X text 319 174 program change;
+#X msg 237 175 progchg 2;
+#X msg 197 30 noteoff 10;
+#X text 315 282 after touch;
+#X obj 238 213 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
 10 -262144 -1 -1 0 256;
-#X obj 156 222 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+#X obj 238 264 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
 10 -262144 -1 -1 0 256;
-#X msg 155 191 pbend \$1;
-#X msg 154 241 atouch \$1;
+#X msg 237 233 pbend \$1;
+#X msg 236 283 atouch \$1;
+#X obj 35 71 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X msg 20 29 note 10 100;
+#X msg 36 94 note \$1 100;
+#X msg 193 94 noteoff \$1;
+#X obj 194 72 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -262144 -1 -1 0 256;
 #X connect 1 0 0 0;
-#X connect 2 0 0 0;
-#X connect 4 0 0 0;
-#X connect 9 0 0 0;
-#X connect 10 0 0 0;
-#X connect 12 0 14 0;
-#X connect 13 0 15 0;
-#X connect 14 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
+#X connect 10 0 12 0;
+#X connect 11 0 13 0;
+#X connect 12 0 0 0;
+#X connect 13 0 0 0;
+#X connect 14 0 16 0;
 #X connect 15 0 0 0;
+#X connect 16 0 0 0;
+#X connect 17 0 0 0;
+#X connect 18 0 17 0;
 #X restore 25 581 pd midi;
 #X text 93 582 midi messages for vst synths;
 #X msg 414 442 getprogcats;
@@ -165,6 +173,20 @@
 ;
 #X text 133 14 VST plugins for PD \, (C)2003-04 Thomas Grill;
 #X obj 26 140 vst~ 1 2;
+#X obj 685 548 loadbang;
+#X msg 685 575 \; pd dsp 1;
+#X obj 233 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
+1;
+#X obj 231 416 s \$0-vst;
+#X msg 232 389 bypass \$1;
+#X msg 314 389 getbypass;
+#X text 258 366 bypass plugin;
+#X obj 237 264 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+1;
+#X obj 235 313 s \$0-vst;
+#X text 262 263 mute output;
+#X msg 236 286 mute \$1;
+#X msg 318 286 getmute;
 #X connect 1 0 56 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
@@ -193,3 +215,10 @@
 #X connect 56 0 0 0;
 #X connect 56 1 0 1;
 #X connect 56 2 4 0;
+#X connect 57 0 58 0;
+#X connect 59 0 61 0;
+#X connect 61 0 60 0;
+#X connect 62 0 60 0;
+#X connect 64 0 67 0;
+#X connect 67 0 65 0;
+#X connect 68 0 65 0;

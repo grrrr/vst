@@ -133,7 +133,6 @@ void VSTPlugin::Free() // Called also in destruction
 		Dispatch(effMainsChanged, 0, 0);
 		Dispatch(effClose);
 
-//		delete _pEffect; // <-  Should check for the necessity of this command.
 		_pEffect = NULL;
         if(h_dll) { FreeLibrary(h_dll); h_dll = NULL; }
 	}
@@ -344,17 +343,26 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-#if 1 //def FLEXT_DEBUG
-    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
+#if 0
+    audioMasterEnum op = (audioMasterEnum)opcode;
+    audioMasterEnumx opx = (audioMasterEnumx)opcode;
+#endif
+
+#ifdef FLEXT_DEBUG
+//    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
 #endif
 
 	switch (opcode) {
     case audioMasterAutomate: // 0
+#ifdef FLEXT_DEBUG
+        post("Automate index=%li value=%li",index,value);
+#endif
 		// index, value given
 		//! \todo set effect parameter
         return 0;
     case audioMasterVersion: // 1
-        return 2;
+        // support VST 2.3
+        return 2300;
     case audioMasterCurrentId: // 2
         return 0;
 	case audioMasterIdle: // 3
@@ -363,12 +371,73 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 	case audioMasterPinConnected: // 4
 		//! \todo set connection state correctly (if possible..)
 		// index=pin, value=0..input, else..output
+#ifdef FLEXT_DEBUG
+        post("Pin connected pin=%li conn=%li",index,value);
+#endif
 		return 0; // 0 means connected
+	case audioMasterWantMidi: // 6
+#ifdef FLEXT_DEBUG
+        post("Want MIDI = %li",value);
+#endif
+		return 0; // VST header says: "currently ignored"
 	case audioMasterGetTime: // 7
+		return 0; // not supported
+    case audioMasterProcessEvents: { // 8
+        // VST event data from plugin
+        VstEvent *ev = static_cast<VstEvent *>(ptr);
+        if(ev->type == kVstMidiType) {
+            VstMidiEvent *mev = static_cast<VstMidiEvent *>(ptr);
+#ifdef FLEXT_DEBUG
+            if(mev->byteSize == 24)
+                post("MIDI event delta=%li len=%li offs=%li detune=%i offvel=%i",mev->deltaFrames,mev->noteLength,mev->noteOffset,(int)mev->detune,(int)mev->noteOffVelocity);
+            else
+                // has incorrect size
+                post("MIDI event");
+#endif
+        }
+        else {
+#ifdef FLEXT_DEBUG
+            post("VST event type=%li",ev->type);
+#endif
+        }
+		return 1;
+    }
+    case audioMasterSetTime: { // 9
+        VstTimeInfo *tminfo = static_cast<VstTimeInfo *>(ptr);
+#ifdef FLEXT_DEBUG
+        post("TimeInfo pos=%lf rate=%lf filter=%li",tminfo->samplePos,tminfo->sampleRate,value);
+#endif
+        return 0; // not supported
+    }
+	case audioMasterTempoAt: // 10
 		return 0; // not supported
 	case audioMasterGetNumAutomatableParameters: // 11
 		return 0; // not supported
+    case audioMasterGetCurrentProcessLevel: // 23
+        // return thread state
+        return flext::GetThreadId() == flext::GetSysThreadId()?2:1;
+	case audioMasterGetVendorString: // 32
+		strcpy((char*)ptr,"grrrr.org");
+        return 0;
+	case audioMasterGetProductString: // 33
+		strcpy((char *)ptr,"vst~ host external");
+		return 0;
+	case audioMasterGetVendorVersion: // 34
+		return 100;
+	case audioMasterCanDo: // 37
+#ifdef FLEXT_DEBUG
+    	post("\taudioMasterCanDo PTR = %s",ptr);
+#endif
+		return 0; // not supported
+	case audioMasterGetLanguage: // 38
+		return kVstLangEnglish;
+	case audioMasterGetDirectory: // 41
+        // return full path of plugin
+		return 0; // not supported
     default:
+#ifdef FLEXT_DEBUG
+        post("Unknown opcode %li",opcode);
+#endif
         return 0;
     }
 }
