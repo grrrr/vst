@@ -22,6 +22,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #if FLEXT_OS == FLEXT_OS_WIN
 #include "stdafx.h"
+#else
+#error Platform not supported!
 #endif
 
 typedef void V;
