@@ -14,7 +14,7 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
+			Name="PD Release|Win32"
 			OutputDirectory=".\pd-msvc/r"
 			IntermediateDirectory=".\pd-msvc/r"
 			ConfigurationType="2"
@@ -28,16 +28,12 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
+				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\packs\pthreads,f:\prog\max\flext\source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\pd-msvc/r/vst.pch"
-				AssemblerListingLocation=".\pd-msvc/r/"
-				ObjectFile=".\pd-msvc/r/"
-				ProgramDataBaseFileName=".\pd-msvc/r/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				CompileAs="0"/>
@@ -45,11 +41,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_t-pdwin.lib pthreadVC.lib"
-				OutputFile="pd-msvc/vst~.dll"
+				AdditionalDependencies="pd.lib pthreadVC.lib"
+				OutputFile="./pd-msvc/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd\bin,f:\prog\max\flext\pd-msvc"
+				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin;f:\prog\packs\pthreads"
 				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
 				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/r/vst~.lib"
@@ -84,7 +80,7 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
+			Name="PD Debug|Win32"
 			OutputDirectory=".\pd-msvc/d"
 			IntermediateDirectory=".\pd-msvc/d"
 			ConfigurationType="2"
@@ -99,10 +95,6 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\pd-msvc/d/vst.pch"
-				AssemblerListingLocation=".\pd-msvc/d/"
-				ObjectFile=".\pd-msvc/d/"
-				ProgramDataBaseFileName=".\pd-msvc/d/"
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
@@ -112,7 +104,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_tdl-pdwin.lib pthreadVC.lib"
+				AdditionalDependencies="pd.lib  pthreadVC.lib"
 				OutputFile="pd-msvc/d/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -139,6 +131,73 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
+				Culture="3079"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="PD Shared Release|Win32"
+			OutputDirectory=".\pd-msvc/s"
+			IntermediateDirectory=".\pd-msvc/s"
+			ConfigurationType="2"
+			UseOfMFC="2"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\packs\pthreads,f:\prog\max\flext\source"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_SHARED"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="2"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="pd.lib pthreadVC.lib"
+				OutputFile="$(outdir)/vst~.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin;f:\prog\packs\pthreads"
+				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
+				OptimizeReferences="2"
+				ImportLibrary=".\pd-msvc/r/vst~.lib"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="TRUE"
+				SuppressStartupBanner="TRUE"
+				TargetEnvironment="1"
+				TypeLibraryName=".\pd-msvc/r/vst.tlb"
+				HeaderFileName=""/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
 				Culture="3079"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
@@ -180,7 +239,7 @@
 			<File
 				RelativePath="src\vst.cpp">
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="PD Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -189,7 +248,7 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="PD Debug|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -198,12 +257,21 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="src\vst~.cpp">
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="PD Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -212,7 +280,7 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="PD Debug|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -222,17 +290,32 @@
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="src\vst~.h">
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="PD Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="PD Debug|Win32"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCustomBuildTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32"
 					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCustomBuildTool"/>
@@ -248,7 +331,7 @@
 			<File
 				RelativePath="src\StdAfx.cpp">
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="PD Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
@@ -256,7 +339,7 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="PD Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
@@ -264,6 +347,14 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -276,7 +367,7 @@
 			<File
 				RelativePath="src\EditorThread.cpp">
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="PD Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
@@ -284,7 +375,7 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="PD Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
@@ -292,6 +383,14 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -300,7 +399,7 @@
 			<File
 				RelativePath="src\PopupWindow.cpp">
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="PD Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
@@ -308,7 +407,7 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="PD Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
@@ -317,6 +416,14 @@
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="src\PopupWindow.h">
@@ -324,14 +431,21 @@
 			<File
 				RelativePath="src\vst.rc">
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="PD Release|Win32">
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
 						AdditionalIncludeDirectories="src"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="PD Debug|Win32">
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="src"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32">
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
@@ -341,7 +455,7 @@
 			<File
 				RelativePath="src\VstHost.cpp">
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="PD Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
@@ -349,7 +463,7 @@
 						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="PD Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
@@ -357,6 +471,14 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="PD Shared Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -379,7 +501,7 @@
 		<File
 			RelativePath="src\main.cpp">
 			<FileConfiguration
-				Name="Release|Win32">
+				Name="PD Release|Win32">
 				<Tool
 					Name="VCCLCompilerTool"
 					Optimization="2"
@@ -387,7 +509,7 @@
 					PreprocessorDefinitions=""/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Debug|Win32">
+				Name="PD Debug|Win32">
 				<Tool
 					Name="VCCLCompilerTool"
 					Optimization="0"
@@ -395,6 +517,14 @@
 					PreprocessorDefinitions=""
 					BasicRuntimeChecks="3"
 					BrowseInformation="1"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="PD Shared Release|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					Optimization="2"
+					AdditionalIncludeDirectories=""
+					PreprocessorDefinitions=""/>
 			</FileConfiguration>
 		</File>
 		<File
