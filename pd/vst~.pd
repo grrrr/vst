@@ -1,4 +1,4 @@
-#N canvas 108 26 866 648 12;
+#N canvas 108 26 868 650 12;
 #X obj 26 207 dac~;
 #X obj 26 107 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
@@ -13,7 +13,7 @@
 #X msg 26 389 edit \$1;
 #X msg 94 389 getedit;
 #X msg 89 473 getvis;
-#N canvas 367 122 542 449 info 0;
+#N canvas 367 122 544 451 info 0;
 #X msg 94 130 getversion;
 #X msg 94 75 getname;
 #X msg 95 153 getvendor;
@@ -51,16 +51,16 @@
 #X connect 11 0 7 0;
 #X connect 19 0 7 0;
 #X connect 21 0 7 0;
-#X restore 414 537 pd info;
+#X restore 414 561 pd info;
 #X obj 96 109 r \$0-vst;
 #X obj 25 416 s \$0-vst;
 #X obj 25 499 s \$0-vst;
 #X text 52 366 display edit window;
 #X text 50 449 make edit window (in)visible;
 #X obj 413 353 s \$0-vst;
-#X obj 414 493 s \$0-vst;
-#X msg 443 447 program 2;
-#X msg 529 446 getprogram;
+#X obj 414 517 s \$0-vst;
+#X msg 443 471 program 2;
+#X msg 529 470 getprogram;
 #X msg 413 109 getparams;
 #X text 498 108 get number of parameters;
 #X text 509 414 get number of programs;
@@ -69,7 +69,7 @@
 #X msg 105 295 getplug;
 #X obj 26 323 s \$0-vst;
 #X text 175 294 set/get plugin;
-#X text 480 537 further information;
+#X text 480 561 further information;
 #X obj 23 15 cnv 15 550 58 empty empty vst~ 10 32 0 24 -260818 -1 0
 ;
 #X text 134 53 http://www.parasitaere-kapazitaeten.net;
@@ -123,7 +123,7 @@
 #X text 455 310 get value in textual representation;
 #X msg 440 283 getptext 2;
 #X text 466 211 set/get parameter (0-based);
-#X text 469 472 set/get program (0-based);
+#X text 469 496 set/get program (0-based);
 #X text 487 251 NOT IMPLEMENTED;
 #X text 544 270 NOT IMPLEMENTED;
 #X obj 26 153 vst~ 1 2 reson;
@@ -156,6 +156,8 @@
 #X connect 12 0 0 0;
 #X restore 25 581 pd midi;
 #X text 93 582 midi messages for vst synths;
+#X msg 414 442 getprogcats;
+#X text 509 439 get number of program categories;
 #X connect 1 0 48 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
@@ -183,3 +185,4 @@
 #X connect 50 0 27 0;
 #X connect 51 0 52 0;
 #X connect 52 0 50 0;
+#X connect 55 0 18 0;
