@@ -465,7 +465,7 @@ static std::string findFilePath(const std::string &path,const std::string &dllna
 }
 
 // \todo this should be in the background, because it can take some time
-// ideally vst would get a response from VSTPlugin when readily, loaded and
+// ideally vst would get a response from VSTPlugin when readily loaded and
 // vst would dump out a respective signal to the patcher
 bool vst::LoadPlug()
 {

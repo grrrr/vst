@@ -61,8 +61,11 @@ void VSTPlugin::Setup()
 }
 
 VSTPlugin::VSTPlugin(Responder *resp)
-    : hdll(NULL),hwnd(NULL)
-    , effect(NULL),pluginmain(NULL),audiomaster(NULL)
+    : effect(NULL),pluginmain(NULL),audiomaster(NULL)
+#if FLEXT_OS == FLEXT_OS_WIN
+    , hdll(NULL)
+#endif
+    , hwnd(NULL)
     , responder(resp)
     , posx(0),posy(0),sizex(0),sizey(0)
     , visible(true),caption(true),handle(false)
@@ -161,11 +164,12 @@ BadParameter:
 // must be NULL beforehand!
 bool VSTPlugin::NewPlugin(const char *plugname)
 {
-    FLEXT_ASSERT(!hdll && !pluginmain && !audiomaster);
+    FLEXT_ASSERT(!pluginmain && !audiomaster);
 
     dllname = plugname;
 
 #if FLEXT_OS == FLEXT_OS_WIN
+    FLEXT_ASSERT(!hdll);
     hdll = LoadLibrary(dllname.c_str());
     if(hdll) pluginmain = (PVSTMAIN)GetProcAddress(hdll,"main");
     audiomaster = Master;  
@@ -223,7 +227,7 @@ bool VSTPlugin::NewPlugin(const char *plugname)
 #error Platform not supported
 #endif    
 
-    if(hdll && pluginmain && audiomaster)
+    if(pluginmain && audiomaster)
         return true;
     else {
         FreePlugin();
@@ -234,7 +238,7 @@ bool VSTPlugin::NewPlugin(const char *plugname)
 void VSTPlugin::FreePlugin()
 {
 #if FLEXT_OS == FLEXT_OS_WIN
-    if(hdll) FreeLibrary(hdll); 
+    if(hdll) { FreeLibrary(hdll); hdll = NULL; }
 #elif FLEXT_OS == FLEXT_OS_MAC
 	
 #ifdef __MACOSX__
@@ -251,7 +255,6 @@ void VSTPlugin::FreePlugin()
     effect = NULL;
     audiomaster = NULL;
     pluginmain = NULL;
-    hdll = NULL;
 } 
 
 /*
@@ -274,7 +277,7 @@ bool VSTPlugin::InstPlugin(long plugid)
 
 	//This calls the "main" function and receives the pointer to the AEffect structure.
     try { effect = pluginmain(audiomaster); }
-    catch(exception &e) {
+    catch(std::exception &e) {
         flext::post("vst~ - caught exception while instantiating plugin: %s",e.what());
     }
     catch(...) {
@@ -379,7 +382,7 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
     }
 
     }
-    catch(exception &e) {
+    catch(std::exception &e) {
         flext::post("vst~ - caught exception while loading plugin: %s",e.what());
         ok = false;
     }
@@ -419,7 +422,7 @@ void VSTPlugin::DspInit(float sr,int blsz)
         // then signal that mains have changed!
         Dispatch(effMainsChanged,0,1);
     }
-    catch(exception &e) {
+    catch(std::exception &e) {
         flext::post("vst~ - caught exception while initializing dsp: %s",e.what());
     }
     catch(...) {

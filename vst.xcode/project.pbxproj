@@ -79,16 +79,21 @@
 		};
 		0867D691FE84028FC02AAC07 = {
 			children = (
+				E91C4A8207ECD9EA00062063,
+				E91C4A8307ECD9EA00062063,
+				E91C4A8407ECD9EA00062063,
+				E91C4A8507ECD9EA00062063,
+				E91C4A8607ECD9EA00062063,
+				E91C4A8707ECD9EA00062063,
+				E91C4A8807ECD9EA00062063,
+				E91C4A8907ECD9EA00062063,
 				E9304A5F07732F1F00EE7812,
 				E9E87848074674890035356B,
 				E9E87845074674560035356B,
 				E9E87713074673750035356B,
 				E9E87710074673590035356B,
-				E9C0C57707461746002B8D0A,
 				E9C0C57907461746002B8D0A,
 				E9C0C57A07461746002B8D0A,
-				E9C0C57B07461746002B8D0A,
-				E9C0C57C07461746002B8D0A,
 				034768DFFF38A50411DB9C8B,
 			);
 			isa = PBXGroup;
@@ -109,9 +114,10 @@
 		D2AAC0C305546C1D00DB518D = {
 			buildActionMask = 2147483647;
 			files = (
-				E9C0C57D07461746002B8D0A,
 				E9C0C58007461746002B8D0A,
-				E9C0C58207461746002B8D0A,
+				E91C4A8A07ECD9EA00062063,
+				E91C4A8B07ECD9EA00062063,
+				E91C4A8E07ECD9EA00062063,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -120,8 +126,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9C0C57F07461746002B8D0A,
-				E9C0C58107461746002B8D0A,
 				E9304A6007732F1F00EE7812,
+				E91C4A8C07ECD9EA00062063,
+				E91C4A8D07ECD9EA00062063,
+				E91C4A8F07ECD9EA00062063,
+				E91C4A9007ECD9EA00062063,
+				E91C4A9107ECD9EA00062063,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -153,10 +163,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = "FLEXT_SYS=2 FLEXT_SHARED";
-				HEADER_SEARCH_PATHS = "/Volumes/Daten/Prog/pdmax/flext/source /Volumes/Daten/Prog/packs/vstsdk2.3/source/common";
-				INSTALL_PATH = /usr/local/lib/flext;
+				HEADER_SEARCH_PATHS = "/usr/local/include/flext $PD/src /Volumes/Daten/Prog/packs/vstsdk2.3/source/common";
+				INSTALL_PATH = "";
 				LIBRARY_STYLE = BUNDLE;
-				OTHER_LDFLAGS = "-bundle_loader /usr/local/bin/pd";
+				OTHER_LDFLAGS = "-bundle_loader /Applications/audio/Pd-0.38-3.app/Contents/Resources/bin/pd";
 				PRODUCT_NAME = "vst~";
 				SKIP_INSTALL = YES;
 			};
@@ -186,6 +196,126 @@
 //E92
 //E93
 //E94
+		E91C4A8207ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = editor.h;
+			path = src/editor.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8307ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.h;
+			name = editormac.hpp;
+			path = src/editormac.hpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8407ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = vstedit.cpp;
+			path = src/vstedit.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8507ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = vsthost.cpp;
+			path = src/vsthost.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8607ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = vsthost.h;
+			path = src/vsthost.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8707ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = vstmaster.cpp;
+			path = src/vstmaster.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8807ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = vstmidi.cpp;
+			path = src/vstmidi.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8907ECD9EA00062063 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = vstparam.cpp;
+			path = src/vstparam.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E91C4A8A07ECD9EA00062063 = {
+			fileRef = E91C4A8207ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A8B07ECD9EA00062063 = {
+			fileRef = E91C4A8307ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A8C07ECD9EA00062063 = {
+			fileRef = E91C4A8407ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A8D07ECD9EA00062063 = {
+			fileRef = E91C4A8507ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A8E07ECD9EA00062063 = {
+			fileRef = E91C4A8607ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A8F07ECD9EA00062063 = {
+			fileRef = E91C4A8707ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A9007ECD9EA00062063 = {
+			fileRef = E91C4A8807ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E91C4A9107ECD9EA00062063 = {
+			fileRef = E91C4A8907ECD9EA00062063;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		E9304A5F07732F1F00EE7812 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -200,15 +330,6 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
-		};
-		E9C0C57707461746002B8D0A = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = Editor.h;
-			path = src/Editor.h;
-			refType = 4;
-			sourceTree = "<group>";
 		};
 		E9C0C57907461746002B8D0A = {
 			fileEncoding = 30;
@@ -228,30 +349,6 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		E9C0C57B07461746002B8D0A = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.cpp.cpp;
-			name = VstHost.cpp;
-			path = src/VstHost.cpp;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		E9C0C57C07461746002B8D0A = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			name = VstHost.h;
-			path = src/VstHost.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		E9C0C57D07461746002B8D0A = {
-			fileRef = E9C0C57707461746002B8D0A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		E9C0C57F07461746002B8D0A = {
 			fileRef = E9C0C57907461746002B8D0A;
 			isa = PBXBuildFile;
@@ -260,18 +357,6 @@
 		};
 		E9C0C58007461746002B8D0A = {
 			fileRef = E9C0C57A07461746002B8D0A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		E9C0C58107461746002B8D0A = {
-			fileRef = E9C0C57B07461746002B8D0A;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		E9C0C58207461746002B8D0A = {
-			fileRef = E9C0C57C07461746002B8D0A;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -307,8 +392,8 @@
 		E9E87845074674560035356B = {
 			isa = PBXFileReference;
 			lastKnownFileType = "compiled.mach-o.dylib";
-			name = libflext.dylib;
-			path = /usr/local/lib/libflext.dylib;
+			name = "libflext-pd.dylib";
+			path = "/usr/local/lib/libflext-pd.dylib";
 			refType = 0;
 			sourceTree = "<absolute>";
 		};

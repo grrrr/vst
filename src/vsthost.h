@@ -324,8 +324,10 @@ private:
     inline bool HasFlags(long msk) const { return effect && (effect->flags&msk); } 
 
 
+#if FLEXT_OS == FLEXT_OS_WIN
     // the handle to the shared library
 	MHandle hdll;
+#endif
     // the handle to the plugin editor window
     WHandle hwnd;
     // the VST plugin instance

@@ -47,9 +47,12 @@ void TitleEditor(VSTPlugin *p,const char *t)
 {
 }
 
-bool IsEditorShown(const VSTPlugin *p) 
+void HandleEditor(VSTPlugin *p,bool h)
 {
-    return false;
+}
+
+void FrontEditor(VSTPlugin *p)
+{
 }
 
 #endif // FLEXT_OS_MAC
