@@ -1,10 +1,10 @@
-#N canvas 112 28 897 564 12;
+#N canvas 112 28 901 568 12;
 #X obj 26 94 noise~;
 #X obj 229 194 print A;
 #X obj 443 431 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X msg 442 453 vis \$1;
-#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
+#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;
 #X msg 230 452 edit \$1;
 #X msg 298 452 getedit;
@@ -289,7 +289,7 @@ ctlchg \, progchg \, pbend;
 #X text 443 319 Attention: this vst~ version will crash when a plugin
 is unloaded with the editor window open!;
 #X msg 52 440 subplug X-Noise;
-#N canvas 0 0 462 312 out 0;
+#N canvas 0 0 466 316 out 0;
 #X obj 79 164 *~;
 #X obj 79 194 dac~ 1 2 3 4;
 #X obj 109 164 *~;
@@ -318,7 +318,7 @@ is unloaded with the editor window open!;
 #X connect 11 0 10 0;
 #X restore 26 197 pd out;
 #X obj 72 180 hsl 128 15 0.001 1 1 1 empty empty gain -2 -6 0 8 -261689
--1 -1 3800 1;
+-1 -1 4100 1;
 #N canvas 105 36 490 647 seq 0;
 #X obj 17 225 s \$0-vst;
 #X msg 112 78 samplepos \$1;
