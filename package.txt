@@ -1,7 +1,5 @@
 NAME=vst~
 
-BUILDCLASS=ext
-BUILDMODE=release
 BUILDTYPE=multi
 
 BUILDDIR=build
