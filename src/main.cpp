@@ -58,6 +58,7 @@ protected:
 
     V ms_edit(BL on);
     V mg_edit(BL &ed) { ed = plug && plug->Edited(); }
+    V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
     V ms_vis(BL vis);
 
     V mg_winx(I &x) const { x = plug?plug->getX():0; }
@@ -115,6 +116,7 @@ private:
     FLEXT_CALLVAR_V(mg_plug,ms_plug)
 
     FLEXT_CALLVAR_B(mg_edit,ms_edit)
+    FLEXT_CALLGET_B(mg_editor)
     FLEXT_CALLSET_B(ms_vis)
     FLEXT_ATTRGET_B(visible)
 
@@ -163,6 +165,7 @@ V vst::Setup(t_classid c)
 
 	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);
 	FLEXT_CADDATTR_VAR(c,"edit",mg_edit,ms_edit);
+	FLEXT_CADDATTR_GET(c,"editor",mg_editor);
 	FLEXT_CADDATTR_VAR(c,"vis",visible,ms_vis);
 	FLEXT_CADDMETHOD_(c,0,"print",m_print);
 

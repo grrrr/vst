@@ -33,7 +33,6 @@ public:
 	void AddProgramChange( int value );
 	void AddPitchBend( int value );
 	void AddAftertouch( int value );
-	bool editor;
 	bool ShowParams();
 	void SetShowParameters( bool s);
 	void OnEditorClose();
@@ -89,6 +88,7 @@ public:
 	int GetCurrentProgram();
 	int NumPrograms() { return _pEffect->numPrograms; }
 	bool IsSynth() { return _isSynth; }
+	bool HasEditor() const { return _editor; }
 
 	bool AddMIDI(unsigned char data0,unsigned char data1=0,unsigned char data2=0);
 	void SendMidi();
@@ -133,7 +133,7 @@ protected:
 	char _sVendorName[64];
 	char *_sDllName;	// Contains dll name
 	ULONG _version;
-	bool _isSynth;
+	bool _isSynth,_editor;
 
 	float * inputs[MAX_INOUTS];
 	float * outputs[MAX_INOUTS];

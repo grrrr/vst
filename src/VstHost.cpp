@@ -17,7 +17,8 @@ extern "C" void post(char *fmt, ...);
 //
 /////////////////////
 VSTPlugin::VSTPlugin():
-    posx(0),posy(0)
+    posx(0),posy(0),
+    _editor(false)
 {
 	queue_size=0;
 	_sDllName = NULL;
@@ -114,7 +115,7 @@ int VSTPlugin::Instance( const char *dllname)
 	_version = _pEffect->version;
 	_isSynth = (_pEffect->flags & effFlagsIsSynth)?true:false;
 	overwrite = (_pEffect->flags & effFlagsCanReplacing)?true:false;
-	editor = (_pEffect->flags & effFlagsHasEditor)?true:false;
+	_editor = (_pEffect->flags & effFlagsHasEditor)?true:false;
 
 	if ( _sDllName != NULL ) delete _sDllName;
 	_sDllName = new char[strlen(dllname)+1];
@@ -478,7 +479,7 @@ void VSTPlugin::edit(bool open)
 {	
 	if(instantiated) { 	
         if(open) {
-		    if ( editor && !edited) {			
+		    if ( HasEditor() && !edited) {			
 			    edited = true;
 			    b =  new CEditorThread();	
 			    b->SetPlugin( this);
@@ -486,7 +487,7 @@ void VSTPlugin::edit(bool open)
 		    }
         }
         else {
-            if (editor && edited) b->Close();
+            if (HasEditor() && edited) b->Close();
         }
 	}
 }
