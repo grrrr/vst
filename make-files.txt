@@ -1,7 +1,7 @@
 # all the source files from the package
-SRCS= \
-	main.cpp
+SRCS= main.cpp
+SRCS_WIN=EditorThread.cpp PopupWindow.cpp VstHost.cpp StdAfx.cpp
               
 HDRS= \
-	main.h vst~.h 
+	main.h vst.h 
 

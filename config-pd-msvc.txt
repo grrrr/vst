@@ -1,25 +1,50 @@
-# FFTease - A set of Live Spectral Processors
-# Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
-# 
+# vst~ - VST plugin external for PD
+
+# based on the work of Jarno Seppänen and Mark Williamson
+
+#
+
 # Copyright (c)Thomas Grill (xovo@gmx.net)
+
 # For information on usage and redistribution, and for a DISCLAIMER OF ALL
+
 # WARRANTIES, see the file, "license.txt," in this distribution.  
+
 #
 
 
+
+
+
 # where is PD?
+
 PDPATH=c:\programme\audio\pd		
 
+
+
 # where do the flext libraries reside?
+
 FLEXTPATH=$(PDPATH)\flext
 
+
+
 # where is MS VC++?
+
 MSVCPATH=c:\programme\prog\microsoft visual studio\VC98
 
 
+
+
+
 # where should the external be built?
+
 OUTPATH=pd-msvc
 
+
+
 # where should the external be installed?
+
 # (leave blank to omit installation)
+
 INSTDIR=$(PDPATH)\extra
+
