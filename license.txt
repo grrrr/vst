@@ -1,6 +1,6 @@
 vst~ - VST plugin object for PD
 based on the work of Jarno Seppänen and Mark Williamson
-Copyright (C) 2003 Thomas Grill
+Copyright (C) 2003-2005 Thomas Grill
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -52,7 +52,7 @@ syntax
 
 --- flext ----------------------------------------------
 flext - C++ layer for Max/MSP and pd (pure data) externals
-Copyright (C) 2001-2003 Thomas Grill
+Copyright (C) 2001-2005 Thomas Grill
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

@@ -38,7 +38,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             plug->StartEditing(hwnd);
             break; 
         case WM_CLOSE:
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
             flext::post("WM_CLOSE");
 #endif
             // plug could already have been unloaded...
@@ -46,7 +46,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             DestroyWindow(hwnd);
             break; 
         case WM_DESTROY: 
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
             flext::post("WM_DESTROY");
 #endif
             // stop editor thread
@@ -66,7 +66,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             short x = reinterpret_cast<short &>(wx),y = reinterpret_cast<short &>(wy);
             // x and y are the coordinates of the client rect (= actual VST interface)
             plug->SetPos(x,y,false);
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
             flext::post("WM_MOVE x/y=%i/%i",x,y);
 #endif
             break; 
@@ -87,7 +87,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
         }
 #endif
 
-#if 0 //def FLEXT_DEBUG
+#if 0 //def FLEXT_LOGGING
         case WM_SIZE: {
             WORD wx = LOWORD(lp),wy = HIWORD(lp);
             short x = reinterpret_cast<short &>(wx),y = reinterpret_cast<short &>(wy);
@@ -98,7 +98,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 #endif
 
         default: 
-        #ifdef FLEXT_DEBUG
+        #ifdef FLEXT_LOGGING
             flext::post("WND MSG %i, WP=%i, lp=%i",msg,wp,lp);
         #endif
 
@@ -169,7 +169,7 @@ static void threadfun(flext::thr_params *p)
 	    ERect r;
         plug->GetEditorRect(r);
         windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,plug->GetCaption(),SWP_SHOWWINDOW);
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
         flext::post("Editor rect left/top=%i/%i, right/bottom=%i/%i",r.left,r.top,r.right,r.bottom);
 #endif
 
@@ -220,23 +220,23 @@ void SetupEditor()
 
 void StartEditor(VSTPlugin *p)
 {
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
     flext::post("Start editor 1");
 #endif
     flext::LaunchThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
     flext::post("Start editor 2");
 #endif
 }
 
 void StopEditor(VSTPlugin *p) 
 {
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
     flext::post("Stop editor 1");
 #endif
     PostMessage(p->EditorHandle(),WM_CLOSE,0,0); 
     flext::StopThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
-#ifdef FLEXT_DEBUG
+#ifdef FLEXT_LOGGING
     flext::post("Stop editor 2");
 #endif
 }

@@ -1,11 +1,11 @@
-#N canvas 146 124 833 559 12;
+#N canvas 146 124 841 567 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 140 192 print A;
-#X obj 443 431 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+#X obj 443 431 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X msg 442 453 vis \$1;
-#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X msg 230 452 edit \$1;
 #X msg 298 452 getedit;
@@ -227,12 +227,13 @@
 #X text 448 314 Attention: this vst~ version will crash when a plugin
 is unloaded with the editor window open!;
 #X text 133 14 VST plugins for PD \, (C)2003-05 Thomas Grill;
-#X msg 27 429 subplug AudioTrack;
-#X obj 27 479 s \$0-vst;
-#X msg 39 452 getsubplug;
+#X msg 47 413 subplug AudioTrack;
+#X obj 32 498 s \$0-vst;
+#X msg 54 468 getsubplug;
 #X obj 26 140 vst~ 2 2 @pnames 100;
-#X text 27 387 subplugin name for plugin shells;
 #X text 229 501 you can also alt-click on the vst~ object;
+#X msg 32 382 getpluglist;
+#X msg 52 440 subplug C4;
 #X connect 1 0 52 0;
 #X connect 1 0 52 1;
 #X connect 3 0 4 0;
@@ -258,3 +259,5 @@ is unloaded with the editor window open!;
 #X connect 52 0 0 0;
 #X connect 52 1 0 1;
 #X connect 52 2 2 0;
+#X connect 54 0 50 0;
+#X connect 55 0 50 0;

@@ -24,17 +24,5 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error Platform not supported!
 #endif
 
-typedef void V;
-typedef int I;
-typedef long L;
-typedef unsigned long UL;
-typedef float F;
-typedef t_sample R;
-typedef char C;
-typedef bool BL;
-typedef t_atom A;
-typedef t_symbol S;
-
-
 #endif
 

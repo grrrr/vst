@@ -87,7 +87,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;c:\data\prog\pd\pd-cvs\src&quot;;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0501,WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0501;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;xFLEXT_LOGGING"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
@@ -275,10 +275,22 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src\vstedit.cpp">
+			</File>
+			<File
 				RelativePath=".\src\vsthost.cpp">
 			</File>
 			<File
 				RelativePath=".\src\vsthost.h">
+			</File>
+			<File
+				RelativePath=".\src\vstmaster.cpp">
+			</File>
+			<File
+				RelativePath=".\src\vstmidi.cpp">
+			</File>
+			<File
+				RelativePath=".\src\vstparam.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -325,6 +337,9 @@
 		</File>
 		<File
 			RelativePath="src\main.h">
+		</File>
+		<File
+			RelativePath=".\src\resource.h">
 		</File>
 	</Files>
 	<Globals>
