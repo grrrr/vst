@@ -344,7 +344,11 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-    switch (opcode) {
+#if 1 //def FLEXT_DEBUG
+    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
+#endif
+
+	switch (opcode) {
     case audioMasterAutomate: // 0
 		// index, value given
 		//! \todo set effect parameter
@@ -362,10 +366,9 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 0; // 0 means connected
 	case audioMasterGetTime: // 7
 		return 0; // not supported
+	case audioMasterGetNumAutomatableParameters: // 11
+		return 0; // not supported
     default:
-#ifdef FLEXT_DEBUG
-    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
-#endif
         return 0;
     }
 }
