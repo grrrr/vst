@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <string>
 
 
-#define VST_VERSION "0.1.0pre14"
+#define VST_VERSION "0.1.0pre15"
 
 
 class vst:
@@ -50,6 +50,10 @@ protected:
     V mg_winy(I &y) const { y = plug?plug->GetY():0; }
     V ms_winx(I x) { if(plug) plug->SetX(x); }
     V ms_winy(I y) { if(plug) plug->SetY(y); }
+    V ms_wincaption(bool c) { if(plug) plug->SetCaption(c); }
+    V mg_wincaption(bool &c) const { c = plug && plug->GetCaption(); }
+    V ms_wintitle(const t_symbol *t) { if(plug) plug->SetTitle(GetString(t)); }
+    V mg_wintitle(const t_symbol *&t) const { t = plug?MakeSymbol(plug->GetTitle()):sym__; }
 
     V mg_chnsin(I &c) const { c = plug?plug->GetNumInputs():0; }
     V mg_chnsout(I &c) const { c = plug?plug->GetNumOutputs():0; }
@@ -143,6 +147,8 @@ private:
     FLEXT_ATTRVAR_B(echoparam)
     FLEXT_CALLVAR_I(mg_winx,ms_winx)
     FLEXT_CALLVAR_I(mg_winy,ms_winy)
+    FLEXT_CALLVAR_B(mg_wincaption,ms_wincaption)
+    FLEXT_CALLVAR_S(mg_wintitle,ms_wintitle)
 
     FLEXT_CALLGET_I(mg_chnsin)
     FLEXT_CALLGET_I(mg_chnsout)
@@ -201,6 +207,8 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDATTR_VAR1(c,"echo",echoparam);
     FLEXT_CADDATTR_VAR(c,"x",mg_winx,ms_winx);
 	FLEXT_CADDATTR_VAR(c,"y",mg_winy,ms_winy);
+	FLEXT_CADDATTR_VAR(c,"caption",mg_wincaption,ms_wincaption);
+	FLEXT_CADDATTR_VAR(c,"title",mg_wintitle,ms_wintitle);
 
     FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
 	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);

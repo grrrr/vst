@@ -130,6 +130,10 @@ public:
     void SetY(int y,bool upd = true) { SetPos(posx,y,upd); }
     int GetX() const { return posx; }
     int GetY() const { return posy; }
+    void SetCaption(bool b);
+    bool GetCaption() const { return caption; }
+    void SetTitle(const char *t);
+    const char *GetTitle() const { return title.c_str(); }
 
 protected:
 
@@ -175,7 +179,9 @@ protected:
 	void SendMidi();
 	char _midichannel;
 
-    int posx,posy;
+    int posx,posy; // Window position
+    bool caption; // Window border
+    std::string title; // Window title
 };
 
 #endif
