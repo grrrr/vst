@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <direct.h>
 #include <io.h>
 
-#define VST_VERSION "0.1.0pre5"
+#define VST_VERSION "0.1.0pre6"
 
 #if 0
 /* ----- MFC stuff ------------- */
@@ -233,6 +233,7 @@ vst::~vst()
 V vst::ClearPlug()
 {
     if(plug) {
+        ms_edit(false);
         ClearBuf();
         delete plug; plug = NULL;
     }

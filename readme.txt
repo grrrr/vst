@@ -23,6 +23,10 @@ pd - Windows:
 -------------
 o Microsoft Visual C++ 6: edit the project file "vst.dsp" & build 
 
+
+
+NOT YET:
+
 pd - darwin (MacOSX):
 ---------------------
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
@@ -43,6 +47,7 @@ Version history:
 - introduced A LOT of attributes to get info about the plugin
 - make editor window closable by patch
 - plugin can be changed with plug attribute
+- fixed crash on destroying vst~ with open editor window
 
 0.0.0:
 - version of mark@junklight.com

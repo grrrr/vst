@@ -1,4 +1,4 @@
-#N canvas 108 26 868 650 12;
+#N canvas 108 26 872 654 12;
 #X obj 26 207 dac~;
 #X obj 26 107 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
@@ -126,7 +126,6 @@
 #X text 469 496 set/get program (0-based);
 #X text 487 251 NOT IMPLEMENTED;
 #X text 544 270 NOT IMPLEMENTED;
-#X obj 26 153 vst~ 1 2 reson;
 #X text 133 14 VST plugins for PD \, (C)2003 Thomas Grill;
 #X msg 28 296 plug \$1;
 #X obj 28 252 bng 15 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
@@ -158,7 +157,8 @@
 #X text 93 582 midi messages for vst synths;
 #X msg 414 442 getprogcats;
 #X text 509 439 get number of program categories;
-#X connect 1 0 48 0;
+#X obj 26 153 vst~ 1 2 SIR;
+#X connect 1 0 56 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
 #X connect 5 0 6 0;
@@ -167,7 +167,7 @@
 #X connect 8 0 13 0;
 #X connect 9 0 13 0;
 #X connect 10 0 14 0;
-#X connect 12 0 48 0;
+#X connect 12 0 56 0;
 #X connect 19 0 18 0;
 #X connect 20 0 18 0;
 #X connect 21 0 17 0;
@@ -179,10 +179,10 @@
 #X connect 39 0 17 0;
 #X connect 41 0 17 0;
 #X connect 43 0 17 0;
-#X connect 48 0 0 0;
-#X connect 48 1 0 1;
-#X connect 48 2 4 0;
-#X connect 50 0 27 0;
-#X connect 51 0 52 0;
-#X connect 52 0 50 0;
-#X connect 55 0 18 0;
+#X connect 49 0 27 0;
+#X connect 50 0 51 0;
+#X connect 51 0 49 0;
+#X connect 54 0 18 0;
+#X connect 56 0 0 0;
+#X connect 56 1 0 1;
+#X connect 56 2 4 0;
