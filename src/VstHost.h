@@ -36,13 +36,16 @@ public:
 	bool editor;
 	bool ShowParams();
 	void SetShowParameters( bool s);
-	void OnEditorCLose();
+	void OnEditorClose();
 	void SetEditWindow( HWND h );
 	CEditorThread* b;
 	RECT GetEditorRect();
 	void EditorIdle();
-	void edit(void);
+
+	void edit(bool open);
+    void visible(bool vis);
 	bool replace(  );
+
 	VSTPlugin();
 	~VSTPlugin();
 
@@ -112,6 +115,15 @@ public:
 
 	HWND w;
 
+
+    void setPos(int x,int y) { posx = x; posy = y; }
+    void setX(int x) { posx = x; }
+    void setY(int y) { posy = y; }
+    int getX() const { return posx; }
+    int getY() const { return posy; }
+
+    bool Edited() const { return edited; }
+
 protected:
 
 	HMODULE h_dll;
@@ -136,6 +148,7 @@ protected:
 
 
 private:
+    int posx,posy;
 	bool edited;
 	bool show_params;
 	static float sample_rate;

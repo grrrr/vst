@@ -16,27 +16,17 @@ static char THIS_FILE[] = __FILE__;
 
 IMPLEMENT_DYNCREATE(CEditorThread, CWinThread)
 
-CEditorThread::CEditorThread()
-{
-	pop = NULL;
-}
+CEditorThread::CEditorThread(): pop(NULL) {}
 
-CEditorThread::~CEditorThread()
-{
-}
+CEditorThread::~CEditorThread() {}
+
 
 BOOL CEditorThread::InitInstance()
 {
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
-	pop = new CPopupWindow();
-	m_pMainWnd = pop;	
-	pop->CreateEx( WS_EX_DLGMODALFRAME  , AfxRegisterWndClass(  CS_DBLCLKS)  ," VST window" ,   WS_CAPTION | WS_THICKFRAME   | WS_POPUP | WS_SYSMENU , 10 , 10 , 300 , 300 , NULL , NULL , NULL);		
-	pop->SetPlugin( plug );	
-	pop->DoInit();
-	pop->ShowWindow( SW_SHOW );		
-	pop->BringWindowToTop();
-	pop->SetFocus();
+	m_pMainWnd = pop = new CPopupWindow;
+	pop->SetPlugin( plug);	// window class, size etc. is set here!
 	return TRUE;
 }
 
@@ -58,4 +48,14 @@ END_MESSAGE_MAP()
 void CEditorThread::SetPlugin(VSTPlugin *p)
 {
 	plug = p;	
+}
+
+void CEditorThread::Close()
+{
+    if(pop) pop->SendMessage(WM_CLOSE);
+}
+
+void CEditorThread::Show(bool show)
+{
+    if(pop) pop->ShowWindow(show);
 }

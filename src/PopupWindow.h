@@ -22,20 +22,18 @@ public:
 // Operations
 public:
 	void DoInit();
-	void SetPlugin( VSTPlugin *p);
-	VSTPlugin * plug;
+    void SetPlugin(VSTPlugin *p);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPopupWindow)
 	public:
-	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
-	virtual void OnFinalRelease();
 	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
 	
+	VSTPlugin *plug;
 
 	// Generated message map functions
 	//{{AFX_MSG(CPopupWindow)

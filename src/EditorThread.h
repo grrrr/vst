@@ -18,16 +18,16 @@ class CEditorThread : public CWinThread
 	DECLARE_DYNCREATE(CEditorThread)
 protected:
 
-
 // Attributes
 public:
-		CEditorThread();           // protected constructor used by dynamic creation
+	CEditorThread();           // protected constructor used by dynamic creation
 
 // Operations
 public:
-	VSTPlugin* plug;
 	void SetPlugin( VSTPlugin *);
-	CPopupWindow *pop;
+
+    void Close();
+    void Show(bool show);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -40,6 +40,9 @@ public:
 // Implementation
 protected:
 	virtual ~CEditorThread();
+
+	VSTPlugin *plug;
+	CPopupWindow *pop;
 
 	// Generated message map functions
 	//{{AFX_MSG(CEditorThread)

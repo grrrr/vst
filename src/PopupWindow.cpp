@@ -13,22 +13,20 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-extern CVstApp theApp;
+extern CVstApp *theApp;
 
 /////////////////////////////////////////////////////////////////////////////
 // CPopupWindow
 
 IMPLEMENT_DYNCREATE(CPopupWindow, CFrameWnd)
 
-CPopupWindow::CPopupWindow()
-{
-	plug = NULL;
-}
+CPopupWindow::CPopupWindow():
+    plug(NULL)
+{}
 
 CPopupWindow::~CPopupWindow()
 {
-	plug->OnEditorCLose();
-	plug = NULL;
+	plug->OnEditorClose();
 }
 
 
@@ -49,37 +47,48 @@ void CPopupWindow::OnEnterIdle(UINT nWhy, CWnd* pWho)
 	CFrameWnd::OnEnterIdle(nWhy, pWho);
 	
 	// TODO: Add your message handler code here
-	if (plug != NULL )
-	{
-		plug->EditorIdle();		
-	}
+	if(plug) plug->EditorIdle();		
 }
 
 void CPopupWindow::SetPlugin(VSTPlugin *p)
 {
-	plug = p;
+    plug = p;
+
+    char tmp[256];
+    sprintf(tmp,"vst~ - %s",plug->GetName());
+
+	CreateEx( WS_EX_DLGMODALFRAME,AfxRegisterWndClass(CS_DBLCLKS),tmp,WS_CAPTION|WS_THICKFRAME|WS_POPUP|WS_SYSMENU,0,0,0,0,NULL,NULL,NULL);
+    
 	plug->Dispatch(effEditOpen , 0 , 0 , m_hWnd , 0.0f  );
 	RECT r = plug->GetEditorRect();
-	CString str = theApp.GetProfileString( "VSTPos" , plug->GetName() , "10,10");
+/*
+	CString str = theApp->GetProfileString( "VSTPos" , plug->GetName() , "10,10");
 	int idx = str.Find(",");
 	CString x = str.Left( idx );
 	CString y = str.Right( idx );
 	printf(" index is %d left is %s and right is %s" , idx , x , y);	
-	SetWindowPos( &wndTopMost  , atoi( x )  , atoi( y ) , (r.right - r.left) + 10 , r.bottom - r.top + 30 , SWP_SHOWWINDOW   );	
+*/
+	SetWindowPos(&wndTopMost,plug->getX(),plug->getY(),(r.right - r.left) + 10 , r.bottom - r.top + 30 , SWP_SHOWWINDOW);
+
+	DoInit();
+	ShowWindow( SW_SHOW );		
+	BringWindowToTop();
+//	SetFocus();
 }
 
-BOOL CPopupWindow::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
-{
-	// TODO: Add your specialized code here and/or call the base class
-	
-	return CWnd::Create(lpszClassName, lpszWindowName, dwStyle, rect, pParentWnd, nID, pContext);
-}
+
+//DEL BOOL CPopupWindow::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
+//DEL {
+//DEL 	// TODO: Add your specialized code here and/or call the base class
+//DEL 	
+//DEL 	return CWnd::Create(lpszClassName, lpszWindowName, dwStyle, rect, pParentWnd, nID, pContext);
+//DEL }
 
 void CPopupWindow::DoInit()
 {
-	printf("DoInit\n");
+//	printf("DoInit\n");
 	plug->Dispatch(effEditTop,0,0, 0,0.0f);			
-	printf("Dispatched to the top\n");
+//	printf("Dispatched to the top\n");
 	SetTimer(0,25,NULL);
 }
 
@@ -92,20 +101,22 @@ void CPopupWindow::OnTimer(UINT nIDEvent)
 void CPopupWindow::OnMove(int x, int y) 
 {
 	CFrameWnd::OnMove(x, y);
-	if ( plug != NULL )
+	if(plug) plug->setPos(x,y);
+/*
 	{
 		char buf[100];
 		sprintf( buf , "%d,%d" , x , y );
-		theApp.WriteProfileString( "VSTPos" , plug->GetName() , buf );
+		theApp->WriteProfileString( "VSTPos" , plug->GetName() , buf );
 	}
+*/
 }
 
 
-void CPopupWindow::OnFinalRelease() 
-{
-	//
-	CFrameWnd::OnFinalRelease();
-}
+//DEL void CPopupWindow::OnFinalRelease() 
+//DEL {
+//DEL 	//
+//DEL 	CFrameWnd::OnFinalRelease();
+//DEL }
 
 void CPopupWindow::OnClose() 
 {

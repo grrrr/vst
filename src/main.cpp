@@ -20,7 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #define VST_VERSION "0.0.0"
 
-
+#if 0
 /* ----- MFC stuff ------------- */
 
 BEGIN_MESSAGE_MAP(CVstApp, CWinApp)
@@ -35,7 +35,7 @@ CVstApp::CVstApp() {}
 CVstApp theApp;
 
 /* ----- MFC stuff ------------- */
-
+#endif
 
 
 class vst:
@@ -47,53 +47,91 @@ public:
 	vst(I argc,const A *argv);
 	~vst();
 
-	virtual BL Init();
-
 protected:
     virtual V m_dsp(I n,t_signalvec const *insigs,t_signalvec const *outsigs);
     virtual V m_signal(I n,R *const *insigs,R *const *outsigs);
 
     V (VSTPlugin::*dspfun)(R **insigs,R **outsigs,L n);
 
+    BL ms_plug(I argc,const A *argv);
+    BL ms_plug(const AtomList &args) { return ms_plug(args.Count(),args.Atoms()); }
+    V mg_plug(AtomList &sym) const { sym(1); SetString(sym[0],plugname); }
+
+    V ms_edit(BL on);
+    V mg_edit(BL &ed) { ed = plug && plug->Edited(); }
+    V ms_vis(BL vis);
+
+    V mg_winx(I &x) const { x = plug?plug->getX():0; }
+    V mg_winy(I &y) const { y = plug?plug->getY():0; }
+    V ms_winx(I x) { if(plug) plug->setX(x); }
+    V ms_winy(I y) { if(plug) plug->setY(y); }
+
+    V mg_chnsin(I &c) const { c = plug?plug->getNumInputs():0; }
+    V mg_chnsout(I &c) const { c = plug?plug->getNumOutputs():0; }
+    V mg_params(I &p) const { p = plug?plug->GetNumParams():0; }
+    V mg_programs(I &p) const { p = plug?plug->NumPrograms():0; }
+    V mg_plugname(const S *&s) const { s = MakeSymbol(plug?plug->GetName():""); }
+    V mg_plugvendor(const S *&s) const { s = MakeSymbol(plug?plug->GetVendorName():""); }
+    V mg_plugdll(const S *&s) const { s = MakeSymbol(plug?plug->GetDllName():""); }
+    V mg_plugversion(I &v) const { v = plug?plug->GetVersion():0; }
+    V mg_issynth(BL &s) const { s = plug && plug->IsSynth(); }
+
+    V m_print(I ac,const A *av);
+
+    V ms_program(I p);
+    V mg_program(I &p) const { p = plug?plug->GetCurrentProgram()+1:0; }
+    
     V m_control(const S *ctrl_name,I ctrl_value);
     V m_pitchbend(I ctrl_value);
     V m_programchange(I ctrl_value);
-    V m_program (I ctrl_value);
     V m_ctrlchange(I control,I ctrl_value);
-    V m_print(I ac,const A *av);
-    V m_edit();
-    V m_showparams();
-    V m_noshowparams();
-    V m_param(I pnum,F val);
-    V m_reset();
-    inline V m_midinote(I note,I vel) { m_velocity(vel); m_note(note); }
-    V m_note(I note);
-    inline V m_velocity(I vel) { velocity = vel; }
+    V m_note(I note,I vel);
+
+    V ms_param(I pnum,F val);
+    V mg_param(I pnum);
 
 private:
     V display_parameter(I param,BL showparams);
 
     VSTPlugin *plug;
-    CString cmdln;
-    I velocity;
-
+    CString plugname;
+    BL echoparam,visible;
 
 	static V setup(t_classid);
 	
+
+    FLEXT_CALLBACK_V(m_print)
+
+    FLEXT_CALLVAR_V(mg_plug,ms_plug)
+
+    FLEXT_CALLVAR_B(mg_edit,ms_edit)
+    FLEXT_CALLSET_B(ms_vis)
+    FLEXT_ATTRGET_B(visible)
+
     FLEXT_CALLBACK_2(m_control,t_symptr,int)
     FLEXT_CALLBACK_I(m_pitchbend)
     FLEXT_CALLBACK_I(m_programchange)
-    FLEXT_CALLBACK_I(m_program)
     FLEXT_CALLBACK_II(m_ctrlchange)
-    FLEXT_CALLBACK_V(m_print)
-    FLEXT_CALLBACK(m_edit)
-    FLEXT_CALLBACK(m_showparams)
-    FLEXT_CALLBACK(m_noshowparams)
-    FLEXT_CALLBACK_2(m_param,int,float)
-    FLEXT_CALLBACK(m_reset)
-    FLEXT_CALLBACK_II(m_midinote)
-    FLEXT_CALLBACK_I(m_note)
-    FLEXT_CALLBACK_I(m_velocity)
+
+    FLEXT_CALLVAR_I(mg_program,ms_program)
+    FLEXT_CALLBACK_2(ms_param,int,float)
+    FLEXT_CALLBACK_I(mg_param)
+
+    FLEXT_CALLBACK_II(m_note)
+
+    FLEXT_ATTRVAR_B(echoparam)
+    FLEXT_CALLVAR_I(mg_winx,ms_winx)
+    FLEXT_CALLVAR_I(mg_winy,ms_winy)
+
+    FLEXT_CALLGET_I(mg_chnsin)
+    FLEXT_CALLGET_I(mg_chnsout)
+    FLEXT_CALLGET_I(mg_params)
+    FLEXT_CALLGET_I(mg_programs)
+    FLEXT_CALLGET_S(mg_plugname)
+    FLEXT_CALLGET_S(mg_plugvendor)
+    FLEXT_CALLGET_S(mg_plugdll)
+    FLEXT_CALLGET_I(mg_plugversion)
+    FLEXT_CALLGET_B(mg_issynth)
 };
 
 FLEXT_NEW_DSP_V("vst~",vst);
@@ -107,38 +145,56 @@ V vst::setup(t_classid c)
 #endif
 
     post("");
-	post("vst %s - VST plugin object,(C)2003 Thomas Grill",VST_VERSION);
+	post("vst~ %s - VST plugin object,(C)2003 Thomas Grill",VST_VERSION);
+	post("based on the work of mark@junklight.com");
 	post("");
 
+	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);
+	FLEXT_CADDATTR_VAR(c,"edit",mg_edit,ms_edit);
+	FLEXT_CADDATTR_VAR(c,"vis",visible,ms_vis);
+	FLEXT_CADDMETHOD_(c,0,"print",m_print);
+
+	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
 	FLEXT_CADDMETHOD_2(c,0,"control",m_control,t_symptr,int);
 	FLEXT_CADDMETHOD_(c,0,"pitchbend",m_pitchbend);
-	FLEXT_CADDMETHOD_(c,0,"programchange",m_programchange);
-	FLEXT_CADDMETHOD_(c,0,"program",m_program);
 	FLEXT_CADDMETHOD_II(c,0,"ctrlchange",m_ctrlchange);
-	FLEXT_CADDMETHOD_(c,0,"print",m_print);
-	FLEXT_CADDMETHOD_(c,0,"edit",m_edit);
-	FLEXT_CADDMETHOD_(c,0,"showparams",m_showparams);
-	FLEXT_CADDMETHOD_(c,0,"noshowparams",m_noshowparams);
-	FLEXT_CADDMETHOD_2(c,0,"param",m_param,int,float);
-	FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
-	FLEXT_CADDMETHOD_II(c,0,"midinote",m_midinote);
+
+	FLEXT_CADDMETHOD_(c,0,"programchange",m_programchange);
+	FLEXT_CADDATTR_VAR(c,"program",mg_program,ms_program);
+
+	FLEXT_CADDMETHOD_2(c,0,"param",ms_param,int,float);
+	FLEXT_CADDMETHOD_(c,0,"getparam",mg_param);
+
+	FLEXT_CADDATTR_VAR1(c,"echo",echoparam);
+	FLEXT_CADDATTR_VAR(c,"wx",mg_winx,ms_winx);
+	FLEXT_CADDATTR_VAR(c,"wy",mg_winy,ms_winy);
+
+	FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
+	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);
+	FLEXT_CADDATTR_GET(c,"params",mg_params);
+	FLEXT_CADDATTR_GET(c,"programs",mg_programs);
+	FLEXT_CADDATTR_GET(c,"name",mg_plugname);
+	FLEXT_CADDATTR_GET(c,"vendor",mg_plugvendor);
+	FLEXT_CADDATTR_GET(c,"dll",mg_plugdll);
+	FLEXT_CADDATTR_GET(c,"version",mg_plugversion);
+	FLEXT_CADDATTR_GET(c,"synth",mg_issynth);
 }
 
 
 vst::vst(I argc,const A *argv):
-    dspfun(NULL)
+    plug(NULL),visible(false),
+    dspfun(NULL),echoparam(false)
 {
-    plug = new VSTPlugin;
+    if(argc >= 2 && CanbeInt(argv[0]) && CanbeInt(argv[1])) {
+	    AddInSignal(GetAInt(argv[0]));
+        AddOutSignal(GetAInt(argv[1]));     
 
-	C buf[255];	
-	for(I i = 0; i < argc; i++) {
-		if(i > 0) cmdln += ' ';
-		GetAString(argv[i],buf,sizeof buf);
-		cmdln += buf;
-	}
-    cmdln.MakeLower();
-
-    if(!cmdln.GetLength()) InitProblem();
+        if(!ms_plug(argc-2,argv+2)) InitProblem();
+    }
+    else {
+        post("%s - syntax: vst~ inputs outputs [plug]",thisName());
+        InitProblem();
+    }
 }
 
 vst::~vst()
@@ -147,28 +203,22 @@ vst::~vst()
 }
 
 
-static const char * findFilePath( const char * path , const char * dllname )
+static const C *findFilePath(const C *path,const C *dllname)
 {
 	CFileFind finder;
 	_chdir( path );
-	if ( finder.FindFile( dllname ) == TRUE )
-	{
+
+	if(finder.FindFile( dllname ))
 		return path;
-	}
-	else
-	{
+	else {
 		finder.FindFile();
-		while( finder.FindNextFile() )
-		{
-			if ( finder.IsDirectory() )
-			{
-				if ( !finder.IsDots() )
-				{
+		while(finder.FindNextFile()) {
+			if(finder.IsDirectory()) {
+				if(!finder.IsDots()) {
 					CString *npath = new CString( finder.GetFilePath()); 
-					const char * ret = findFilePath( *npath , dllname );
-					if ( ret != NULL)
-					{
-						CString *retstr = new CString( ret );
+					const C *ret = findFilePath( *npath , dllname );
+					if(ret) {
+						CString *retstr = new CString(ret);
 						return *retstr;
 					}
 				}
@@ -178,21 +228,39 @@ static const char * findFilePath( const char * path , const char * dllname )
 	return NULL;
 }
 
-BL vst::Init()
+
+BL vst::ms_plug(I argc,const A *argv)
 {
+    if(plug) { delete plug; plug = NULL; }
+
+    plugname.Empty();
+	C buf[255];	
+	for(I i = 0; i < argc; i++) {
+		if(i > 0) plugname += ' ';
+		GetAString(argv[i],buf,sizeof buf);
+		plugname += buf;
+	}
+    plugname.MakeLower();
+    if(!plugname.GetLength()) return false;
+
+    plug = new VSTPlugin;
+
+    
+    // now try to load plugin
+
     // to help deal with spaces we assume ALL of the args make 
 	// up the filename 
 	bool lf = false;
 
 	// try loading the dll from the raw filename 
-	if (plug->Instance(cmdln) == VSTINSTANCE_NO_ERROR) {
+	if (plug->Instance(plugname) == VSTINSTANCE_NO_ERROR) {
 		//post( "it loaded fine ");
 		lf = true;
 	}
 
     if(!lf) { // try finding it on the PD path
 	    C *name,dir[1024];
-	    I fd = open_via_path("",cmdln,".dll",dir,&name,sizeof(dir)-1,0);
+	    I fd = open_via_path("",plugname,".dll",dir,&name,sizeof(dir)-1,0);
 	    if(fd > 0) close(fd);
 	    else name = NULL;
 
@@ -203,79 +271,51 @@ BL vst::Init()
         dllname += "\\";
         dllname += name;
 
-	    if(plug->Instance(dllname) == VSTINSTANCE_NO_ERROR) {
-		    //post( "it loaded fine ");
-		    lf = true;
-	    }
+	    lf = plug->Instance(dllname) == VSTINSTANCE_NO_ERROR;
     }
 
-    if(!lf) { // try finding it on the VST PAth
-		char* vst_path = getenv ("VST_PATH");
+    if(!lf) { // try finding it on the VST path
+		C *vst_path = getenv ("VST_PATH");
 
-		CString dllname(cmdln);
-		if(cmdln.Find(".dll") == -1) dllname += ".dll";			
+		CString dllname(plugname);
+		if(dllname.Find(".dll") == -1) dllname += ".dll";			
 
-		if ( vst_path ) {
+		if(vst_path) {
             char* tok_path = new C[strlen( vst_path)+1];
             strcpy( tok_path , vst_path);
 			char *tok = strtok( tok_path , ";" );
-			 while( tok != NULL )
-			 {
-				 CString abpath( tok );
-				 if( abpath.Right( 1 ) != _T("\\") )
-				 {
-					abpath += "\\";
-				 }				 
-				 const char * realpath = findFilePath( abpath , dllname );				
-				 //post( "findFilePath( %s , %s ) = %s\n" , abpath , dllname , realpath );
-				 if ( realpath != NULL )
-				 {
-					 CString rpath( realpath );
-					rpath += _T("\\") + cmdln;
-					 post( "trying %s " , rpath );
-					if ( plug->Instance( rpath ) == VSTINSTANCE_NO_ERROR )
-					{
-						post( "  %s loaded " , plug->GetName());
-						lf = TRUE;
+			while( tok != NULL ) {
+				CString abpath( tok );
+				if( abpath.Right( 1 ) != _T("\\") ) abpath += "\\";
+
+				const char * realpath = findFilePath( abpath , dllname );				
+				//post( "findFilePath( %s , %s ) = %s\n" , abpath , dllname , realpath );
+				if ( realpath != NULL ) {
+				    CString rpath( realpath );
+					rpath += _T("\\") + plugname;
+					post( "trying %s " , rpath );
+					if(plug->Instance( rpath ) == VSTINSTANCE_NO_ERROR ) {
+//						post("%s - plugin '%s' loaded ",thisName(),plug->GetName());
+						lf = true;
 						break;
 					}
-				 }
-				tok = strtok( NULL , ";" );
-				if ( tok == NULL )
-				{
-					post( "couldn't find dll");
 				}
-			 }
 
-             delete[] tok_path;
+				tok = strtok( NULL , ";" );
+                if(!tok) post("%s - couldn't find dll",thisName());
+			}
+
+            delete[] tok_path;
 		}
 	}
 
-	if ( !lf ) // failed - don't make any ins or outs
-	{
-		post("Unable to load %s" , cmdln);
-		delete plug;
-		plug = NULL;
+    if(!lf) { // failed - don't make any ins or outs
+		post("%s - unable to load plugin '%s'",thisName(),plugname);
+		delete plug; plug = NULL;
 	}
 
-    if(lf) {
-    	I inputs = plug->getNumInputs(),outputs = plug->getNumOutputs();
-        
-	    AddInSignal(inputs);
-
-        AddInInt("midi note");
-        AddInInt("midi velocity");
-
-    	FLEXT_ADDMETHOD(inputs,m_note);
-	    FLEXT_ADDMETHOD(inputs+1,m_velocity);
-
-        AddOutAnything("control out");
-        AddOutSignal(outputs);
-    }
-
-    return lf && flext_dsp::Init();
+    return lf;
 }
-
 
 V vst::m_dsp(I n,t_signalvec const *insigs,t_signalvec const *outsigs)
 {
@@ -296,14 +336,15 @@ V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 }
 
 
+
+
 V vst::m_control(const S *ctrl_name,I ctrl_value)     
 {
     if(!plug) return;
 
     I parm_num = 0;
     
-    if (!*GetString(ctrl_name) || !strlen(GetString(ctrl_name))) 
-	{
+    if (!*GetString(ctrl_name) || !strlen(GetString(ctrl_name))) {
 		error ("plugin~: control messages must have a name and a value");
 		return;
     }
@@ -328,9 +369,9 @@ V vst::m_programchange(I ctrl_value)
 	if(plug) plug->AddProgramChange(ctrl_value );    
 }
 
-V vst::m_program (I ctrl_value)     
+V vst::ms_program(I p)
 {
-	if(plug) plug->SetCurrentProgram(ctrl_value );    
+	if(plug) plug->SetCurrentProgram(p);    
 }
 
 V vst::m_ctrlchange(I control,I ctrl_value)     
@@ -354,7 +395,7 @@ V vst::m_print(I ac,const A *av)
 	bool programs = false;
 	bool parameters = true;
 	int specific = -1;
-    if ( ac > 0 ) {
+    if( ac > 0 ) {
 		for( i = 0 ; i < ac ; i++) {
 			if(IsString(av[i])) {
 				const C *buf = GetString(av[i]);	
@@ -374,7 +415,9 @@ V vst::m_print(I ac,const A *av)
 				else if ( strcmp( buf , "-help" ) == 0 ) {
 					post("print options:");
 					post("-help \t\tprint this");
-					post("-params \tshow the parameter display values ");
+					post("-programs \tshow the programs");
+					post("-parameters \tshow the parameters");
+					post("-params \tshow the parameter display values");
 					post("-noheader \tdo not display the header");
 					return;
 				}
@@ -427,29 +470,24 @@ V vst::m_print(I ac,const A *av)
 }
 
 
-/**
-*	display an editor - currently not implemented 
-*/
-
-V vst::m_edit()     
+//!	display an editor 
+V vst::ms_edit(BL on)
 {
-//	AFX_MANAGE_STATE(AfxGetStaticModuleState());	
-	if(plug) 
-        plug->edit();    
-	else
-		post("No plugin to edit");
+#if FLEXT_OS == FLEXT_OS_WIN
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+#endif
+
+    if(plug) plug->edit(on);
 }
 
-V vst::m_showparams()     
+V vst::ms_vis(BL vis)
 {
-	if(plug) plug->SetShowParameters( true);    
-}
+#if FLEXT_OS == FLEXT_OS_WIN
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+#endif
 
-V vst::m_noshowparams()
-{
-	if(plug) plug->SetShowParameters(false);
+   if(plug) plug->visible(vis);
 }
-
 
 
 V vst::display_parameter(I param,BL showparams)
@@ -459,23 +497,20 @@ V vst::display_parameter(I param,BL showparams)
 	char name[109];
 	char display[164];
 	float val;
-	if (j == 0) 
-	{
-		post ("Control input/output(s):");
-	}
-	memset (name, 0, 108);
-	memset( display, 0 ,163);
+
+	if(j == 0) post ("Control input/output(s):");
+
+    memset (name, 0, sizeof(name));
+	memset( display, 0 ,sizeof(display));
 	plug->GetParamName( j , name );
-	if ( name[0] != NULL )
-	{
-		if ( showparams )
-		{
+
+	if(*name) {
+		if (showparams) {
 			plug->DescribeValue( j , display );		
 			val = plug->GetParamValue( j );
 			post ("parameter[#%d], \"%s\" value=%f (%s) ", j + 1, name,  val,display);			
 		}
-		else
-		{
+		else {
 			val = plug->GetParamValue( j );
 			post ("parameter[#%d], \"%s\" value=%f ", j + 1, name,  val);			
 		}
@@ -483,43 +518,60 @@ V vst::display_parameter(I param,BL showparams)
 }
 
 
-/**
-*	set the value of a parameter
-*/
-
-V vst::m_param(I pnum,F val)     
+// set the value of a parameter
+V vst::ms_param(I pnum,F val)     
 {
     if(!plug) return;
 
-	if ( ( pnum > 0 ) && ( pnum <= plug->GetNumParams() ))
-	{		
-		int i = (int) pnum - 1;
+	if( pnum > 0 && pnum <= plug->GetNumParams() ) {		
+		int i = pnum-1;
+/*
 		char name[9];
 		char display[64];
-		float xval;
-		memset (name, 0, 9);
-		memset( display, 0 ,64);
-		plug->GetParamName( i , name );
-		if ( name[0] != NULL )
-		{		
-			xval = plug->GetParamValue( i );
-			if ( xval <= 1.0f)
-			{
+
+		memset (name, 0, sizeof(name));
+		memset( display, 0 ,sizeof(display));
+		plug->GetParamName(i,name );
+
+		if(*name) 
+*/
+        {
+			F xval = plug->GetParamValue( i );
+			if(xval <= 1.0f) {
 				plug->SetParameter( i , val );
-				if ( plug->ShowParams() )
-				{
-					display_parameter(i , true );
-				}
+				if(echoparam) display_parameter(i , true );
 			}		
 		}
 	}
 }
 
-V vst::m_reset()
+V vst::mg_param(I pnum)
 {
+    if(!plug) return;
+
+	if( pnum > 0 && pnum <= plug->GetNumParams() ) {		
+		int i = pnum-1;
+/*
+		char name[9];
+		char display[64];
+//		float xval;
+
+		memset (name, 0, sizeof(name));
+		memset( display, 0 ,sizeof(display));
+		plug->GetParamName(i,name );
+
+		if(*name) 
+*/
+        {
+            A at[2];
+            SetInt(at[0],i);
+            SetFloat(at[1],plug->GetParamValue(i));
+			ToOutAnything(GetOutAttr(),MakeSymbol("param"),2,at);
+		}
+	}
 }
 
-V vst::m_note(I note)     
+V vst::m_note(I note,I velocity)
 {
     if(!plug) return;
 

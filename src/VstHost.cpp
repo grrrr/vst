@@ -16,7 +16,8 @@ extern "C" void post(char *fmt, ...);
 ////////////////////
 //
 /////////////////////
-VSTPlugin::VSTPlugin()
+VSTPlugin::VSTPlugin():
+    posx(0),posy(0)
 {
 	queue_size=0;
 	_sDllName = NULL;
@@ -24,7 +25,7 @@ VSTPlugin::VSTPlugin()
 	instantiated=false;		// Constructin' with no instance
 	overwrite = false;
 	 w = GetForegroundWindow();
-	 show_params = false;
+//	 show_params = false;
 	 _midichannel = 0;
 	 edited = false;
 }
@@ -473,18 +474,26 @@ bool VSTPlugin::replace()
 }
 
 
-void VSTPlugin::edit()
+void VSTPlugin::edit(bool open)
 {	
-	if(instantiated)
-	{ 		
-		if ( ( editor ) && (!edited))
-		{			
-			edited = true;
-			b =  new CEditorThread();	
-			b->SetPlugin( this );			
-			b->CreateThread();			
-		}
+	if(instantiated) { 	
+        if(open) {
+		    if ( editor && !edited) {			
+			    edited = true;
+			    b =  new CEditorThread();	
+			    b->SetPlugin( this);
+			    b->CreateThread();			
+		    }
+        }
+        else {
+            if (editor && edited) b->Close();
+        }
 	}
+}
+
+void VSTPlugin::visible(bool vis)
+{	
+	if(instantiated && edited) b->Show(vis);
 }
 
 void VSTPlugin::EditorIdle()
@@ -510,11 +519,12 @@ void VSTPlugin::SetEditWindow(HWND h)
 	Dispatch(effEditOpen,0,0, w,0.0f);							
 }
 
-void VSTPlugin::OnEditorCLose()
+void VSTPlugin::OnEditorClose()
 {
 	Dispatch(effEditClose,0,0, w,0.0f);					
 }
 
+/*
 void VSTPlugin::SetShowParameters(bool s)
 {
 	show_params = s;
@@ -524,6 +534,7 @@ bool VSTPlugin::ShowParams()
 {
 	return show_params;
 }
+*/
 
 void VSTPlugin::AddAftertouch(int value)
 {

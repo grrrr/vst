@@ -1,6 +1,6 @@
 vst~ - VST plugin external for PD
 
-Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -39,6 +39,8 @@ Version history:
 - fixed crash when there's no "VST_PATH" environment string found
 - included pd path into VST search path
 - made thread of editor window low priority
+- introduced A LOT of attributes to get info about the plugin
+- make editor window closable by patch
 
 0.0.0:
 - version of mark@junklight.com
@@ -46,9 +48,9 @@ Version history:
 ---------------------------------------------------------------------------
 
 BUGS:
-- no MFC application instantiated... crash in debug mode (upon assertion)
+- match number of in/out-signals to those of plug
 
 features:
-- make plugs loadable at run-time
+- allow various window styles
 
 
