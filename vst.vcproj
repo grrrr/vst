@@ -23,10 +23,13 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
@@ -48,6 +51,7 @@
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="c:\programme\audio\pd\bin,f:\prog\max\flext\pd-msvc"
 				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
+				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/r/vst~.lib"
 				TargetMachine="1"/>
 			<Tool
@@ -91,7 +95,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -115,6 +119,7 @@
 				AdditionalLibraryDirectories="c:\programme\audio\pd\bin,f:\prog\max\flext\pd-msvc"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/vst~.pdb"
+				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/d/vst~.lib"
 				TargetMachine="1"/>
 			<Tool

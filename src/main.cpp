@@ -243,7 +243,7 @@ V vst::InitPlug()
 {
     FLEXT_ASSERT(plug);
 
-    vstfun = plug->replace()?plug->processReplacing:plug->process;
+	vstfun = plug->replace()?VSTPlugin::processReplacing:VSTPlugin::process;
     sigmatch = plug->getNumInputs() == CntInSig() && plug->getNumOutputs() == CntOutSig();
 
     InitBuf();
