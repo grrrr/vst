@@ -1,3 +1,7 @@
+NAME=vst~
+
+SRCDIR=.
+
 # all the source files from the package
 SRCS= main.cpp
 SRCS_WIN=VstHost.cpp EditorWin.cpp
