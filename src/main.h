@@ -1,6 +1,7 @@
 /* 
 
 vst - VST plugin object for PD 
+based on the work of mark@junklight.com
 
 Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL

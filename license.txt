@@ -1,4 +1,5 @@
 vst~ - VST plugin object for PD
+based on the work of mark@junklight.com
 Copyright (C) 2003 Thomas Grill
 
 This program is free software; you can redistribute it and/or
@@ -24,6 +25,13 @@ in the file gpl.txt
 
 ---------------------------------------------------------
 This package uses the flext C++ layer - See its license text below:
+
+--- vst by mark@junklight.com --------------------------
+
+reference: http://iem.kug.ac.at/~jams/
+this plugin uses a tiny amount of code from the plugin~
+object mentioned above. It also tries to replicate the 
+syntax
 
 
 --- flext ----------------------------------------------
