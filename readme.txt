@@ -1,7 +1,7 @@
 vst~ - VST plugin external for PD
 based on the work of mark@junklight.com
 
-Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -42,14 +42,12 @@ Version history:
 - made thread of editor window low priority
 - introduced A LOT of attributes to get info about the plugin
 - make editor window closable by patch
+- plugin can be changed with plug attribute
 
 0.0.0:
 - version of mark@junklight.com
 
 ---------------------------------------------------------------------------
-
-BUGS:
-- match number of in/out-signals to those of plug
 
 features:
 - allow various window styles and window moving & titling
