@@ -7,15 +7,12 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#include "Editor.h"
-#include "VstHost.h"
-#include <flext.h>
+#if FLEXT_OS != FLEXT_OS_WIN
+// only Windows code is situated in this file
+#error Wrong implementation
+#endif
 
 #include <map>
-
-#if FLEXT_OS == FLEXT_OS_WIN
-// only Windows code is situated in this file
-
 #include <windows.h>
 
 typedef std::map<flext::thrid_t,VSTPlugin *> WndMap;
@@ -292,5 +289,3 @@ bool IsEditorShown(const VSTPlugin *p)
 {
     return IsWindowVisible(p->EditorHandle()) != FALSE;
 }
-
-#endif // FLEXT_OS_WIN

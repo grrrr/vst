@@ -24,7 +24,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
-				AdditionalIncludeDirectories="&quot;f:\prog\pd\pd-cvs\src&quot;;f:\prog\packs\pthreads;f:\prog\max\flext\source;F:\prog\audio\vstsdk2.3\source\common"
+				AdditionalIncludeDirectories="&quot;c:\data\prog\pd\pd-cvs\src&quot;;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
@@ -41,7 +41,7 @@
 				OutputFile="./pd-msvc/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin;f:\prog\packs\pthreads"
+				AdditionalLibraryDirectories="&quot;c:\data\prog\pd\pd-cvs\bin&quot;"
 				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
 				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/r/vst~.lib"
@@ -86,7 +86,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src;f:\prog\max\flext\source;F:\prog\audio\vstsdk2.3\source\common"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\src;..\flext\source;c:\data\prog\audio\vstsdk2.3\source\common"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_LOGGING"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -104,7 +104,7 @@
 				OutputFile="$(outdir)/vst~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd\bin,f:\prog\max\flext\pd-msvc"
+				AdditionalLibraryDirectories="c:\programme\audio\pd\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/vst~.pdb"
 				OptimizeReferences="2"
@@ -242,10 +242,10 @@
 			Name="host"
 			Filter="">
 			<File
-				RelativePath=".\src\Editor.h">
+				RelativePath=".\src\editor.cpp">
 			</File>
 			<File
-				RelativePath=".\src\EditorWin.cpp">
+				RelativePath=".\src\Editor.h">
 			</File>
 			<File
 				RelativePath="src\vst.rc">

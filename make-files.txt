@@ -1,10 +1,7 @@
 NAME=vst~
 
-SRCDIR=.
+SRCDIR=src
 
-# all the source files from the package
-SRCS= main.cpp
-SRCS_WIN=VstHost.cpp EditorWin.cpp
+SRCS= main.cpp vsthost.cpp editor.cpp
               
-HDRS= main.h VstHost.h Editor.h 
-
+HDRS= main.h vsthost.h editor.h editorwin.hpp editormac.hpp
