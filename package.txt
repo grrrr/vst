@@ -1,9 +1,8 @@
 NAME=vst~
 
 THREADED=1
-HAVECONFIG=1
-HAVEMAKE=1
 
+BUILDDIR=build
 SRCDIR=src
 
 SRCS=main.cpp vsthost.cpp editor.cpp
