@@ -145,8 +145,8 @@
 		</Configuration>
 		<Configuration
 			Name="PD Shared Release|Win32"
-			OutputDirectory=".\pd-msvc/s"
-			IntermediateDirectory=".\pd-msvc/s"
+			OutputDirectory=".\pd-msvc/sr"
+			IntermediateDirectory=".\pd-msvc/sr"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -177,7 +177,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin,f:\prog\packs\pthreads"
-				ProgramDatabaseFile=".\pd-msvc/r/vst~.pdb"
+				ProgramDatabaseFile="$(outdir)/vst~.pdb"
 				OptimizeReferences="2"
 				ImportLibrary=".\pd-msvc/r/vst~.lib"
 				TargetMachine="1"/>
