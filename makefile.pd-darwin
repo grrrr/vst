@@ -1,156 +1,78 @@
 # vst~ - VST plugin external for PD
-
 # based on the work of Jarno Seppänen and Mark Williamson
-
 # 
-
 # Copyright (c)Thomas Grill (xovo@gmx.net)
-
 # For information on usage and redistribution, and for a DISCLAIMER OF ALL
-
 # WARRANTIES, see the file, "license.txt," in this distribution.  
-
 #
-
 #
-
 # Makefile for gcc @ darwin (OSX)
-
 #
-
 # usage:
-
 # to build run "make -f makefile.pd-darwin"
-
 # to install (as root), do "make -f makefile.pd-darwin install"
-
 #
-
-
 
 CONFIG=config-pd-darwin.txt
 
-
-
 include ${CONFIG}
-
-
 
 FLEXTLIB=${FLEXTPATH}/flext.a
 
-
-
 # compiler+linker stuff	
-
 INCLUDES=${PDPATH} ${FLEXTPATH} 
-
 LIBPATH= 
-
 FLAGS=-DFLEXT_SYS=2 ${UFLAGS}
-
 CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions -fno-rtti
-
 LIBS=m 
-
 LDFLAGS=-bundle -bundle_loader ${PD}
-
 FRAMEWORKS=Carbon
 
-
-
 # ---------------------------------------------
-
 # the rest can stay untouched
-
 # ----------------------------------------------
-
 NAME=vst~
 
-
-
 # all the source files from the package
-
 include make-files.txt
-
-
+SRCS+=${SRCS_MAC}
 
 DIR=src
 
-
-
 TARGET=$(TARGDIR)/$(NAME).pd_darwin
-
 MAKEFILE=makefile.pd-darwin
 
-
-
 # default target
-
 all: $(TARGDIR) $(TARGET)
 
-
-
 $(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(MAKEFILE) $(CONFIG)
-
 	touch $@
 
-
-
 $(TARGDIR):
-
 	mkdir $(TARGDIR)
 
-
-
 $(TARGDIR)/%.o : $(DIR)/%.cpp
-
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
 
-
-
 $(TARGDIR)/%.co : $(DIR)/%.c
-
 	$(CC) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
 
-
-
 $(TARGET) : $(patsubst %.c,$(TARGDIR)/%.co,$(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))) $(FLEXTLIB) 
-
 	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework%,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
-
 	chmod 755 $@
 
-
-
 $(INSTPATH):
-
 	mkdir $(INSTPATH)
-
-
 
 install:: $(INSTPATH)
 
-
-
 install:: $(TARGET)
-
 	cp $^ $(INSTPATH)
-
 #	chown root.root  $(patsubst %,$(INSTPATH)/%,$(notdir $^))
-
 #	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
-
-
 
 .PHONY: clean
 
-
-
 clean:
-
 	rm -f $(TARGDIR)/*.o $(TARGET)
-
 	
-
-
-
