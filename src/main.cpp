@@ -70,6 +70,7 @@ protected:
     V mg_chnsout(I &c) const { c = plug?plug->getNumOutputs():0; }
     V mg_params(I &p) const { p = plug?plug->GetNumParams():0; }
     V mg_programs(I &p) const { p = plug?plug->NumPrograms():0; }
+    V mg_progcats(I &p) const { p = plug?plug->GetNumCategories():0; }
     V mg_plugname(const S *&s) const { s = MakeSymbol(plug?plug->GetName():""); }
     V mg_plugvendor(const S *&s) const { s = MakeSymbol(plug?plug->GetVendorName():""); }
     V mg_plugdll(const S *&s) const { s = MakeSymbol(plug?plug->GetDllName():""); }
@@ -145,6 +146,7 @@ private:
     FLEXT_CALLGET_I(mg_chnsout)
     FLEXT_CALLGET_I(mg_params)
     FLEXT_CALLGET_I(mg_programs)
+    FLEXT_CALLGET_I(mg_progcats)
     FLEXT_CALLGET_S(mg_plugname)
     FLEXT_CALLGET_S(mg_plugvendor)
     FLEXT_CALLGET_S(mg_plugdll)
@@ -196,6 +198,7 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);
 	FLEXT_CADDATTR_GET(c,"params",mg_params);
 	FLEXT_CADDATTR_GET(c,"programs",mg_programs);
+	FLEXT_CADDATTR_GET(c,"progcats",mg_progcats);
 	FLEXT_CADDATTR_GET(c,"name",mg_plugname);
 	FLEXT_CADDATTR_GET(c,"vendor",mg_plugvendor);
 	FLEXT_CADDATTR_GET(c,"dll",mg_plugdll);

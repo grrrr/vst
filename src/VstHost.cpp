@@ -4,14 +4,12 @@
 #include "PopupWindow.h"
 #include "vst\aeffeditor.h"
 #include "vst\aeffectx.h"
-
+#include <flext.h>
 
 VstTimeInfo VSTPlugin::_timeInfo;
 
 float VSTPlugin::sample_rate = 44100;
 
-
-extern "C" void post(char *fmt, ...);
 
 ////////////////////
 //
@@ -25,6 +23,7 @@ VSTPlugin::VSTPlugin():
 	h_dll=NULL;
 	instantiated=false;		// Constructin' with no instance
 	overwrite = false;
+//    wantidle = false;
 	 w = GetForegroundWindow();
 //	 show_params = false;
 	 _midichannel = 0;
@@ -305,8 +304,11 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
+#if 0 //def FLEXT_DEBUG
+    if(opcode != audioMasterGetTime)
 	post("VST plugin call to host dispatcher: Eff: 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
 	//st( "audioMasterWantMidi %d " , audioMasterWantMidi);
+#endif
 
 	// Support opcodes
 	switch(opcode)
@@ -315,7 +317,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 0;		// index, value, returns 0
 		
 	case audioMasterVersion:			
-		return 9;		// vst version, currently 7 (0 for older)
+		return 2;		// vst version, currently 7 (0 for older)
 		
 	case audioMasterCurrentId:			
 		return 'AASH';	// returns the unique id of a plug that's currently loading
@@ -325,7 +327,17 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 0;		// call application idle routine (this will call effEditIdle for all open editors too) 
 		
 	case audioMasterPinConnected:	
-		return false;	// inquire if an input or output is beeing connected;
+		if (value == 0) //input
+		{
+			if ( index < 2) return 0;
+			else return 1;
+		}
+		else //output
+		{
+			if ( index < 2) return 0;
+			else return 1;
+		}
+		return 0;	// inquire if an input or output is beeing connected;
 
 	case audioMasterWantMidi:			
 		return 0;
@@ -344,7 +356,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 0;
 
 	case audioMasterNeedIdle:	
-		effect->dispatcher(effect, effIdle, 0, 0, NULL, 0.0f);
+//		effect->dispatcher(effect, effIdle, 0, 0, NULL, 0.0f);
 		return 1;
 
 	case audioMasterGetSampleRate:		
@@ -371,36 +383,50 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return kVstLangEnglish;
 	
 	case audioMasterUpdateDisplay:
+#ifdef FLEXT_DEBUG
 		post("audioMasterUpdateDisplay");
+#endif
 		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
 		return 0;
 
+	case 	audioMasterCanDo:
+		if (!strcmp((char*)ptr,"sendVstEvents")) return 1;
+		if (!strcmp((char*)ptr,"sendVstMidiEvent")) return 1;
+		if (!strcmp((char*)ptr,"sendVstTimeInfo")) return 1;
+//			"receiveVstEvents",
+//			"receiveVstMidiEvent",
+//			"receiveVstTimeInfo",
 		
-	case 	audioMasterSetTime:						post("VST master dispatcher: Set Time");break;
-	case 	audioMasterGetNumAutomatableParameters:	post("VST master dispatcher: GetNumAutPar");break;
-	case 	audioMasterGetParameterQuantization:	post("VST master dispatcher: ParamQuant");break;
-	case 	audioMasterIOChanged:					post("VST master dispatcher: IOchanged");break;
-	case 	audioMasterSizeWindow:					post("VST master dispatcher: Size Window");break;
-	case 	audioMasterGetBlockSize:				post("VST master dispatcher: GetBlockSize");break;
-	case 	audioMasterGetInputLatency:				post("VST master dispatcher: GetInLatency");break;
-	case 	audioMasterGetOutputLatency:			post("VST master dispatcher: GetOutLatency");break;
-	case 	audioMasterGetPreviousPlug:				post("VST master dispatcher: PrevPlug");break;
-	case 	audioMasterGetNextPlug:					post("VST master dispatcher: NextPlug");break;
-	case 	audioMasterWillReplaceOrAccumulate:		post("VST master dispatcher: WillReplace"); break;
+//			"reportConnectionChanges",
+//			"acceptIOChanges",
+		if (!strcmp((char*)ptr,"sizeWindow")) return 1;
+		if (!strcmp((char*)ptr,"supplyIdle")) return 1;
+		return -1;
+		
+	case 	audioMasterSetTime:						FLEXT_LOG("VST master dispatcher: Set Time");break;
+	case 	audioMasterGetNumAutomatableParameters:	FLEXT_LOG("VST master dispatcher: GetNumAutPar");break;
+	case 	audioMasterGetParameterQuantization:	FLEXT_LOG("VST master dispatcher: ParamQuant");break;
+	case 	audioMasterIOChanged:					FLEXT_LOG("VST master dispatcher: IOchanged");break;
+	case 	audioMasterSizeWindow:					FLEXT_LOG("VST master dispatcher: Size Window");break;
+	case 	audioMasterGetBlockSize:				FLEXT_LOG("VST master dispatcher: GetBlockSize");break;
+	case 	audioMasterGetInputLatency:				FLEXT_LOG("VST master dispatcher: GetInLatency");break;
+	case 	audioMasterGetOutputLatency:			FLEXT_LOG("VST master dispatcher: GetOutLatency");break;
+	case 	audioMasterGetPreviousPlug:				FLEXT_LOG("VST master dispatcher: PrevPlug");break;
+	case 	audioMasterGetNextPlug:					FLEXT_LOG("VST master dispatcher: NextPlug");break;
+	case 	audioMasterWillReplaceOrAccumulate:		FLEXT_LOG("VST master dispatcher: WillReplace"); break;
 	case 	audioMasterGetCurrentProcessLevel:		return 0; break;
-	case 	audioMasterGetAutomationState:			post("VST master dispatcher: GetAutState");break;
-	case 	audioMasterOfflineStart:				post("VST master dispatcher: Offlinestart");break;
-	case 	audioMasterOfflineRead:					post("VST master dispatcher: Offlineread");break;
-	case 	audioMasterOfflineWrite:				post("VST master dispatcher: Offlinewrite");break;
-	case 	audioMasterOfflineGetCurrentPass:		post("VST master dispatcher: OfflineGetcurrentpass");break;
-	case 	audioMasterOfflineGetCurrentMetaPass:	post("VST master dispatcher: GetGetCurrentMetapass");break;
-	case 	audioMasterSetOutputSampleRate:			post("VST master dispatcher: Setsamplerate");break;
-	case 	audioMasterGetSpeakerArrangement:		post("VST master dispatcher: Getspeaker");break;
-	case 	audioMasterSetIcon:						post("VST master dispatcher: seticon");break;
-	case 	audioMasterCanDo:						post("VST master dispatcher: Can Do");break;
-	case 	audioMasterOpenWindow:					post("VST master dispatcher: OpenWindow");break;
-	case 	audioMasterCloseWindow:					post("VST master dispatcher: CloseWindow");break;
-	case 	audioMasterGetDirectory:				post("VST master dispatcher: GetDirectory");break;
+	case 	audioMasterGetAutomationState:			FLEXT_LOG("VST master dispatcher: GetAutState");break;
+	case 	audioMasterOfflineStart:				FLEXT_LOG("VST master dispatcher: Offlinestart");break;
+	case 	audioMasterOfflineRead:					FLEXT_LOG("VST master dispatcher: Offlineread");break;
+	case 	audioMasterOfflineWrite:				FLEXT_LOG("VST master dispatcher: Offlinewrite");break;
+	case 	audioMasterOfflineGetCurrentPass:		FLEXT_LOG("VST master dispatcher: OfflineGetcurrentpass");break;
+	case 	audioMasterOfflineGetCurrentMetaPass:	FLEXT_LOG("VST master dispatcher: GetGetCurrentMetapass");break;
+	case 	audioMasterSetOutputSampleRate:			FLEXT_LOG("VST master dispatcher: Setsamplerate");break;
+	case 	audioMasterGetSpeakerArrangement:		FLEXT_LOG("VST master dispatcher: Getspeaker");break;
+	case 	audioMasterSetIcon:						FLEXT_LOG("VST master dispatcher: seticon");break;
+	case 	audioMasterOpenWindow:					FLEXT_LOG("VST master dispatcher: OpenWindow");break;
+	case 	audioMasterCloseWindow:					FLEXT_LOG("VST master dispatcher: CloseWindow");break;
+	case 	audioMasterGetDirectory:				FLEXT_LOG("VST master dispatcher: GetDirectory");break;
 //	case		audioMasterUpdateDisplay:				post("VST master dispatcher: audioMasterUpdateDisplay");break;
 
 	default: post("VST master dispatcher: undefed: %d , %d",opcode , effKeysRequired )	;break;

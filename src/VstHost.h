@@ -149,7 +149,7 @@ protected:
 
 private:
     int posx,posy;
-	bool edited;
+	bool edited; //,wantidle;
 	bool show_params;
 	static float sample_rate;
 };
