@@ -56,7 +56,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
         
         case WM_TIMER: // fall through
         case WM_ENTERIDLE:
-            plug->EditorIdle();		
+//            plug->EditorIdle();		
             break; 
 #if 0
         case WM_WINDOWPOSCHANGED: {
@@ -225,7 +225,10 @@ static void threadfun(flext::thr_params *p)
             }
             else {
                 TranslateMessage(&msg); 
+//                double tm1 = flext::GetOSTime();
                 DispatchMessage(&msg); 
+//                double tm2 = flext::GetOSTime();
+//                if(tm2-tm1 > 0.01) FLEXT_LOG1("halt %lf",(tm2-tm1)*1000);
             }
         }
 

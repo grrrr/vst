@@ -70,9 +70,8 @@ void VSTPlugin::ProcessEvent(const VstEvent &ev)
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-#ifdef FLEXT_LOGGING
-  	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
-#endif
+    if(opcode != audioMasterGetTime)
+  	    FLEXT_LOG6("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
 
     VSTPlugin *th = effect?(VSTPlugin *)effect->user:NULL;
 
@@ -101,15 +100,11 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 	case audioMasterPinConnected: // 4
 		//! \todo set connection state correctly (if possible..)
 		// index=pin, value=0..input, else..output
-#ifdef FLEXT_LOGGING
-        post("Pin connected pin=%li conn=%li",index,value);
-#endif
+        FLEXT_LOG2("Pin connected pin=%li conn=%li",index,value);
 		return 0; // 0 means connected
 
 	case audioMasterWantMidi: // 6
-#ifdef FLEXT_LOGGING
-        post("Want MIDI = %li",value);
-#endif
+        FLEXT_LOG1("Want MIDI = %li",value);
 		return 0; // VST header says: "currently ignored"
 
     case audioMasterGetTime: { // 7
@@ -166,9 +161,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 
     case audioMasterSetTime: { // 9
         VstTimeInfo *tminfo = static_cast<VstTimeInfo *>(ptr);
-#ifdef FLEXT_DEBUG
-        post("TimeInfo pos=%lf rate=%lf filter=%li",tminfo->samplePos,tminfo->sampleRate,value);
-#endif
+        FLEXT_LOG3("TimeInfo pos=%lf rate=%lf filter=%li",tminfo->samplePos,tminfo->sampleRate,value);
         return 0; // not supported
     }
 
@@ -206,9 +199,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return VST_VERSION;
 
 	case audioMasterCanDo: // 37
-#ifdef FLEXT_LOGGING
-    	post("\taudioMasterCanDo PTR = %s",ptr);
-#endif
+    	FLEXT_LOG1("\taudioMasterCanDo PTR = %s",ptr);
         if(!strcmp((char *)ptr,"sendVstEvents"))
             return 1;
         else if(!strcmp((char *)ptr,"sendVstMidiEvent"))
@@ -259,15 +250,11 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
         return (long)(th?th->dllname.c_str():dllloading.c_str());
 
     case audioMasterUpdateDisplay: // 42
-#ifdef FLEXT_LOGGING
-        post("UPDATE DISPLAY");
-#endif
+        FLEXT_LOG("UPDATE DISPLAY");
         return 0;
 
     default:
-#ifdef FLEXT_DEBUG
-        post("Unknown opcode %li",opcode);
-#endif
+        FLEXT_LOG1("Unknown opcode %li",opcode);
         return 0;
     }
 }

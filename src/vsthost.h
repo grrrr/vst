@@ -216,7 +216,7 @@ public:
 
 	void AddPitchBend(int value)
     {
-	    AddMIDI(MIDI_PITCHBEND+midichannel,((value>>7)&127),(value&127));
+	    AddMIDI(MIDI_PITCHBEND+midichannel,(value&127),((value>>7)&127));
     }
 
 	void AddAftertouch(int value)
@@ -291,21 +291,23 @@ private:
     //////////////////////////////////////////////////////////////////////////////
 
 public:
-	void processReplacing(float **inputs,float **outputs,long sampleframes )
+	bool processReplacing(float **inputs,float **outputs,long sampleframes )
     {
         FLEXT_ASSERT(effect);
-    	effect->processReplacing(effect,inputs,outputs,sampleframes);
+  	    effect->processReplacing(effect,inputs,outputs,sampleframes);
         if(playing) updatepos(sampleframes);
+        return true;
     }
 
-	void process(float **inputs,float **outputs,long sampleframes )
+	bool process(float **inputs,float **outputs,long sampleframes )
     {
         FLEXT_ASSERT(effect);
-    	effect->process(effect,inputs,outputs,sampleframes);
-        if(playing) updatepos(sampleframes);
+   	    effect->process(effect,inputs,outputs,sampleframes);
+        return true;
     }
 
 private:
+
     void updatepos(long frames);
 
     //////////////////////////////////////////////////////////////////////////////

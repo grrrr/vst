@@ -12,8 +12,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "main.h"
 
-#include "Editor.h"
-#include "VstHost.h"
+#include "editor.h"
+#include "vsthost.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre24"
+#define VST_VERSION "0.1.0pre26"
 
 
 class vst
@@ -157,7 +157,7 @@ private:
     int paramnames;
 
     int blsz;
-    void (VSTPlugin::*vstfun)(t_sample **insigs,t_sample **outsigs,long n);
+    bool (VSTPlugin::*vstfun)(t_sample **insigs,t_sample **outsigs,long n);
     bool sigmatch;
     t_sample **vstin,**vstout,**tmpin,**tmpout;
 
@@ -651,8 +651,12 @@ void vst::CbSignal()
         for(; i < CntOutSig(); ++i)
             ZeroSamples(outsigs[i],n);
     }
-    else if(sigmatch)
-        (plug->*vstfun)(const_cast<t_sample **>(InSig()),const_cast<t_sample **>(OutSig()),Blocksize());
+    else if(sigmatch) {
+        if(!(plug->*vstfun)(const_cast<t_sample **>(InSig()),const_cast<t_sample **>(OutSig()),Blocksize())) {
+            for(int i = 0; i < CntOutSig(); ++i)
+                ZeroSamples(OutSig()[i],Blocksize());
+        }
+    }
     else {
         const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
         const int cntin = CntInSig(),cntout = CntOutSig();
@@ -686,7 +690,10 @@ void vst::CbSignal()
         }
 
         // call plugin DSP function
-        (plug->*vstfun)(inv,outv,n);
+        if(!(plug->*vstfun)(inv,outv,n)) {
+            for(int i = 0; i < outputs; ++i)
+                ZeroSamples(outsigs[i],n);
+        }
 
         if(more) {
             // according to mode set dangling output vectors

@@ -169,8 +169,7 @@ bool VSTPlugin::NewPlugin(const char *plugname)
     dllname = plugname;
 
 #if FLEXT_OS == FLEXT_OS_WIN
-    FLEXT_ASSERT(!hdll);
-    hdll = LoadLibrary(dllname.c_str());
+    hdll = LoadLibraryEx(dllname.c_str(),NULL,0 /*DONT_RESOLVE_DLL_REFERENCES*/);
     if(hdll) pluginmain = (PVSTMAIN)GetProcAddress(hdll,"main");
     audiomaster = Master;  
 
