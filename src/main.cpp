@@ -183,6 +183,8 @@ V vst::Setup(t_classid c)
 	FLEXT_CADDATTR_GET(c,"dll",mg_plugdll);
 	FLEXT_CADDATTR_GET(c,"version",mg_plugversion);
 	FLEXT_CADDATTR_GET(c,"synth",mg_issynth);
+
+    SetupEditor();
 }
 
 

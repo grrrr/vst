@@ -22,6 +22,8 @@ typedef std::map<flext::thrid_t,VSTPlugin *> WndMap;
 static WndMap wndmap;
 static flext::ThrMutex mapmutex;
 
+#define WCLNAME "vst~-class"
+
 
 static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 {
@@ -85,43 +87,17 @@ static void threadfun(flext::thr_params *p)
     char tmp[256];
     sprintf(tmp,"vst~ - %s",plug->GetName());
 
-//	CreateEx( WS_EX_DLGMODALFRAME,AfxRegisterWndClass(CS_DBLCLKS),tmp,WS_CAPTION|WS_THICKFRAME|WS_POPUP|WS_SYSMENU,0,0,0,0,NULL,NULL,NULL);
-
-
-    // Fill in the window class structure with parameters that describe the main window. 
-    WNDCLASSEX wcx; 
-    wcx.cbSize = sizeof(wcx);          // size of structure 
-    wcx.style = CS_DBLCLKS; // | CS_HREDRAW | CS_VREDRAW;   // redraw if size changes 
-    wcx.lpfnWndProc = wndproc;     // points to window procedure 
-    wcx.cbClsExtra = 0;                // no extra class memory 
-    wcx.cbWndExtra = 0;                // no extra window memory 
-    wcx.hInstance = hinstance;         // handle to instance 
-    wcx.hIcon = NULL; //LoadIcon(NULL, IDI_APPLICATION);              // predefined app. icon 
-    wcx.hCursor = LoadCursor(NULL, IDC_ARROW);                    // predefined arrow 
-    wcx.hbrBackground = NULL; //GetStockObject(WHITE_BRUSH);                  // white background brush 
-    wcx.lpszMenuName = NULL;    // name of menu resource 
-    wcx.lpszClassName = "VSTClass";  // name of window class 
-    wcx.hIconSm = NULL;
-
-    ATOM at = RegisterClassEx(&wcx); 
-
-    HWND wnd = NULL;
-    if(!at)
-        FLEXT_LOG1("wndclass == NULL: %i",GetLastError());
-    else
-        wnd = CreateWindowEx( 
-            0 /*WS_EX_DLGMODALFRAME*/,wcx.lpszClassName,tmp,
-            WS_BORDER|WS_CAPTION|/*WS_THICKFRAME|*/WS_POPUP|WS_SYSMENU|WS_MINIMIZEBOX,
-            CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
-            NULL,NULL,
-            hinstance,NULL
-        );
+    HWND wnd = CreateWindow( 
+        WCLNAME,tmp,
+        WS_BORDER|WS_CAPTION|/*WS_THICKFRAME|*/WS_POPUP|WS_SYSMENU|WS_MINIMIZEBOX,
+        CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
+        NULL,NULL,
+        hinstance,NULL
+    );
 
     if(!wnd) 
         FLEXT_LOG1("wnd == NULL: %i",GetLastError());
     else {
-
-        
 //        plug->Dispatch(effEditOpen , 0 , 0 , wnd, 0.0f  );  // Done in WNDPROC!!
     /*
 	    CString str = theApp->GetProfileString( "VSTPos" , plug->GetName() , "10,10");
@@ -136,19 +112,15 @@ static void threadfun(flext::thr_params *p)
 
 	    SetTimer(wnd,0,25,NULL);
 
-
 	    RECT r = plug->GetEditorRect();
 	    SetWindowPos(wnd,HWND_TOPMOST,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
     //	ShowWindow( SW_SHOW );		
     //  BringWindowToTop(wnd);
     //	SetFocus();
 
-
         // Message pump
-
         MSG msg;
         BOOL bRet;
-
         while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0) { 
             if (bRet == -1) {
                 // handle the error and possibly exit
@@ -161,13 +133,33 @@ static void threadfun(flext::thr_params *p)
         }
     }
 
-    UnregisterClass(wcx.lpszClassName,hinstance);
+//    UnregisterClass(wcx.lpszClassName,hinstance);
 
     mapmutex.Lock();
     wndmap.erase(thrid);
     mapmutex.Unlock();
 }
 
+void SetupEditor()
+{
+    HINSTANCE hinstance = (HINSTANCE)GetModuleHandle(NULL);
+
+    // Fill in the window class structure with parameters that describe the main window. 
+    WNDCLASS wcx; 
+    wcx.style = CS_DBLCLKS; // | CS_HREDRAW | CS_VREDRAW;   // redraw if size changes 
+    wcx.lpfnWndProc = wndproc;     // points to window procedure 
+    wcx.cbClsExtra = 0;                // no extra class memory 
+    wcx.cbWndExtra = 0;                // no extra window memory 
+    wcx.hInstance = hinstance;         // handle to instance 
+    wcx.hIcon = NULL; //LoadIcon(NULL, IDI_APPLICATION);              // predefined app. icon 
+    wcx.hCursor = LoadCursor(NULL, IDC_ARROW);                    // predefined arrow 
+    wcx.hbrBackground = NULL; //GetStockObject(WHITE_BRUSH);                  // white background brush 
+    wcx.lpszMenuName = NULL;    // name of menu resource 
+    wcx.lpszClassName = WCLNAME;  // name of window class 
+
+    ATOM at = RegisterClass(&wcx); 
+    FLEXT_ASSERT(at);
+}
 
 void StartEditor(VSTPlugin *p)
 {

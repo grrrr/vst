@@ -12,6 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 class VSTPlugin;
 
+void SetupEditor();
 void StartEditor(VSTPlugin *p);
 void StopEditor(VSTPlugin *p);
 void ShowEditor(VSTPlugin *p,bool show);
