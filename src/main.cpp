@@ -1,7 +1,7 @@
 /* 
 
 vst - VST plugin object for PD 
-based on the work of mark@junklight.com
+based on the work of Jarno Seppänen and Mark Williamson
 
 Copyright (c)2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -164,7 +164,7 @@ V vst::Setup(t_classid c)
 
     post("");
 	post("vst~ %s - VST plugin object, (C)2003 Thomas Grill",VST_VERSION);
-	post("based on the work of mark@junklight.com");
+	post("based on the work of Jarno Seppänen and Mark Williamson");
 	post("");
 
 	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);

@@ -1,5 +1,5 @@
 vst~ - VST plugin external for PD
-based on the work of mark@junklight.com
+based on the work of Jarno Seppänen and Mark Williamson
 
 Copyright (c)2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
