@@ -39,7 +39,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 //        case WM_NCREATE: res = TRUE; break;
         case WM_CREATE: 
             // Initialize the window. 
-            plug->SetEditWindow(hwnd);
+            plug->StartEditing(hwnd);
             break; 
         case WM_CLOSE:
 	        plug->StopEditing();
@@ -60,9 +60,15 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             break; 
         }
 /*
-        case WM_PAINT: 
+        case WM_PAINT: {
             // Paint the window's client area. 
+            RECT rect;
+            GetUpdateRect(hwnd,rect,FALSE);
+            plug->Paint(rect);
             break;  
+        }
+*/
+/*
         case WM_SIZE: 
             // Set the size and position of the window. 
             break; 
@@ -114,7 +120,8 @@ static void threadfun(flext::thr_params *p)
 
 	    SetTimer(wnd,0,25,NULL);
 
-	    RECT r = plug->GetEditorRect();
+	    ERect r;
+        plug->GetEditorRect(r);
 //	    SetWindowPos(wnd,HWND_TOP,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
 	    SetWindowPos(wnd,HWND_TOP,r.left,r.top,(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
 

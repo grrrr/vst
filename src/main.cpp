@@ -20,7 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 using namespace std;
 
 
-#define VST_VERSION "0.1.0pre9"
+#define VST_VERSION "0.1.0pre10"
 
 
 class vst:
@@ -42,7 +42,7 @@ protected:
 
     V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
 
-    V ms_edit(BL on) { if(plug) plug->edit(on); }
+    V ms_edit(BL on) { if(plug) plug->Edit(on); }
     V mg_edit(BL &ed) { ed = plug && plug->IsEdited(); }
     V ms_vis(BL vis) { if(plug) plug->Visible(vis); }
     V mg_vis(BL &vis) { vis = plug && plug->IsVisible(); }
@@ -399,7 +399,7 @@ BL vst::ms_plug(I argc,const A *argv)
 V vst::m_dsp(I n,t_signalvec const *,t_signalvec const *)
 {
     if(plug) {
-        plug->Init(Samplerate(),(F)Blocksize());
+        plug->DspInit(Samplerate(),Blocksize());
         FLEXT_ASSERT(vstfun);
 
         if(blsz != Blocksize()) {
@@ -670,7 +670,6 @@ V vst::m_ptext(I pnum)
 	C display[164];  /* the Steinberg(tm) way... */
 
 	memset(display,0,sizeof(display));
-//	plug->DescribeValue(pnum,display);
 	plug->GetParamValue(pnum,display);
 
     A at[2];
