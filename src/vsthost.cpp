@@ -13,10 +13,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <ctype.h>
 
-#if FLEXT_OS == FLEXT_OS_WIN
-#include <objbase.h>
-#endif
-
 typedef AEffect *(VSTCALLBACK *PVSTMAIN)(audioMasterCallback audioMaster);
 
 
@@ -26,18 +22,11 @@ VSTPlugin::VSTPlugin():
     posx(0),posy(0),caption(true),
 	_midichannel(0),queue_size(0),
     paramnamecnt(0)
-{
-#if FLEXT_OS == FLEXT_OS_WIN
-    HRESULT result = CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
-#endif
-}
+{}
 
 VSTPlugin::~VSTPlugin()
 {
 	Free();				// Call free
-#if FLEXT_OS == FLEXT_OS_WIN
-    CoUninitialize();
-#endif
 }
  
 void VSTPlugin::FreeVST(MHandle handle)

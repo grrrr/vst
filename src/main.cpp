@@ -7,6 +7,9 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
+// needed for CoInitializeEx
+#define _WIN32_DCOM
+
 #include "main.h"
 
 #include "Editor.h"
@@ -19,6 +22,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #if FLEXT_OS == FLEXT_OS_WIN
 #include <direct.h>
 #include <io.h>
+#include <objbase.h>
 #endif
 
 
@@ -255,11 +259,19 @@ vst::vst(I argc,const A *argv):
     }
     else
         throw "syntax: vst~ inputs outputs [plug]";
+
+#if FLEXT_OS == FLEXT_OS_WIN
+    // this is necessary for Waveshell
+    CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
+#endif
 }
 
 vst::~vst()
 {
     ClearPlug();
+#if FLEXT_OS == FLEXT_OS_WIN
+    CoUninitialize();
+#endif
 }
 
 V vst::ClearPlug()
