@@ -9,7 +9,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "Editor.h"
 #include "VstHost.h"
-#include "vst\aeffectx.h"
+#include "AEffectx.h"
 
 using namespace std;
 

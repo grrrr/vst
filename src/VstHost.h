@@ -11,8 +11,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define __VSTHOST_H
 
 #include <flext.h>
-#include "Vst\AEffectx.h"
-#include "vst\aeffeditor.h"
+#include "AEffectx.h"
+#include "AEffEditor.hpp"
 
 #if FLEXT_OS == FLEXT_OS_WIN
 #include <windows.h>
