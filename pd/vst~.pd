@@ -1,4 +1,4 @@
-#N canvas 75 40 850 632 12;
+#N canvas 75 40 856 638 12;
 #X obj 26 207 dac~;
 #X obj 26 107 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
@@ -8,12 +8,12 @@
 #X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 473 vis \$1;
-#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
+#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
 ;
 #X msg 26 389 edit \$1;
 #X msg 94 389 getedit;
 #X msg 89 473 getvis;
-#N canvas 367 122 532 439 info 0;
+#N canvas 367 122 534 441 info 0;
 #X msg 94 130 getversion;
 #X msg 94 75 getname;
 #X msg 95 153 getvendor;
@@ -63,18 +63,16 @@
 #X text 509 414 get number of programs;
 #X msg 414 417 getprograms;
 #X msg 543 190 getparam 2;
-#X msg 51 279 getplug;
-#X obj 26 308 s \$0-vst;
-#X msg 26 254 plug freeverb;
-#X text 149 267 set/get plugin;
+#X msg 105 295 getplug;
+#X obj 26 323 s \$0-vst;
+#X text 175 294 set/get plugin;
 #X text 480 537 further information;
 #X obj 23 15 cnv 15 550 58 empty empty vst~ 10 32 0 24 -260818 -1 0
 ;
 #X text 134 53 http://www.parasitaere-kapazitaeten.net;
-#X text 133 14 vst plugins for PD \, (C)2003 Thomas Grill;
 #X text 140 182 attribute outlet;
 #X text 143 153 inlets outlets [plugname];
-#N canvas 367 122 478 333 win 0;
+#N canvas 367 122 480 335 win 0;
 #X obj 14 187 s \$0-vst;
 #X msg 94 84 getx;
 #X text 186 84 get window coordinates;
@@ -121,12 +119,17 @@
 #X msg 545 283 getptext gain;
 #X text 455 310 get value in textual representation;
 #X msg 440 283 getptext 2;
-#X obj 26 153 vst~ 1 2 reson;
 #X text 466 211 set/get parameter (0-based);
 #X text 469 472 set/get program (0-based);
 #X text 487 251 NOT IMPLEMENTED;
 #X text 544 270 NOT IMPLEMENTED;
-#X connect 1 0 46 0;
+#X obj 26 153 vst~ 1 2 reson;
+#X text 133 14 VST plugins for PD \, (C)2003 Thomas Grill;
+#X msg 28 296 plug \$1;
+#X obj 28 252 bng 15 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
+-1;
+#X obj 27 271 openpanel;
+#X connect 1 0 48 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
 #X connect 5 0 6 0;
@@ -135,19 +138,21 @@
 #X connect 8 0 13 0;
 #X connect 9 0 13 0;
 #X connect 10 0 14 0;
-#X connect 12 0 46 0;
+#X connect 12 0 48 0;
 #X connect 19 0 18 0;
 #X connect 20 0 18 0;
 #X connect 21 0 17 0;
 #X connect 24 0 18 0;
 #X connect 25 0 17 0;
 #X connect 26 0 27 0;
-#X connect 28 0 27 0;
-#X connect 38 0 17 0;
+#X connect 36 0 17 0;
+#X connect 37 0 17 0;
 #X connect 39 0 17 0;
 #X connect 41 0 17 0;
 #X connect 43 0 17 0;
-#X connect 45 0 17 0;
-#X connect 46 0 0 0;
-#X connect 46 1 0 1;
-#X connect 46 2 4 0;
+#X connect 48 0 0 0;
+#X connect 48 1 0 1;
+#X connect 48 2 4 0;
+#X connect 50 0 27 0;
+#X connect 51 0 52 0;
+#X connect 52 0 50 0;
