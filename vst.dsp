@@ -23,8 +23,8 @@ CFG=vst - Win32 Debug
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName ""
-# PROP Scc_LocalPath ""
+# PROP Scc_ProjName "max/vst"
+# PROP Scc_LocalPath "."
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX- /ZI /Od /I "c:\programme\audio\pd\src" /I "f:\prog\max\flext\source" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D FLEXT_SYS=2 /D "FLEXT_THREADS" /D "_WINDLL" /D "_AFXDLL" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /ZI /Od /I "c:\programme\audio\pd\src" /I "f:\prog\max\flext\source" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D FLEXT_SYS=2 /D "FLEXT_THREADS" /D "_WINDLL" /D "_AFXDLL" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0xc07 /d "_DEBUG"
@@ -176,6 +176,22 @@ SOURCE=.\src\VstHost.cpp
 # Begin Source File
 
 SOURCE=.\src\VstHost.h
+# End Source File
+# End Group
+# Begin Group "doc"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\gpl.txt
+# End Source File
+# Begin Source File
+
+SOURCE=.\license.txt
+# End Source File
+# Begin Source File
+
+SOURCE=.\readme.txt
 # End Source File
 # End Group
 # Begin Source File
