@@ -1,0 +1,338 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 39;
+	objects = {
+		014CEA440018CDF011CA2923 = {
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "FLEXT_SYS=2 FLEXT_SHARED";
+				LIBRARY_STYLE = DYNAMIC;
+				ZERO_LINK = YES;
+			};
+			isa = PBXBuildStyle;
+			name = Development;
+		};
+		014CEA450018CDF011CA2923 = {
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "FLEXT_SYS=2 FLEXT_SHARED";
+				ZERO_LINK = NO;
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+//010
+//011
+//012
+//013
+//014
+//030
+//031
+//032
+//033
+//034
+		034768DFFF38A50411DB9C8B = {
+			children = (
+				D2AAC0C705546C1D00DB518D,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+//030
+//031
+//032
+//033
+//034
+//080
+//081
+//082
+//083
+//084
+		0867D690FE84028FC02AAC07 = {
+			buildSettings = {
+			};
+			buildStyles = (
+				014CEA440018CDF011CA2923,
+				014CEA450018CDF011CA2923,
+			);
+			hasScannedForEncodings = 1;
+			isa = PBXProject;
+			mainGroup = 0867D691FE84028FC02AAC07;
+			productRefGroup = 034768DFFF38A50411DB9C8B;
+			projectDirPath = "";
+			targets = (
+				D2AAC0C605546C1D00DB518D,
+			);
+		};
+		0867D691FE84028FC02AAC07 = {
+			children = (
+				E9E87848074674890035356B,
+				E9E87845074674560035356B,
+				E9E87713074673750035356B,
+				E9E87710074673590035356B,
+				E9C0C57707461746002B8D0A,
+				E9C0C57807461746002B8D0A,
+				E9C0C57907461746002B8D0A,
+				E9C0C57A07461746002B8D0A,
+				E9C0C57B07461746002B8D0A,
+				E9C0C57C07461746002B8D0A,
+				034768DFFF38A50411DB9C8B,
+			);
+			isa = PBXGroup;
+			name = vst;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+//080
+//081
+//082
+//083
+//084
+//D20
+//D21
+//D22
+//D23
+//D24
+		D2AAC0C305546C1D00DB518D = {
+			buildActionMask = 2147483647;
+			files = (
+				E9C0C57D07461746002B8D0A,
+				E9C0C58007461746002B8D0A,
+				E9C0C58207461746002B8D0A,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2AAC0C405546C1D00DB518D = {
+			buildActionMask = 2147483647;
+			files = (
+				E9C0C57E07461746002B8D0A,
+				E9C0C57F07461746002B8D0A,
+				E9C0C58107461746002B8D0A,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2AAC0C505546C1D00DB518D = {
+			buildActionMask = 2147483647;
+			files = (
+				E9E87711074673590035356B,
+				E9E87714074673750035356B,
+				E9E87846074674560035356B,
+				E9E87849074674890035356B,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D2AAC0C605546C1D00DB518D = {
+			buildPhases = (
+				D2AAC0C305546C1D00DB518D,
+				D2AAC0C405546C1D00DB518D,
+				D2AAC0C505546C1D00DB518D,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_EXTENSION = pd_darwin;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "FLEXT_SYS=2 FLEXT_SHARED";
+				HEADER_SEARCH_PATHS = "/Volumes/Daten/Prog/pdmax/flext/source /Volumes/Daten/Prog/packs/vstsdk2.3/source/common";
+				INSTALL_PATH = /usr/local/lib/flext;
+				LIBRARY_STYLE = BUNDLE;
+				OTHER_LDFLAGS = "-bundle_loader /usr/local/bin/pd";
+				PRODUCT_NAME = "vst~";
+				SKIP_INSTALL = YES;
+			};
+			dependencies = (
+			);
+			isa = PBXNativeTarget;
+			name = vst;
+			productName = vst;
+			productReference = D2AAC0C705546C1D00DB518D;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		D2AAC0C705546C1D00DB518D = {
+			explicitFileType = "compiled.mach-o.dylib";
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			path = "vst~.pd_darwin";
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+//D20
+//D21
+//D22
+//D23
+//D24
+//E90
+//E91
+//E92
+//E93
+//E94
+		E9C0C57707461746002B8D0A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Editor.h;
+			path = src/Editor.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9C0C57807461746002B8D0A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = EditorMac.cpp;
+			path = src/EditorMac.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9C0C57907461746002B8D0A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = main.cpp;
+			path = src/main.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9C0C57A07461746002B8D0A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = main.h;
+			path = src/main.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9C0C57B07461746002B8D0A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = VstHost.cpp;
+			path = src/VstHost.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9C0C57C07461746002B8D0A = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = VstHost.h;
+			path = src/VstHost.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		E9C0C57D07461746002B8D0A = {
+			fileRef = E9C0C57707461746002B8D0A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9C0C57E07461746002B8D0A = {
+			fileRef = E9C0C57807461746002B8D0A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9C0C57F07461746002B8D0A = {
+			fileRef = E9C0C57907461746002B8D0A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9C0C58007461746002B8D0A = {
+			fileRef = E9C0C57A07461746002B8D0A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9C0C58107461746002B8D0A = {
+			fileRef = E9C0C57B07461746002B8D0A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9C0C58207461746002B8D0A = {
+			fileRef = E9C0C57C07461746002B8D0A;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9E87710074673590035356B = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = System.framework;
+			path = /System/Library/Frameworks/System.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		E9E87711074673590035356B = {
+			fileRef = E9E87710074673590035356B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9E87713074673750035356B = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = ApplicationServices.framework;
+			path = /System/Library/Frameworks/ApplicationServices.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		E9E87714074673750035356B = {
+			fileRef = E9E87713074673750035356B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9E87845074674560035356B = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.dylib";
+			name = libflext.dylib;
+			path = /usr/local/lib/libflext.dylib;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		E9E87846074674560035356B = {
+			fileRef = E9E87845074674560035356B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		E9E87848074674890035356B = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = vecLib.framework;
+			path = /System/Library/Frameworks/vecLib.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		E9E87849074674890035356B = {
+			fileRef = E9E87848074674890035356B;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+	};
+	rootObject = 0867D690FE84028FC02AAC07;
+}

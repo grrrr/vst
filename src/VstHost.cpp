@@ -28,31 +28,136 @@ VSTPlugin::~VSTPlugin()
 	Free();				// Call free
 }
  
+static void FreeVST(void *handle)
+{
+#if FLEXT_OS == FLEXT_OS_WIN
+    FreeLibrary(h_dll); 
+#elif FLEXT_OS == FLEXT_OS_MAC
+#else
+#error Platform not supported
+#endif    
+} 
+
+#if FLEXT_OS == FLEXT_OS_MAC
+OSStatus FSPathMakeFSSpec(
+  const UInt8 *path,
+  FSSpec *spec,
+  Boolean *isDirectory)  /* can be NULL */
+{
+  OSStatus  result;
+  FSRef    ref;
+  
+  /* check parameters */
+  require_action(NULL != spec, BadParameter, result = paramErr);
+  
+  /* convert the POSIX path to an FSRef */
+  result = FSPathMakeRef(path, &ref, isDirectory);
+  require_noerr(result, FSPathMakeRef);
+  
+  /* and then convert the FSRef to an FSSpec */
+  result = FSGetCatalogInfo(&ref, kFSCatInfoNone, NULL, NULL, spec, NULL);
+  require_noerr(result, FSGetCatalogInfo);
+  
+FSGetCatalogInfo:
+FSPathMakeRef:
+BadParameter:
+
+  return ( result );
+}
+#endif
+
 int VSTPlugin::Instance(const char *dllname)
 {
 #ifdef FLEXT_DEBUG
         flext::post("New Plugin 1 - %x",this);
 #endif
 
+    PVSTMAIN pluginmain;
+#if FLEXT_OS == FLEXT_OS_WIN
     h_dll = LoadLibrary(dllname);
 	if(!h_dll)
 		return VSTINSTANCE_ERR_NO_VALID_FILE;
 
-	PVSTMAIN main = (PVSTMAIN)GetProcAddress(h_dll,"main");
-	if(!main) {	
-		FreeLibrary(h_dll);
+    pluginmain = (PVSTMAIN)GetProcAddress(h_dll,"main");
+    void *audioMasterFPtr = Master;
+    
+#elif FLEXT_OS == FLEXT_OS_MAC
+    short   resFileID;
+    FSSpec  spec;
+    OSErr err;
+
+    err = FSPathMakeFSSpec(dllname,&spec,NULL);
+    resFileID = FSpOpenResFile(&spec, fsRdPerm);
+    short cResCB = Count1Resources('aEff');
+
+    for(int i = 0; i < cResCB; i++) {
+        Handle             codeH;
+        CFragConnectionID  connID;
+        Ptr                mainAddr;
+        Str255             errName;
+        Str255             fragName;
+        char               fragNameCStr[256];
+        short              resID;
+        OSType             resType;
+
+        codeH = Get1IndResource('aEff', short(i+1));
+        if (!codeH) continue;
+
+        GetResInfo(codeH, &resID, &resType, fragName);
+        DetachResource(codeH);
+        HLock(codeH);
+
+        err = GetMemFragment(*codeH,
+                             GetHandleSize(codeH),
+                             fragName,
+                             kPrivateCFragCopy,
+                             &connID, (Ptr *) & mainAddr, errName);
+
+        if (!err) {
+           #ifdef __CFM__
+           pluginmain = (PVSTMAIN)NewMachOFromCFM(mainAddr);
+           #else
+           pluginmain = (PVSTMAIN)mainAddr;
+           #endif
+        }
+    }
+
+    CloseResFile(resFileID);
+
+    void *audioMasterFPtr = 
+#ifdef __CFM__
+        NewCFMFromMachO(Master);
+#else
+        Master;
+#endif
+
+#else
+#error Platform not supported
+#endif    
+
+	if(!pluginmain) {	
+		FreeVST(h_dll);
 		_pEffect = NULL;
 		return VSTINSTANCE_ERR_NO_VST_PLUGIN;
 	}
 
 	//This calls the "main" function and receives the pointer to the AEffect structure.
-	_pEffect = main((audioMasterCallback)Master);
+	_pEffect = pluginmain((audioMasterCallback)audioMasterFPtr);
 	
+#ifdef __MACOSX__
+#ifdef __CFM__
+    DisposeCFMFromMachO(audioMasterFPtr);
+    DisposeMachOFromCFM(pluginmain);
+#endif
+#endif
+
+    
 	if(!_pEffect || _pEffect->magic != kEffectMagic) {
 		post("VST plugin : Unable to create effect");
 
 	    _pEffect = NULL;
-		FreeLibrary(h_dll); h_dll = NULL;
+		FreeVST(h_dll); 
+        h_dll = NULL;
 	    return VSTINSTANCE_ERR_REJECTED;
     }
 	
@@ -158,7 +263,10 @@ void VSTPlugin::Free() // Called also in destruction
         // There should be a data stub accessible from the plugin object and the thread
         // holding the necessary data, so that both can operate independently
 
-        if(h_dll) { FreeLibrary(h_dll); h_dll = NULL; }
+        if(h_dll) { 
+            FreeVST(h_dll); 
+            h_dll = NULL; 
+        }
 
 #ifdef FLEXT_DEBUG
         flext::post("Free Plugin 2 - %x",this);
@@ -425,7 +533,7 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-#if 1
+#if 0
     audioMasterEnum op = (audioMasterEnum)opcode;
     audioMasterEnumx opx = (audioMasterEnumx)opcode;
 #endif

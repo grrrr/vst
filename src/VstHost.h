@@ -13,10 +13,14 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <flext.h>
 #include "AEffectx.h"
 #include "AEffEditor.hpp"
+#include <string>
 
 #if FLEXT_OS == FLEXT_OS_WIN
 #include <windows.h>
 typedef HWND WHandle;
+#elif FLEXT_OS == FLEXT_OS_MAC
+#include <CoreServices/CoreServices.h>
+typedef Handle WHandle;
 #else
 #error Platform not supported!
 #endif
@@ -54,7 +58,7 @@ public:
 
     bool Is() const { return _pEffect != NULL; }
 
-    ULONG GetVersion() const { return _pEffect?_pEffect->version:0; }
+    long GetVersion() const { return _pEffect?_pEffect->version:0; }
 
     bool IsSynth() const { return HasFlags(effFlagsIsSynth); }
     bool IsReplacing() const { return HasFlags(effFlagsCanReplacing); }
@@ -139,6 +143,8 @@ protected:
 
 #if FLEXT_OS == FLEXT_OS_WIN
 	HMODULE h_dll;
+#elif FLEXT_OS == FLEXT_OS_MAC
+	void *h_dll;
 #else
 #error
 #endif

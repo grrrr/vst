@@ -18,7 +18,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.5
 #endif
 
-#if FLEXT_OS == FLEXT_OS_WIN
+#if FLEXT_OS == FLEXT_OS_WIN || FLEXT_OS == FLEXT_OS_MAC
 //
 #else
 #error Platform not supported!

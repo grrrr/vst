@@ -13,13 +13,16 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "VstHost.h"
 
 #include <stdlib.h>
-#include <direct.h>
-#include <io.h>
-
+#include <string.h>
 #include <string>
 
+#if FLEXT_OS == FLEXT_OS_WIN
+#include <direct.h>
+#include <io.h>
+#endif
 
-#define VST_VERSION "0.1.0pre16"
+
+#define VST_VERSION "0.1.0pre17"
 
 
 class vst:
@@ -264,7 +267,7 @@ V vst::InitPlug()
 {
     FLEXT_ASSERT(plug);
 
-	vstfun = plug->IsReplacing()?VSTPlugin::processReplacing:VSTPlugin::process;
+	vstfun = plug->IsReplacing()?&VSTPlugin::processReplacing:&VSTPlugin::process;
     sigmatch = plug->GetNumInputs() == CntInSig() && plug->GetNumOutputs() == CntOutSig();
     InitPlugDSP();
 
@@ -286,12 +289,12 @@ V vst::ClearBuf()
     if(!plug) return;
 
     if(vstin) {
-        for(I i = 0; i < plug->GetNumInputs(); ++i) delete[] vstin[i];
+        for(I i = 0; i < plug->GetNumInputs(); ++i) FreeAligned(vstin[i]);
         delete[] vstin; vstin = NULL;
         delete[] tmpin; tmpin = NULL;
     }
     if(vstout) {
-        for(I i = 0; i < plug->GetNumOutputs(); ++i) delete[] vstout[i];
+        for(I i = 0; i < plug->GetNumOutputs(); ++i) FreeAligned(vstout[i]);
         delete[] vstout; vstout = NULL;
         delete[] tmpout; tmpout = NULL;
     }
@@ -306,17 +309,17 @@ V vst::InitBuf()
 
     vstin = new R *[inputs];
     tmpin = new R *[inputs];
-    for(i = 0; i < inputs; ++i) vstin[i] = new R[Blocksize()];
+    for(i = 0; i < inputs; ++i) vstin[i] = (R *)NewAligned(Blocksize()*sizeof(R));
     
     vstout = new R *[outputs];
     tmpout = new R *[outputs];
-    for(i = 0; i < outputs; ++i) vstout[i] = new R[Blocksize()];
+    for(i = 0; i < outputs; ++i) vstout[i] = (R *)NewAligned(Blocksize()*sizeof(R));
 }
 
 static std::string findFilePath(const std::string &path,const std::string &dllname)
 {
-	_chdir( path.c_str() );
 #if FLEXT_OS == FLEXT_OS_WIN
+	_chdir( path.c_str() );
     WIN32_FIND_DATA data;
     HANDLE fh = FindFirstFile(dllname.c_str(),&data);
     if(fh != INVALID_HANDLE_VALUE) {
@@ -358,7 +361,9 @@ BL vst::ms_plug(I argc,const A *argv)
 	for(I i = 0; i < argc; i++) {
 		if(i > 0) plugname += ' ';
 		GetAString(argv[i],buf,sizeof buf);
+#if FLEXT_OS == FLEXT_OS_WIN
         strlwr(buf);
+#endif
 
 #if FLEXT_SYS == FLEXT_SYS_PD
         // strip char escapes (only in newer/devel PD version)
@@ -447,7 +452,7 @@ BL vst::ms_plug(I argc,const A *argv)
 	}
 
     if(!lf) { // failed - don't make any ins or outs
-		post("%s - unable to load plugin '%s', load error %i",thisName(),plugname,loaderr);
+		post("%s - unable to load plugin '%s', load error %i",thisName(),plugname.c_str(),loaderr);
 		ClearPlug();
 	}
 
