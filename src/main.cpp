@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre19"
+#define VST_VERSION "0.1.0pre20"
 
 
 class vst
@@ -308,6 +308,7 @@ void vst::Setup(t_classid c)
     SetupEditor();
 }
 
+static int corefs = 0;
 
 vst::vst(int argc,const t_atom *argv):
     plug(NULL),visible(false),
@@ -317,7 +318,7 @@ vst::vst(int argc,const t_atom *argv):
 {
 #if FLEXT_OS == FLEXT_OS_WIN
     // this is necessary for Waveshell
-    CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
+    if(!corefs++) CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
 #endif
 
     int ins = 1,outs = 1;
@@ -334,7 +335,7 @@ vst::~vst()
 {
     ClearPlug();
 #if FLEXT_OS == FLEXT_OS_WIN
-    CoUninitialize();
+    if(!--corefs) CoUninitialize();
 #endif
 }
 

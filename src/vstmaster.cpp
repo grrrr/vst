@@ -274,6 +274,7 @@ void VSTPlugin::updatepos(long frames)
     // and if, how?
     samplepos += frames;
 
+    // \todo this factor should be cached
     ppqpos += frames*tempo/(samplerate*60);
 
     if(looping) {

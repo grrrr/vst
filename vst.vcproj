@@ -338,9 +338,6 @@
 		<File
 			RelativePath="src\main.h">
 		</File>
-		<File
-			RelativePath=".\src\resource.h">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
