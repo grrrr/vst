@@ -60,7 +60,6 @@ void CPopupWindow::SetPlugin(VSTPlugin *p)
 	CreateEx( WS_EX_DLGMODALFRAME,AfxRegisterWndClass(CS_DBLCLKS),tmp,WS_CAPTION|WS_THICKFRAME|WS_POPUP|WS_SYSMENU,0,0,0,0,NULL,NULL,NULL);
     
 	plug->Dispatch(effEditOpen , 0 , 0 , m_hWnd , 0.0f  );
-	RECT r = plug->GetEditorRect();
 /*
 	CString str = theApp->GetProfileString( "VSTPos" , plug->GetName() , "10,10");
 	int idx = str.Find(",");
@@ -68,11 +67,13 @@ void CPopupWindow::SetPlugin(VSTPlugin *p)
 	CString y = str.Right( idx );
 	printf(" index is %d left is %s and right is %s" , idx , x , y);	
 */
-	SetWindowPos(&wndTopMost,plug->getX(),plug->getY(),(r.right - r.left) + 10 , r.bottom - r.top + 30 , SWP_SHOWWINDOW);
 
 	DoInit();
-	ShowWindow( SW_SHOW );		
-	BringWindowToTop();
+
+	RECT r = plug->GetEditorRect();
+	SetWindowPos(&wndTop,plug->getX(),plug->getY(),(r.right - r.left) + 10 , r.bottom - r.top + 30 , SWP_SHOWWINDOW);
+//	ShowWindow( SW_SHOW );		
+//	BringWindowToTop();
 //	SetFocus();
 }
 

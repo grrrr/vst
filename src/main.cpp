@@ -378,7 +378,7 @@ BL vst::ms_plug(I argc,const A *argv)
 	}
 
     // re-init dsp stuff 
-    InitPlug();
+    if(plug) InitPlug();
 
     return lf;
 }
