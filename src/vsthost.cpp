@@ -9,6 +9,39 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "vsthost.h"
 
+
+const t_symbol 
+    *VSTPlugin::sym_event,
+    *VSTPlugin::sym_evmidi,
+    *VSTPlugin::sym_evaudio,
+    *VSTPlugin::sym_evvideo,
+    *VSTPlugin::sym_evparam,
+    *VSTPlugin::sym_evtrigger,
+    *VSTPlugin::sym_evsysex,
+    *VSTPlugin::sym_ev_,
+    *VSTPlugin::sym_midi[8];
+
+void VSTPlugin::Setup()
+{
+    sym_event = flext::MakeSymbol("event");
+    sym_evmidi = flext::MakeSymbol("midi");
+    sym_evaudio = flext::MakeSymbol("audio");
+    sym_evvideo = flext::MakeSymbol("video");
+    sym_evparam = flext::MakeSymbol("param");
+    sym_evtrigger = flext::MakeSymbol("trigger");
+    sym_evsysex = flext::MakeSymbol("sysex");
+    sym_ev_ = flext::MakeSymbol("???");
+
+    sym_midi[0] = flext::MakeSymbol("noteon");
+    sym_midi[1] = flext::MakeSymbol("noteoff");
+    sym_midi[2] = flext::MakeSymbol("polyafter");
+    sym_midi[3] = flext::MakeSymbol("cntl");
+    sym_midi[4] = flext::MakeSymbol("progchg");
+    sym_midi[5] = flext::MakeSymbol("chnafter");
+    sym_midi[6] = flext::MakeSymbol("pitchbend");
+    sym_midi[7] = sym__;
+}
+
 VSTPlugin::VSTPlugin(Responder *resp)
     : hdll(NULL),hwnd(NULL)
     , effect(NULL),pluginmain(NULL),audiomaster(NULL)
@@ -16,15 +49,20 @@ VSTPlugin::VSTPlugin(Responder *resp)
     , posx(0),posy(0),caption(true)
     , midichannel(0),eventqusz(0)
     , paramnamecnt(0)
-    , samplerate(0),samplepos(0)
-    , timesignom(0),timesigden(0)
+    , transchg(true)
+    , playing(false),looping(false)
+    , samplerate(0)
+    , samplepos(0),ppqpos(0)
+    , tempo(120)
+    , timesignom(4),timesigden(4)
     , barstartpos(0)
     , cyclestartpos(0),cycleendpos(0)
+    , smpteoffset(0),smpterate(0)
 {}
 
 VSTPlugin::~VSTPlugin()
 {
-	Free();				// Call free
+	Free();
 }
 
 
@@ -158,9 +196,12 @@ queried in a called function
 */
 long VSTPlugin::uniqueid = 0;
 
+std::string VSTPlugin::dllloading;
+
 bool VSTPlugin::InstPlugin(long plugid)
 {
     uniqueid = plugid;
+    dllloading = dllname;
 
     FLEXT_ASSERT(pluginmain && audiomaster);
 
@@ -288,11 +329,14 @@ void VSTPlugin::ListPlugs(const t_symbol *sym) const
 {
     if(responder) {
         if(Is() && Dispatch(effGetPlugCategory) == kPlugCategShell) {
+            t_atom at;
             // sub plugin-name given -> scan plugs
 	        char tmp[64];
 	        // scan shell for subplugins
-	        while(Dispatch(effShellGetNextPlugin,0,0,tmp))
-                responder->Respond(sym,tmp);
+            while(Dispatch(effShellGetNextPlugin,0,0,tmp)) {
+                SetString(at,tmp);
+                responder->Respond(sym,1,&at);
+            }
         }
 
         // bang

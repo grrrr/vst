@@ -13,6 +13,60 @@ static const int VST_VERSION = 100;
 static const char *vendor = "grrrr.org";
 static const char *product = "vst~";
 
+
+void VSTPlugin::ProcessEvent(const VstEvent &ev)
+{
+    if(!responder) return;
+
+    if(ev.type == kVstMidiType) {
+        const VstMidiEvent &mev = (const VstMidiEvent &)ev;
+        t_atom lst[10];
+        SetSymbol(lst[0],sym_evmidi);
+        int midi = ((unsigned char)mev.midiData[0]>>4)-8;
+        FLEXT_ASSERT(midi >= 0 && midi < 8);
+        SetSymbol(lst[1],sym_midi[midi]);
+        SetInt(lst[2],(unsigned char)mev.midiData[0]&0x0f);
+        SetInt(lst[3],(unsigned char)mev.midiData[1]);
+        SetInt(lst[4],(unsigned char)mev.midiData[2]);
+        // what about running status? (obviously not possible)
+        SetInt(lst[5],mev.deltaFrames);
+        SetInt(lst[6],mev.noteLength);
+        SetInt(lst[7],mev.noteOffset);
+        SetInt(lst[8],(int)mev.detune);
+        SetInt(lst[9],(int)mev.noteOffVelocity);
+        responder->Respond(sym_event,9,lst);
+    }
+    else {
+        const t_symbol *sym;
+        if(ev.type == kVstAudioType)
+            sym = sym_evaudio;
+        else if(ev.type == kVstVideoType)
+            sym = sym_evvideo;
+        else if(ev.type == kVstParameterType)
+            sym = sym_evparam;
+        else if(ev.type == kVstTriggerType)
+            sym = sym_evtrigger;
+        else if(ev.type == kVstSysExType)
+            sym = sym_evsysex;
+        else
+            sym = sym_ev_;
+
+        int data = ev.byteSize-sizeof(ev.deltaFrames)-sizeof(ev.flags);
+        const int stsize = 16;
+        t_atom stlst[stsize];
+        t_atom *lst = data+3 > stsize?new t_atom[data+3]:stlst;
+
+        SetSymbol(lst[0],sym);
+        SetInt(lst[1],ev.deltaFrames);
+        SetInt(lst[2],ev.flags);
+        for(int i = 0; i < data; ++i) SetInt(lst[3],(unsigned char)ev.data[i]);
+
+        responder->Respond(sym_event,data+3,lst);
+
+        if(lst != stlst) delete[] lst;
+    }
+}
+
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
@@ -62,57 +116,50 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 
         static VstTimeInfo time;
 		memset(&time,0,sizeof(time));
-		time.samplePos = th->samplepos;
-        time.sampleRate = th->samplerate;
+
         // flags
-        time.flags = kVstTempoValid|kVstBarsValid|kVstCyclePosValid;
+        time.flags = kVstTempoValid|kVstBarsValid|kVstCyclePosValid|kVstPpqPosValid|kVstSmpteValid|kVstTimeSigValid;
+
+        if(th->transchg) { time.flags |= kVstTransportChanged; th->transchg = false; }
+        if(th->playing) time.flags |= kVstTransportPlaying;
+        if(th->looping) time.flags |= kVstTransportCycleActive;
+            
+        time.sampleRate = th->samplerate;
+		time.samplePos = th->samplepos;
+        time.ppqPos = th->ppqpos;
 
         time.tempo = th->tempo;
         time.barStartPos = th->barstartpos;
         time.cycleStartPos = th->cyclestartpos;
         time.cycleEndPos = th->cycleendpos;
 
-        if(th->timesigden) {
-            time.timeSigNumerator = th->timesignom;
-            time.timeSigDenominator = th->timesigden;
-            time.flags |= kVstTimeSigValid;
-        }
+        time.timeSigNumerator = th->timesignom;
+        time.timeSigDenominator = th->timesigden;
+
+        // SMPTE data
+        time.smpteOffset = th->smpteoffset;
+        time.smpteFrameRate = th->smpterate;
+
+//        time.samplesToNextClock = 0;
 
         if(value&kVstNanosValid) {
             time.nanoSeconds = flext::GetOSTime()*1.e9;
             time.flags |= kVstNanosValid;
         }
 
-//        time.ppqPos = 0;
-
-/*
-        // SMPTE data
-        time.smpteOffset = 0;
-        time.smpteFrameRate = 0;
-        //
-        time.samplesToNextClock = 0;
-*/
 		return (long)&time;
     }
+
     case audioMasterProcessEvents: { // 8
         // VST event data from plugin
-        VstEvent *ev = static_cast<VstEvent *>(ptr);
-        if(ev->type == kVstMidiType) {
-            VstMidiEvent *mev = static_cast<VstMidiEvent *>(ptr);
-#ifdef FLEXT_DEBUG
-            if(mev->byteSize == 24)
-                post("MIDI event delta=%li len=%li offs=%li detune=%i offvel=%i",mev->deltaFrames,mev->noteLength,mev->noteOffset,(int)mev->detune,(int)mev->noteOffVelocity);
-            else
-                // has incorrect size
-                post("MIDI event");
-#endif
+        VstEvents *evs = static_cast<VstEvents *>(ptr);
+        if(th) {
+            for(int i = 0; i < evs->numEvents; ++i) 
+                th->ProcessEvent(*evs->events[i]);
+            return 1;
         }
-        else {
-#ifdef FLEXT_DEBUG
-            post("VST event type=%li",ev->type);
-#endif
-        }
-		return 1;
+        else 
+            return 0;
     }
 
     case audioMasterSetTime: { // 9
@@ -203,8 +250,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return kVstLangEnglish;
 
 	case audioMasterGetDirectory: // 41
-        // return full path of plugin
-		return 0; // not supported
+        return (long)(th?th->dllname.c_str():dllloading.c_str());
 
     case audioMasterUpdateDisplay: // 42
 #ifdef FLEXT_LOGGING
@@ -217,5 +263,26 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
         post("Unknown opcode %li",opcode);
 #endif
         return 0;
+    }
+}
+
+void VSTPlugin::updatepos(long frames)
+{
+    bool inloop = ppqpos < cycleendpos;
+
+    // \todo should the sample position also jump back when cycling?
+    // and if, how?
+    samplepos += frames;
+
+    ppqpos += frames*tempo/(samplerate*60);
+
+    if(looping) {
+        double cyclelen = cycleendpos-cyclestartpos;
+        if(cyclelen > 0) {
+            if(inloop && ppqpos >= cycleendpos) 
+                ppqpos = cyclestartpos+fmod(ppqpos-cyclestartpos,cyclelen);
+        }
+        else
+            ppqpos = cyclestartpos;
     }
 }

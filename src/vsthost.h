@@ -13,6 +13,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <flext.h>
 #include <string>
 #include <map>
+#include <math.h>
 
 #include "AEffectx.h"
 #include "AEffEditor.hpp"
@@ -36,13 +37,15 @@ typedef void *MHandle;
 class Responder
 {
 public:
-    virtual void Respond(const t_symbol *sym,const char *txt = NULL) = 0;
+    virtual void Respond(const t_symbol *sym,int argc = 0,const t_atom *argv = NULL) = 0;
 };
 
 class VSTPlugin:
     public flext
 {
 public:
+
+    static void Setup();
 
 	VSTPlugin(Responder *resp);
 	~VSTPlugin();
@@ -206,14 +209,48 @@ private:
     //////////////////////////////////////////////////////////////////////////////
 
 public:
-    double samplepos,tempo;
-    int timesignom,timesigden;
-    double barstartpos;
-    double cyclestartpos,cycleendpos;
+
+    void SetPlaying(bool p) { if(playing != p) transchg = true,playing = p; }
+    bool GetPlaying() const { return playing; }
+    void SetLooping(bool p) { if(looping != p) transchg = true,looping = p; }
+    bool GetLooping() const { return looping; }
+
+    void SetSamplePos(double p) { if(samplepos != p) transchg = true,samplepos = p; }
+    double GetSamplePos() const { return samplepos; }
+    void SetTempo(double p) { if(tempo != p) transchg = true,tempo = p; }
+    double GetTempo() const { return tempo; }
+    void SetPPQPos(double p) { if(ppqpos != p) transchg = true,ppqpos = p; }
+    double GetPPQPos() const { return ppqpos; }
+
+    void SetTimesigNom(int p) { if(timesignom != p) transchg = true,timesignom = p; }
+    int GetTimesigNom() const { return timesignom; }
+    void SetTimesigDen(int p) { if(timesigden != p) transchg = true,timesigden = p; }
+    int GetTimesigDen() const { return timesigden; }
+    void SetBarStart(double p) { if(barstartpos != p) transchg = true,barstartpos = p; }
+    double GetBarStart() const { return barstartpos; }
+    void SetCycleStart(double p) { if(cyclestartpos != p) transchg = true,cyclestartpos = p; }
+    double GetCycleStart() const { return cyclestartpos; }
+    void SetCycleEnd(double p) { if(cycleendpos != p) transchg = true,cycleendpos = p; }
+    double GetCycleEnd() const { return cycleendpos; }
+
+    void SetSmpteOffset(int p) { if(smpteoffset != p) transchg = true,smpteoffset = p; }
+    int GetSmpteOffset() const { return smpteoffset; }
+    void SetSmpteRate(int p) { if(smpterate != p) transchg = true,smpterate = p; }
+    int GetSmpteRate() const { return smpterate; }
 
 private:
 
+    bool playing,looping;
     float samplerate;
+    bool transchg;
+
+    double samplepos,tempo;
+    double ppqpos;
+
+    int timesignom,timesigden;
+    double barstartpos;
+    double cyclestartpos,cycleendpos;
+    int smpteoffset,smpterate;
 
     //////////////////////////////////////////////////////////////////////////////
 
@@ -222,15 +259,20 @@ public:
     {
         FLEXT_ASSERT(effect);
     	effect->processReplacing(effect,inputs,outputs,sampleframes);
-        samplepos += sampleframes;
+        if(playing) updatepos(sampleframes);
     }
 
 	void process(float **inputs,float **outputs,long sampleframes )
     {
         FLEXT_ASSERT(effect);
     	effect->process(effect,inputs,outputs,sampleframes);
-        samplepos += sampleframes;
+        if(playing) updatepos(sampleframes);
     }
+
+private:
+    void updatepos(long frames);
+
+    //////////////////////////////////////////////////////////////////////////////
 
 private:
     Responder *responder;
@@ -240,6 +282,7 @@ private:
     bool InstPlugin(long plugid = 0);
 
     static long uniqueid;
+    static std::string dllloading;
 
     inline long GetFlags() const { return effect?effect->flags:0; } 
     inline bool HasFlags(long msk) const { return effect && (effect->flags&msk); } 
@@ -263,6 +306,11 @@ private:
 	}
 
 	static long VSTCALLBACK Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);
+
+    static const t_symbol *sym_event,*sym_evmidi,*sym_evaudio,*sym_evvideo,*sym_evparam,*sym_evtrigger,*sym_evsysex,*sym_ev_;
+    static const t_symbol *sym_midi[8];
+
+    void ProcessEvent(const VstEvent &ev);
 };
 
 #endif

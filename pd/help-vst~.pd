@@ -1,41 +1,43 @@
-#N canvas 146 124 841 567 12;
+#N canvas 125 128 853 560 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
-#X obj 140 192 print A;
+#X obj 93 189 print A;
 #X obj 443 431 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X msg 442 453 vis \$1;
-#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
+#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;
 #X msg 230 452 edit \$1;
 #X msg 298 452 getedit;
 #X msg 505 453 getvis;
-#N canvas 367 122 558 434 info 0;
-#X msg 94 130 getversion;
-#X msg 94 75 getname;
-#X msg 95 153 getvendor;
-#X msg 94 188 getsynth;
-#X msg 94 218 getins;
-#X msg 155 220 getouts;
-#X msg 95 104 getdll;
-#X obj 26 260 s \$0-vst;
-#X msg 100 293 print;
-#X msg 101 340 echo \$1;
-#X obj 100 323 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
-1;
-#X msg 173 339 getecho;
-#X text 250 321 old stuff;
-#X text 171 190 is synth?;
-#X text 179 153 get vendor string;
-#X text 181 131 get version;
-#X text 154 104 get shared lib name;
-#X text 159 79 get internal (official) plug name;
-#X text 219 221 number of plug inlets and outlets;
+#N canvas 367 122 562 438 info 0;
+#X msg 92 160 getversion;
+#X msg 92 105 getname;
+#X msg 93 183 getvendor;
+#X msg 92 218 getsynth;
+#X msg 92 248 getins;
+#X msg 153 250 getouts;
+#X msg 93 134 getdll;
+#X obj 24 290 s \$0-vst;
+#X msg 98 323 print;
+#X msg 99 370 echo \$1;
+#X obj 98 353 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
+;
+#X msg 171 369 getecho;
+#X text 248 351 old stuff;
+#X text 169 220 is synth?;
+#X text 177 183 get vendor string;
+#X text 179 161 get version;
+#X text 152 134 get shared lib name;
+#X text 157 109 get internal (official) plug name;
+#X text 217 251 number of plug inlets and outlets;
 #X msg 93 41 getattributes;
-#X text 213 38 get all attributes;
-#X msg 268 189 geteditor;
-#X text 348 189 has editor?;
+#X msg 266 219 geteditor;
+#X text 346 219 has editor?;
 #X msg 22 41 help;
+#X text 213 38 list all attributes;
+#X msg 93 64 getmethods;
+#X text 213 65 list all methods;
 #X connect 0 0 7 0;
 #X connect 1 0 7 0;
 #X connect 2 0 7 0;
@@ -48,8 +50,9 @@
 #X connect 10 0 9 0;
 #X connect 11 0 7 0;
 #X connect 19 0 7 0;
-#X connect 21 0 7 0;
-#X connect 23 0 7 0;
+#X connect 20 0 7 0;
+#X connect 22 0 7 0;
+#X connect 24 0 7 0;
 #X restore 445 110 pd info;
 #X obj 96 96 r \$0-vst;
 #X obj 229 479 s \$0-vst;
@@ -60,11 +63,11 @@
 #X obj 26 323 s \$0-vst;
 #X text 65 249 set/get plugin;
 #X text 511 110 further information;
-#X obj 23 15 cnv 15 750 58 empty empty vst~ 10 32 0 24 -260818 -1 0
+#X obj 23 15 cnv 15 800 58 empty empty vst~ 10 32 0 24 -260818 -1 0
 ;
-#X text 137 173 attribute outlet;
+#X text 90 170 attribute outlet;
 #X text 103 137 inlets outlets [plugname];
-#N canvas 367 122 513 321 win 0;
+#N canvas 367 122 521 329 win 0;
 #X obj 11 287 s \$0-vst;
 #X msg 28 84 getx;
 #X text 135 77 get window coordinates;
@@ -103,7 +106,7 @@
 #X obj 27 240 bng 25 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
 -1;
 #X obj 27 271 openpanel;
-#N canvas 461 281 498 343 midi 0;
+#N canvas 461 281 502 347 midi 0;
 #X obj 20 279 s \$0-vst;
 #X msg 238 147 ctlchg 3 123;
 #X text 116 28 note on;
@@ -156,7 +159,7 @@
 #X text 256 239 mute output;
 #X msg 230 262 mute \$1;
 #X msg 312 262 getmute;
-#N canvas 200 110 473 372 parameters 0;
+#N canvas 200 110 477 376 parameters 0;
 #X obj 84 118 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
 -1 -1 0 1;
 #X msg 81 135 param 2 \$1;
@@ -189,7 +192,7 @@
 #X connect 14 0 2 0;
 #X connect 15 0 2 0;
 #X restore 444 143 pd parameters;
-#N canvas 0 0 458 308 programs 0;
+#N canvas 0 0 462 312 programs 0;
 #X obj 39 245 s \$0-vst;
 #X msg 162 106 getprogram;
 #X text 134 34 get number of programs;
@@ -224,9 +227,6 @@
 #X text 562 175 VST programs;
 #X text 134 53 http://grrrr.org;
 #X text 513 209 midi messages for VST synths;
-#X text 448 314 Attention: this vst~ version will crash when a plugin
-is unloaded with the editor window open!;
-#X text 133 14 VST plugins for PD \, (C)2003-05 Thomas Grill;
 #X msg 47 413 subplug AudioTrack;
 #X obj 32 498 s \$0-vst;
 #X msg 54 468 getsubplug;
@@ -234,15 +234,111 @@ is unloaded with the editor window open!;
 #X text 229 501 you can also alt-click on the vst~ object;
 #X msg 32 382 getpluglist;
 #X msg 52 440 subplug C4;
-#X connect 1 0 52 0;
-#X connect 1 0 52 1;
+#N canvas 105 36 474 631 time 0;
+#X obj 17 225 s \$0-vst;
+#X msg 112 78 samplepos \$1;
+#X obj 111 60 nbx 5 14 0 1e+037 0 0 empty empty empty 0 -6 0 10 -225271
+-1 -1 5 256;
+#X msg 224 77 getsamplepos;
+#X obj 111 108 nbx 5 14 0 1e+037 0 0 empty empty empty 0 -6 0 10 -225271
+-1 -1 11 256;
+#X msg 112 126 ppqpos \$1;
+#X msg 199 127 getppqpos;
+#X obj 111 153 nbx 5 14 5 400 0 1 empty empty empty 0 -6 0 10 -225271
+-1 -1 120 256;
+#X msg 112 171 tempo \$1;
+#X msg 199 172 gettempo;
+#X msg 113 28 playing \$1;
+#X msg 203 28 getplaying;
+#X obj 112 -1 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+;
+#X obj 109 218 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+1;
+#X msg 110 247 looping \$1;
+#X msg 200 247 getlooping;
+#X obj 111 275 nbx 5 14 0 1e+037 0 0 empty empty empty 0 -6 0 10 -225271
+-1 -1 5 256;
+#X msg 112 293 loopstart \$1;
+#X msg 222 293 getloopstart;
+#X obj 111 319 nbx 5 14 0 1e+037 0 0 empty empty empty 0 -6 0 10 -225271
+-1 -1 35 256;
+#X msg 112 337 loopend \$1;
+#X msg 222 337 getloopend;
+#X obj 111 363 nbx 5 14 0 1e+037 0 0 empty empty empty 0 -6 0 10 -225271
+-1 -1 0 256;
+#X msg 112 379 looplength \$1;
+#X msg 227 379 getlooplength;
+#X obj 112 512 nbx 5 14 0 1e+037 0 0 empty empty empty 0 -6 0 10 -225271
+-1 -1 0 256;
+#X msg 113 528 smpteoffset \$1;
+#X msg 235 528 getsmpteoffset;
+#X msg 113 570 smpterate \$1;
+#X msg 227 570 getsmpterate;
+#X obj 113 553 hradio 15 1 0 6 empty empty empty 0 -6 0 8 -225271 -1
+-1 0;
+#X text 227 552 24/25/24/30/29.97df/30df;
+#X obj 112 415 nbx 5 14 1 128 0 1 empty empty empty 0 -6 0 10 -225271
+-1 -1 4 256;
+#X msg 113 433 timenom \$1;
+#X msg 205 434 gettimenom;
+#X obj 113 455 nbx 5 14 1 128 0 1 empty empty empty 0 -6 0 10 -225271
+-1 -1 4 256;
+#X msg 114 473 timeden \$1;
+#X msg 206 474 gettimeden;
+#X text 300 423 time signature;
+#X text 302 438 nominator;
+#X text 302 476 denominator;
+#X text 284 161 tempo in quarters per minute;
+#X connect 1 0 0 0;
+#X connect 2 0 1 0;
+#X connect 3 0 0 0;
+#X connect 4 0 5 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 8 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 10 0 0 0;
+#X connect 11 0 0 0;
+#X connect 12 0 10 0;
+#X connect 13 0 14 0;
+#X connect 14 0 0 0;
+#X connect 15 0 0 0;
+#X connect 16 0 17 0;
+#X connect 17 0 0 0;
+#X connect 18 0 0 0;
+#X connect 19 0 20 0;
+#X connect 20 0 0 0;
+#X connect 21 0 0 0;
+#X connect 22 0 23 0;
+#X connect 23 0 0 0;
+#X connect 24 0 0 0;
+#X connect 25 0 26 0;
+#X connect 26 0 0 0;
+#X connect 27 0 0 0;
+#X connect 28 0 0 0;
+#X connect 29 0 0 0;
+#X connect 30 0 28 0;
+#X connect 32 0 33 0;
+#X connect 33 0 0 0;
+#X connect 34 0 0 0;
+#X connect 35 0 36 0;
+#X connect 36 0 0 0;
+#X connect 37 0 0 0;
+#X restore 446 280 pd time;
+#X text 513 278 sequencer stuff;
+#X text 133 14 VST plugins for PD \, (C)2003-2005 Thomas Grill;
+#X text 443 319 Attention: this vst~ version will crash when a plugin
+is unloaded with the editor window open!;
+#X connect 1 0 50 0;
+#X connect 1 0 50 1;
 #X connect 3 0 4 0;
 #X connect 4 0 12 0;
 #X connect 5 0 6 0;
 #X connect 6 0 11 0;
 #X connect 7 0 11 0;
 #X connect 8 0 12 0;
-#X connect 10 0 52 0;
+#X connect 10 0 50 0;
 #X connect 15 0 16 0;
 #X connect 24 0 16 0;
 #X connect 25 0 26 0;
@@ -254,10 +350,10 @@ is unloaded with the editor window open!;
 #X connect 36 0 39 0;
 #X connect 39 0 37 0;
 #X connect 40 0 37 0;
-#X connect 49 0 50 0;
-#X connect 51 0 50 0;
-#X connect 52 0 0 0;
-#X connect 52 1 0 1;
-#X connect 52 2 2 0;
-#X connect 54 0 50 0;
-#X connect 55 0 50 0;
+#X connect 47 0 48 0;
+#X connect 49 0 48 0;
+#X connect 50 0 0 0;
+#X connect 50 1 0 1;
+#X connect 50 2 2 0;
+#X connect 52 0 48 0;
+#X connect 53 0 48 0;

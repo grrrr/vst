@@ -106,20 +106,32 @@ protected:
     void m_note(int note,int vel);
     void m_noteoff(int note) { m_note(note,0); }
 
-    void mg_samplepos(float &p) { p = plug?plug->samplepos:0; }
-    void ms_samplepos(float p) { if(plug) plug->samplepos = p; }
-    void mg_tempo(float &p) { p = plug?plug->tempo:0; }
-    void ms_tempo(float p) { if(plug) plug->tempo = p; }
-    void mg_barstart(float &p) { p = plug?plug->barstartpos:0; }
-    void ms_barstart(float p) { if(plug) plug->barstartpos = p; }
-    void mg_cyclestart(float &p) { p = plug?plug->cyclestartpos:0; }
-    void ms_cyclestart(float p) { if(plug) plug->cyclestartpos = p; }
-    void mg_cycleend(float &p) { p = plug?plug->cycleendpos:0; }
-    void ms_cycleend(float p) { if(plug) plug->cycleendpos = p; }
-    void mg_timesignom(int &p) { p = plug?plug->timesignom:0; }
-    void ms_timesignom(float p) { if(plug) plug->timesignom = p; }
-    void mg_timesigden(int &p) { p = plug?plug->timesigden:0; }
-    void ms_timesigden(float p) { if(plug) plug->timesigden = p; }
+    void mg_playing(bool &p) { p = plug && plug->GetPlaying(); }
+    void ms_playing(bool p) { if(plug) plug->SetPlaying(p); }
+    void mg_looping(bool &p) { p = plug && plug->GetLooping(); }
+    void ms_looping(bool p) { if(plug) plug->SetLooping(p); }
+    void mg_samplepos(float &p) { p = plug?(float)plug->GetSamplePos():0; }
+    void ms_samplepos(float p) { if(plug) plug->SetSamplePos(p); }
+    void mg_ppqpos(float &p) { p = plug?(float)plug->GetPPQPos():0; }
+    void ms_ppqpos(float p) { if(plug) plug->SetPPQPos(p); }
+    void mg_tempo(float &p) { p = plug?(float)plug->GetTempo():0; }
+    void ms_tempo(float p) { if(plug) plug->SetTempo(p); }
+    void mg_barstart(float &p) { p = plug?(float)plug->GetBarStart():0; }
+    void ms_barstart(float p) { if(plug) plug->SetBarStart(p); }
+    void mg_cyclestart(float &p) { p = plug?(float)plug->GetCycleStart():0; }
+    void ms_cyclestart(float p) { if(plug) plug->SetCycleStart(p); }
+    void mg_cycleend(float &p) { p = plug?(float)plug->GetCycleEnd():0; }
+    void ms_cycleend(float p) { if(plug) plug->SetCycleEnd(p); }
+    void mg_cyclelength(float &p) { p = plug?(float)(plug->GetCycleEnd()-plug->GetCycleStart()):0; }
+    void ms_cyclelength(float p) { if(p) plug->SetCycleEnd(plug->GetCycleStart()+p); }
+    void mg_timesignom(int &p) { p = plug?plug->GetTimesigNom():0; }
+    void ms_timesignom(int p) { if(plug) plug->SetTimesigNom(p); }
+    void mg_timesigden(int &p) { p = plug?plug->GetTimesigDen():0; }
+    void ms_timesigden(int p) { if(plug) plug->SetTimesigDen(p); }
+    void mg_smpteoffset(int &p) { p = plug?plug->GetSmpteOffset():0; }
+    void ms_smpteoffset(int p) { if(plug) plug->SetSmpteOffset(p); }
+    void mg_smpterate(int &p) { p = plug?plug->GetSmpteRate():0; }
+    void ms_smpterate(int p) { if(plug) plug->SetSmpteRate(p); }
 
 private:
     void display_parameter(int param,bool showparams);
@@ -143,7 +155,7 @@ private:
 
     static void Setup(t_classid);
 	
-    virtual void Respond(const t_symbol *sym,const char *txt);
+    virtual void Respond(const t_symbol *sym,int argc = 0,const t_atom *argv = NULL);
 
     FLEXT_CALLBACK_V(m_print)
 
@@ -196,13 +208,19 @@ private:
     FLEXT_CALLGET_I(mg_plugversion)
     FLEXT_CALLGET_B(mg_issynth)
 
+    FLEXT_CALLVAR_B(mg_playing,ms_playing)
+    FLEXT_CALLVAR_B(mg_looping,ms_looping)
     FLEXT_CALLVAR_F(mg_samplepos,ms_samplepos)
+    FLEXT_CALLVAR_F(mg_ppqpos,ms_ppqpos)
     FLEXT_CALLVAR_F(mg_tempo,ms_tempo)
     FLEXT_CALLVAR_F(mg_barstart,ms_barstart)
     FLEXT_CALLVAR_F(mg_cyclestart,ms_cyclestart)
     FLEXT_CALLVAR_F(mg_cycleend,ms_cycleend)
+    FLEXT_CALLVAR_F(mg_cyclelength,ms_cyclelength)
     FLEXT_CALLVAR_I(mg_timesignom,ms_timesignom)
     FLEXT_CALLVAR_I(mg_timesigden,ms_timesigden)
+    FLEXT_CALLVAR_I(mg_smpteoffset,ms_smpteoffset)
+    FLEXT_CALLVAR_I(mg_smpterate,ms_smpterate)
 
     static const t_symbol *sym_progname,*sym_pname,*sym_param,*sym_ptext,*sym_pluglist;
 };
@@ -266,13 +284,19 @@ void vst::Setup(t_classid c)
 	FLEXT_CADDATTR_GET(c,"version",mg_plugversion);
 	FLEXT_CADDATTR_GET(c,"synth",mg_issynth);
 
+	FLEXT_CADDATTR_VAR(c,"playing",mg_playing,ms_playing);
+	FLEXT_CADDATTR_VAR(c,"looping",mg_looping,ms_looping);
 	FLEXT_CADDATTR_VAR(c,"samplepos",mg_samplepos,ms_samplepos);
+	FLEXT_CADDATTR_VAR(c,"ppqpos",mg_ppqpos,ms_ppqpos);
 	FLEXT_CADDATTR_VAR(c,"tempo",mg_tempo,ms_tempo);
 	FLEXT_CADDATTR_VAR(c,"barstart",mg_barstart,ms_barstart);
-	FLEXT_CADDATTR_VAR(c,"cyclestart",mg_cyclestart,ms_cyclestart);
-	FLEXT_CADDATTR_VAR(c,"cycleend",mg_cycleend,ms_cycleend);
-	FLEXT_CADDATTR_VAR(c,"timesignom",mg_timesignom,ms_timesignom);
-	FLEXT_CADDATTR_VAR(c,"timesigden",mg_timesigden,ms_timesigden);
+	FLEXT_CADDATTR_VAR(c,"loopstart",mg_cyclestart,ms_cyclestart);
+	FLEXT_CADDATTR_VAR(c,"loopend",mg_cycleend,ms_cycleend);
+	FLEXT_CADDATTR_VAR(c,"looplength",mg_cyclelength,ms_cyclelength);
+	FLEXT_CADDATTR_VAR(c,"timenom",mg_timesignom,ms_timesignom);
+	FLEXT_CADDATTR_VAR(c,"timeden",mg_timesigden,ms_timesigden);
+	FLEXT_CADDATTR_VAR(c,"smpteoffset",mg_smpteoffset,ms_smpteoffset);
+	FLEXT_CADDATTR_VAR(c,"smpterate",mg_smpterate,ms_smpterate);
 
     sym_progname = MakeSymbol("progname");
     sym_pname = MakeSymbol("pname");
@@ -280,6 +304,7 @@ void vst::Setup(t_classid c)
     sym_ptext = MakeSymbol("ptext");
     sym_pluglist = MakeSymbol("pluglist");
 
+    VSTPlugin::Setup();
     SetupEditor();
 }
 
@@ -290,19 +315,19 @@ vst::vst(int argc,const t_atom *argv):
     vstfun(NULL),vstin(NULL),vstout(NULL),tmpin(NULL),tmpout(NULL),
     echoparam(false),bypass(false),mute(false),paramnames(0)
 {
-    if(argc >= 2 && CanbeInt(argv[0]) && CanbeInt(argv[1])) {
-	    AddInSignal(GetAInt(argv[0]));
-        AddOutSignal(GetAInt(argv[1]));     
-
-        if(argc >= 3 && !ms_plug(argc-2,argv+2)) InitProblem();
-    }
-    else
-        throw "syntax: vst~ inputs outputs [plug]";
-
 #if FLEXT_OS == FLEXT_OS_WIN
     // this is necessary for Waveshell
     CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
 #endif
+
+    int ins = 1,outs = 1;
+    if(argc >= 1 && CanbeInt(argv[0])) { ins = GetAInt(argv[0]); argc--,argv++; }
+    if(argc >= 1 && CanbeInt(argv[0])) { outs = GetAInt(argv[0]); argc--,argv++; }
+
+    AddInSignal(ins);
+    AddOutSignal(outs);     
+
+    if(argc >= 1 && !ms_plug(argc,argv)) InitProblem();
 }
 
 vst::~vst()
@@ -931,11 +956,8 @@ void vst::m_note(int note,int velocity)
 		plug->AddNoteOff(note);
 }
 
-void vst::Respond(const t_symbol *sym,const char *txt)
+void vst::Respond(const t_symbol *sym,int argc,const t_atom *argv)
 {
     FLEXT_ASSERT(sym);
-
-    t_atom at; 
-    if(txt) SetString(at,txt);
-    ToOutAnything(GetOutAttr(),sym,txt?1:0,&at);
+    ToOutAnything(GetOutAttr(),sym,argc,argv);
 }
