@@ -34,22 +34,23 @@ void VSTPlugin::Setup()
     sym_evsysex = flext::MakeSymbol("sysex");
     sym_ev_ = flext::MakeSymbol("???");
 
-    sym_midi[0] = flext::MakeSymbol("noteon");
-    sym_midi[1] = flext::MakeSymbol("noteoff");
-    sym_midi[2] = flext::MakeSymbol("polyafter");
-    sym_midi[3] = flext::MakeSymbol("cntl");
+    sym_midi[0] = flext::MakeSymbol("noteoff");
+    sym_midi[1] = flext::MakeSymbol("note");
+    sym_midi[2] = flext::MakeSymbol("atouch");
+    sym_midi[3] = flext::MakeSymbol("ctlchg");
     sym_midi[4] = flext::MakeSymbol("progchg");
-    sym_midi[5] = flext::MakeSymbol("chnafter");
-    sym_midi[6] = flext::MakeSymbol("pitchbend");
-    sym_midi[7] = sym__;
+    sym_midi[5] = flext::MakeSymbol("atouch");
+    sym_midi[6] = flext::MakeSymbol("pbend");
+    sym_midi[7] = flext::MakeSymbol("sysex");
 }
 
 VSTPlugin::VSTPlugin(Responder *resp)
     : hdll(NULL),hwnd(NULL)
     , effect(NULL),pluginmain(NULL),audiomaster(NULL)
     , responder(resp)
-    , posx(0),posy(0),caption(true)
-    , midichannel(0),eventqusz(0)
+    , posx(0),posy(0),sizex(0),sizey(0)
+    , visible(true),caption(true),handle(false)
+    , midichannel(0),eventqusz(0),dumpevents(false)
     , paramnamecnt(0)
     , transchg(true)
     , playing(false),looping(false),feedback(false)

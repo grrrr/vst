@@ -27,7 +27,6 @@ void VSTPlugin::StartEditing(WHandle h)
 {
     FLEXT_ASSERT(h != NULL);
 	Dispatch(effEditOpen,0,0,hwnd = h);
-//	Dispatch(effEditTop);
 
     TitleEditor(this,title.c_str());
 }
@@ -40,37 +39,46 @@ void VSTPlugin::StopEditing()
     }
 }
 
-void VSTPlugin::Visible(bool vis)
+void VSTPlugin::Visible(bool vis,bool upd)
 {	
-	if(Is() && IsEdited()) ShowEditor(this,vis);
+    visible = vis;
+	if(upd && Is() && IsEdited()) ShowEditor(this,vis);
 }
 
-bool VSTPlugin::IsVisible() const
-{	
-	return Is() && IsEdited() && IsEditorShown(this);
-}
-
-
-void VSTPlugin::SetPos(int x,int y,bool upd) 
+void VSTPlugin::SetPos(int x,int y,bool upd)
 {
-    if(Is()) {
-        posx = x; posy = y; 
-        if(upd && IsEdited()) MoveEditor(this,posx,posy);
-    }
+    posx = x; posy = y; 
+    if(upd && Is() && IsEdited()) MoveEditor(this,posx,posy);
+}
+
+void VSTPlugin::SetSize(int x,int y,bool upd)
+{
+    sizex = x; sizey = y; 
+    if(upd && Is() && IsEdited()) SizeEditor(this,sizex,sizey);
 }
 
 void VSTPlugin::SetCaption(bool c) 
 {
-    if(Is()) {
-        caption = c; 
-        if(IsEdited()) CaptionEditor(this,c);
-    }
+    caption = c; 
+    if(Is() && IsEdited()) CaptionEditor(this,c);
+}
+
+void VSTPlugin::SetHandle(bool h) 
+{
+    handle = h; 
+    if(Is() && IsEdited()) HandleEditor(this,h);
 }
 
 void VSTPlugin::SetTitle(const char *t)
 {
-    if(Is()) {
-        title = t; 
-        if(IsEdited()) TitleEditor(this,t);
+    title = t; 
+    if(Is() && IsEdited()) TitleEditor(this,t);
+}
+
+void VSTPlugin::ToFront()
+{
+    if(Is() && IsEdited()) {
+        FrontEditor(this);
+	    Dispatch(effEditTop,0,0,vendorname);
     }
 }

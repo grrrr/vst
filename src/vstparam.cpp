@@ -16,6 +16,7 @@ static void striptrail(char *txt)
     for(int i = strlen(txt)-1; i >= 0; --i) 
         // cast to unsigned char since isspace functions don't want characters like 0x80 = -128
         if(isspace(((unsigned char *)txt)[i])) txt[i] = 0;
+        else break;
 }
 
 void VSTPlugin::GetParamName(int numparam,char *name) const

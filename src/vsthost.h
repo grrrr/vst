@@ -119,15 +119,23 @@ private:
 
 public:
     void SetPos(int x,int y,bool upd = true);
+    void SetSize(int x,int y,bool upd = true);
     void SetX(int x,bool upd = true) { SetPos(x,posy,upd); }
     void SetY(int y,bool upd = true) { SetPos(posx,y,upd); }
+    void SetW(int x,bool upd = true) { SetSize(x,sizey,upd); }
+    void SetH(int y,bool upd = true) { SetSize(sizex,y,upd); }
     int GetX() const { return posx; }
     int GetY() const { return posy; }
+    int GetW() const { return sizex; }
+    int GetH() const { return sizey; }
     void SetCaption(bool b);
     bool GetCaption() const { return caption; }
+    void SetHandle(bool h);
+    bool GetHandle() const { return handle; }
     void SetTitle(const char *t);
     const char *GetTitle() const { return title.c_str(); }
 
+    void ToFront();
 
 	void Edit(bool open);
 
@@ -139,61 +147,75 @@ public:
     void GetEditorRect(ERect &er) const { ERect *r; Dispatch(effEditGetRect,0,0,&r); er = *r; }
     void EditorIdle() { Dispatch(effEditIdle); }
 
-    void Visible(bool vis);
-    bool IsVisible() const;
+    void Visible(bool vis,bool upd = true);
+    bool IsVisible() const { return visible; }
 
     void Paint(ERect &r) const { Dispatch(effEditDraw,0,0,&r); }
 
 private:
-    int posx,posy; // Window position
+    bool visible;
+    int posx,posy,sizex,sizey; // Window position
     bool caption; // Window border
+    bool handle; // Window handle (like taskbar button)
     std::string title; // Window title
 
     //////////////////////////////////////////////////////////////////////////////
 
 public:
     enum {
-        MIDI_NOTEON = 144,
-        MIDI_NOTEOFF = 128,
-        MIDI_POLYAFTERTOUCH = 160,
-        MIDI_CONTROLCHANGE = 176,
-        MIDI_PROGRAMCHANGE = 192,
-        MIDI_AFTERTOUCH = 208,
-        MIDI_PITCHBEND = 224
+        MIDI_NOTEOFF = 0x80,
+        MIDI_NOTEON = 0x90,
+        MIDI_POLYAFTERTOUCH = 0xa0,
+        MIDI_CONTROLCHANGE = 0xb0,
+        MIDI_PROGRAMCHANGE = 0xc0,
+        MIDI_AFTERTOUCH = 0xd0,
+        MIDI_PITCHBEND = 0xe0,
+        MIDI_SYSEX = 0xf0,
     };
     
+    void SetEvents(bool ev) { dumpevents = ev; }
+    bool GetEvents() const { return dumpevents; }
+
     bool AddMIDI(unsigned char data0,unsigned char data1 = 0,unsigned char data2 = 0);
 
     static int range(int value,int mn = 0,int mx = 127) { return value < mn?mn:(value > mx?mx:value); }
 
-	bool AddNoteOn(unsigned char note,unsigned char speed,unsigned char midichannel = 0)
+    void SetChannel(int channel) { midichannel = range(channel,0,0xf); }
+    int GetChannel() const { return midichannel; }
+
+	bool AddNoteOn(unsigned char note,unsigned char speed /*,unsigned char midichannel = 0*/)
     {
-        return AddMIDI((char)MIDI_NOTEON|midichannel,note,speed);
+        return AddMIDI(MIDI_NOTEON+midichannel,note,speed);
     }
 
-    bool AddNoteOff(unsigned char note,unsigned char midichannel = 0)
+    bool AddNoteOff(unsigned char note /*,unsigned char midichannel = 0*/)
     {
-        return AddMIDI((char)MIDI_NOTEOFF|midichannel,note,0);
+        return AddMIDI(MIDI_NOTEOFF+midichannel,note,0);
     }
 	
 	void AddControlChange(int control,int value)
     {
-        AddMIDI(MIDI_CONTROLCHANGE+(midichannel&0xf),range(control),range(value));
+        AddMIDI(MIDI_CONTROLCHANGE+midichannel,range(control),range(value));
     }
 
 	void AddProgramChange(int value)
     {
-        AddMIDI(MIDI_PROGRAMCHANGE+(midichannel&0xf),range(value),0);
+        AddMIDI(MIDI_PROGRAMCHANGE+midichannel,range(value),0);
     }
 
 	void AddPitchBend(int value)
     {
-	    AddMIDI(MIDI_PITCHBEND+(midichannel&0xf),((value>>7)&127),(value&127));
+	    AddMIDI(MIDI_PITCHBEND+midichannel,((value>>7)&127),(value&127));
     }
 
 	void AddAftertouch(int value)
     {
- 	    AddMIDI((char)MIDI_AFTERTOUCH|midichannel,range(value));
+ 	    AddMIDI(MIDI_AFTERTOUCH+midichannel,range(value));
+    }
+
+	void AddPolyAftertouch(unsigned char note,int value)
+    {
+ 	    AddMIDI(MIDI_POLYAFTERTOUCH+midichannel,note,range(value));
     }
 
 private:
@@ -205,6 +227,7 @@ private:
 	int	eventqusz;
 
 	char midichannel;
+    bool dumpevents;
 
     //////////////////////////////////////////////////////////////////////////////
 

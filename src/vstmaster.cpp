@@ -16,7 +16,7 @@ static const char *product = "vst~";
 
 void VSTPlugin::ProcessEvent(const VstEvent &ev)
 {
-    if(!responder) return;
+    if(!responder && dumpevents) return;
 
     if(ev.type == kVstMidiType) {
         const VstMidiEvent &mev = (const VstMidiEvent &)ev;
@@ -204,6 +204,9 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 
 	case audioMasterGetVendorVersion: // 34
 		return VST_VERSION;
+
+    case audioMasterVendorSpecific: // 35
+        return 0;
 
 	case audioMasterCanDo: // 37
 #ifdef FLEXT_LOGGING

@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre21"
+#define VST_VERSION "0.1.0pre22"
 
 
 class vst
@@ -64,12 +64,19 @@ protected:
 
     void mg_winx(int &x) const { x = plug?plug->GetX():0; }
     void mg_winy(int &y) const { y = plug?plug->GetY():0; }
+    void mg_winw(int &x) const { x = plug?plug->GetW():0; }
+    void mg_winh(int &y) const { y = plug?plug->GetH():0; }
     void ms_winx(int x) { if(plug) plug->SetX(x); }
     void ms_winy(int y) { if(plug) plug->SetY(y); }
+    void ms_winw(int x) { if(plug) plug->SetW(x); }
+    void ms_winh(int y) { if(plug) plug->SetH(y); }
     void ms_wincaption(bool c) { if(plug) plug->SetCaption(c); }
     void mg_wincaption(bool &c) const { c = plug && plug->GetCaption(); }
+    void ms_winhandle(bool c) { if(plug) plug->SetHandle(c); }
+    void mg_winhandle(bool &c) const { c = plug && plug->GetHandle(); }
     void ms_wintitle(const AtomList &t);
     void mg_wintitle(AtomList &t) const { if(plug) { t(1); SetString(t[0],plug->GetTitle()); } }
+    void m_winfront() const { if(plug) plug->ToFront(); }
 
     void mg_chnsin(int &c) const { c = plug?plug->GetNumInputs():0; }
     void mg_chnsout(int &c) const { c = plug?plug->GetNumOutputs():0; }
@@ -98,13 +105,19 @@ protected:
     void m_ptext(int pnum);
     void m_ptexts(int argc,const t_atom *argv);
 
-//    void m_control(const t_symbol *ctrl_name,int ctrl_value);
-    void m_pitchbend(int ctrl_value) { if(plug) plug->AddPitchBend(ctrl_value ); }
-    void m_programchange(int ctrl_value) { if(plug) plug->AddProgramChange(ctrl_value ); }
-    void m_aftertouch(int ctrl_value) { if(plug) plug->AddAftertouch(ctrl_value ); }
-    void m_ctrlchange(int control,int ctrl_value) { if(plug) plug->AddControlChange(control,ctrl_value ); }
+    void mg_channel(int &chn) const { chn = plug?plug->GetChannel():0; }
+    void ms_channel(int chn) { if(plug) plug->SetChannel(chn); }
+
     void m_note(int note,int vel);
     void m_noteoff(int note) { m_note(note,0); }
+    void m_programchange(int ctrl_value) { if(plug) plug->AddProgramChange(ctrl_value); }
+    void m_ctrlchange(int control,int ctrl_value) { if(plug) plug->AddControlChange(control,ctrl_value); }
+    void m_aftertouch(int ctrl_value) { if(plug) plug->AddAftertouch(ctrl_value); }
+    void m_polyaftertouch(int note,int ctrl_value) { if(plug) plug->AddPolyAftertouch(note,ctrl_value); }
+    void m_pitchbend(int ctrl_value) { if(plug) plug->AddPitchBend(ctrl_value); }
+
+    void mg_dumpevents(bool &ev) const { ev = plug?plug->GetEvents():false; }
+    void ms_dumpevents(bool ev) { if(plug) plug->SetEvents(ev); }
 
     void mg_playing(bool &p) { p = plug && plug->GetPlaying(); }
     void ms_playing(bool p) { if(plug) plug->SetPlaying(p); }
@@ -140,7 +153,7 @@ private:
 
     VSTPlugin *plug;
     std::string plugname,subplug;
-    bool echoparam,visible,bypass,mute;
+    bool visible,bypass,mute;
     int paramnames;
 
     int blsz;
@@ -171,12 +184,17 @@ private:
     FLEXT_ATTRVAR_B(bypass)
     FLEXT_ATTRVAR_B(mute)
 
-//    FLEXT_CALLBACK_2(m_control,t_symptr,int)
-    FLEXT_CALLBACK_I(m_pitchbend)
-    FLEXT_CALLBACK_I(m_aftertouch)
-    FLEXT_CALLBACK_I(m_programchange)
+    FLEXT_CALLVAR_I(mg_channel,ms_channel)
+    FLEXT_CALLBACK_II(m_note)
+    FLEXT_CALLBACK_I(m_noteoff)
     FLEXT_CALLBACK_II(m_ctrlchange)
+    FLEXT_CALLBACK_I(m_aftertouch)
+    FLEXT_CALLBACK_II(m_polyaftertouch)
+    FLEXT_CALLBACK_I(m_pitchbend)
 
+    FLEXT_CALLVAR_B(mg_dumpevents,ms_dumpevents)
+
+    FLEXT_CALLBACK_I(m_programchange)
     FLEXT_CALLVAR_I(mg_program,ms_program)
     FLEXT_CALLBACK_V(mg_progname)
 
@@ -190,14 +208,14 @@ private:
     FLEXT_CALLBACK_I(m_ptext)
     FLEXT_CALLBACK_V(m_ptexts)
 
-    FLEXT_CALLBACK_II(m_note)
-    FLEXT_CALLBACK_I(m_noteoff)
-
-    FLEXT_ATTRVAR_B(echoparam)
     FLEXT_CALLVAR_I(mg_winx,ms_winx)
     FLEXT_CALLVAR_I(mg_winy,ms_winy)
+    FLEXT_CALLVAR_I(mg_winw,ms_winw)
+    FLEXT_CALLVAR_I(mg_winh,ms_winh)
     FLEXT_CALLVAR_B(mg_wincaption,ms_wincaption)
+    FLEXT_CALLVAR_B(mg_winhandle,ms_winhandle)
     FLEXT_CALLVAR_V(mg_wintitle,ms_wintitle)
+    FLEXT_CALLBACK(m_winfront)
 
     FLEXT_CALLGET_I(mg_chnsin)
     FLEXT_CALLGET_I(mg_chnsout)
@@ -250,12 +268,15 @@ void vst::Setup(t_classid c)
 	FLEXT_CADDATTR_VAR1(c,"mute",mute);
 	FLEXT_CADDMETHOD_(c,0,"print",m_print);
 
-	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
+	FLEXT_CADDATTR_VAR(c,"channel",mg_channel,ms_channel);
 	FLEXT_CADDMETHOD_I(c,0,"noteoff",m_noteoff);
-//	FLEXT_CADDMETHOD_2(c,0,"control",m_control,t_symptr,int);
-	FLEXT_CADDMETHOD_(c,0,"pbend",m_pitchbend);
-	FLEXT_CADDMETHOD_(c,0,"atouch",m_aftertouch);
+	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
+	FLEXT_CADDMETHOD_II(c,0,"patouch",m_polyaftertouch);
 	FLEXT_CADDMETHOD_II(c,0,"ctlchg",m_ctrlchange);
+	FLEXT_CADDMETHOD_(c,0,"atouch",m_aftertouch);
+	FLEXT_CADDMETHOD_(c,0,"pbend",m_pitchbend);
+
+	FLEXT_CADDATTR_VAR(c,"events",mg_dumpevents,ms_dumpevents);
 
 	FLEXT_CADDMETHOD_(c,0,"progchg",m_programchange);
 	FLEXT_CADDATTR_VAR(c,"program",mg_program,ms_program);
@@ -270,11 +291,14 @@ void vst::Setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"getptext",m_ptext);
 	FLEXT_CADDMETHOD_(c,0,"getptext",m_ptexts);
 
-	FLEXT_CADDATTR_VAR1(c,"echo",echoparam);
     FLEXT_CADDATTR_VAR(c,"x",mg_winx,ms_winx);
 	FLEXT_CADDATTR_VAR(c,"y",mg_winy,ms_winy);
-	FLEXT_CADDATTR_VAR(c,"caption",mg_wincaption,ms_wincaption);
+	FLEXT_CADDATTR_VAR(c,"w",mg_winw,ms_winw);
+    FLEXT_CADDATTR_VAR(c,"h",mg_winh,ms_winh);
 	FLEXT_CADDATTR_VAR(c,"title",mg_wintitle,ms_wintitle);
+	FLEXT_CADDATTR_VAR(c,"caption",mg_wincaption,ms_wincaption);
+	FLEXT_CADDATTR_VAR(c,"handle",mg_winhandle,ms_winhandle);
+	FLEXT_CADDMETHOD_(c,0,"front",m_winfront);
 
     FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
 	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);
@@ -318,7 +342,7 @@ vst::vst(int argc,const t_atom *argv):
     plug(NULL),visible(false),
     blsz(0),
     vstfun(NULL),vstin(NULL),vstout(NULL),tmpin(NULL),tmpout(NULL),
-    echoparam(false),bypass(false),mute(false),paramnames(0)
+    bypass(false),mute(false),paramnames(0)
 {
 #if FLEXT_OS == FLEXT_OS_WIN
     // this is necessary for Waveshell
@@ -674,32 +698,6 @@ void vst::CbSignal()
         flext_dsp::CbSignal();
 }
 
-
-#if 0
-
-void vst::m_control(const t_symbol *ctrl_name,int ctrl_value)     
-{
-    if(!plug) return;
-
-    int parm_num = 0;
-    
-    if (!*GetString(ctrl_name) || !strlen(GetString(ctrl_name))) {
-		error ("plugin~: control messages must have a name and a value");
-		return;
-    }
-    //parm_num = vst_tilde_get_parm_number (x, ctrl_name->s_name);
-    //if (parm_num) 
-	//{
-		//vst_tilde_set_control_input_by_index (x, parm_num - 1, ctrl_value);
-    //}
-    //else 
-	//{
-		//vst_tilde_set_control_input_by_name (x, ctrl_name->s_name, ctrl_value);
-    //}
-}
-
-#endif
-
 void vst::mg_progname(int argc,const t_atom *argv) const
 {
     if(plug) {
@@ -788,8 +786,8 @@ void vst::m_print(int ac,const t_atom *av)
 	 }
 
 	 if ( header ) {
-		post("VST~ plugin: %s " , plug->GetName() );
-		post("made by: %s " , plug->GetVendorName() );
+		post("VST~ plugin: %s ", plug->GetName() );
+		post("made by: %s ", plug->GetVendorName() );
 		post("parameters %d\naudio: %d in(s)/%d out(s) \nLoaded from library \"%s\".\n",
 			plug->GetNumParams(),
 			CntInSig(),
@@ -868,12 +866,12 @@ void vst::ms_param(int pnum,float val)
 {
     if(!plug || pnum < 0 || pnum >= plug->GetNumParams()) return;
 
-	float xval = plug->GetParamValue( pnum );
+//	float xval = plug->GetParamValue( pnum );
 //    if(xval <= 1.0f) // What's that????
     if(true)
     { 
 		plug->SetParamFloat( pnum, val );
-		if(echoparam) display_parameter(pnum , true );
+//		if(echoparam) display_parameter(pnum , true );
 	}	
     else
         FLEXT_ASSERT(false);

@@ -248,6 +248,9 @@
 				RelativePath=".\src\editor.cpp">
 			</File>
 			<File
+				RelativePath=".\src\editor.h">
+			</File>
+			<File
 				RelativePath=".\src\editorwin.hpp">
 			</File>
 			<File
