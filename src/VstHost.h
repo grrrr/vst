@@ -113,7 +113,7 @@ public:
     void Visible(bool vis);
     bool IsVisible() const;
 
-//    void Paint(ERect &r) const { Dispatch(effEditDraw,0,0,&r); }
+    void Paint(ERect &r) const { Dispatch(effEditDraw,0,0,&r); }
 
 	void processReplacing( float **inputs, float **outputs, long sampleframes );
 	void process( float **inputs, float **outputs, long sampleframes );
@@ -150,8 +150,8 @@ protected:
     inline long GetFlags() const { return _pEffect?_pEffect->flags:0; } 
     inline bool HasFlags(long msk) const { return _pEffect && (_pEffect->flags&msk); } 
 
-	char _sProductName[64];
-	char _sVendorName[64];
+	char _sProductName[300];
+	char _sVendorName[300];
     std::string _sDllName;	// Contains dll name
 
     struct NameCmp:

@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <string>
 
 
-#define VST_VERSION "0.1.0pre15"
+#define VST_VERSION "0.1.0pre16"
 
 
 class vst:
@@ -52,8 +52,8 @@ protected:
     V ms_winy(I y) { if(plug) plug->SetY(y); }
     V ms_wincaption(bool c) { if(plug) plug->SetCaption(c); }
     V mg_wincaption(bool &c) const { c = plug && plug->GetCaption(); }
-    V ms_wintitle(const t_symbol *t) { if(plug) plug->SetTitle(GetString(t)); }
-    V mg_wintitle(const t_symbol *&t) const { t = plug?MakeSymbol(plug->GetTitle()):sym__; }
+    V ms_wintitle(const AtomList &t);
+    V mg_wintitle(AtomList &t) const { if(plug) { t(1); SetString(t[0],plug->GetTitle()); } }
 
     V mg_chnsin(I &c) const { c = plug?plug->GetNumInputs():0; }
     V mg_chnsout(I &c) const { c = plug?plug->GetNumOutputs():0; }
@@ -148,7 +148,7 @@ private:
     FLEXT_CALLVAR_I(mg_winx,ms_winx)
     FLEXT_CALLVAR_I(mg_winy,ms_winy)
     FLEXT_CALLVAR_B(mg_wincaption,ms_wincaption)
-    FLEXT_CALLVAR_S(mg_wintitle,ms_wintitle)
+    FLEXT_CALLVAR_V(mg_wintitle,ms_wintitle)
 
     FLEXT_CALLGET_I(mg_chnsin)
     FLEXT_CALLGET_I(mg_chnsout)
@@ -632,6 +632,14 @@ V vst::m_ctrlchange(I control,I ctrl_value)
 	if(plug) plug->AddControlChange(control,ctrl_value );    
 }
 
+V vst::ms_wintitle(const AtomList &t) 
+{ 
+    if(plug) {
+        char txt[256];
+        t.Print(txt,sizeof txt);
+        plug->SetTitle(txt); 
+    }
+}
 
  /**
  *	display the parameters names and values and some other bits and pieces that 

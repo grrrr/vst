@@ -55,12 +55,12 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             // stop editor thread
             PostQuitMessage(0); 
             break; 
-        case WM_TIMER:
-//        	plug->Dispatch(effEditIdle, 0, 0, NULL, 0.0f);
-  //          break; 
+        
+        case WM_TIMER: // fall through
         case WM_ENTERIDLE:
             plug->EditorIdle();		
             break; 
+
         case WM_MOVE: {
             // ignore after WM_CLOSE so that x,y positions are preserved
             if(!plug->IsEdited()) break;
@@ -74,15 +74,22 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 #endif
             break; 
         }
-/*
+
+#if 0 // NOT needed for Windows
         case WM_PAINT: {
             // Paint the window's client area. 
             RECT rect;
-            GetUpdateRect(hwnd,rect,FALSE);
-            plug->Paint(rect);
+            GetUpdateRect(hwnd,&rect,FALSE);
+            ERect erect;
+            erect.left = rect.left;
+            erect.top = rect.top;
+            erect.right = rect.right;
+            erect.bottom = rect.bottom;
+            plug->Paint(erect);
             break;  
         }
-*/
+#endif
+
 #if 0 //def FLEXT_DEBUG
         case WM_SIZE: {
             WORD wx = LOWORD(lp),wy = HIWORD(lp);
@@ -94,6 +101,10 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 #endif
 
         default: 
+        #ifdef FLEXT_DEBUG
+            flext::post("WND MSG %i, WP=%i, lp=%i",msg,wp,lp);
+        #endif
+
             res = DefWindowProc(hwnd,msg,wp,lp); 
     }
     return res;

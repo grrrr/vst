@@ -48,6 +48,7 @@ Version history:
 - fixed DSP initialization, zero dangling audio vectors
 - pre12: added "bypass" and "mute" attributes
 - pre13: with flext 0.4.7 no more interruptions on window close
+- pre14: allow window titles with spaces and update it on window startup
 
 0.0.0:
 - version of mark@junklight.com
@@ -55,11 +56,11 @@ Version history:
 ---------------------------------------------------------------------------
 
 BUGS:
-- Waveshell crashes on load
 - mouse interaction in editor can cause audio dropouts
 - crash when unloading plugin with open window
 
 TODO:
+- examine why Waveshell behaves so strange (vendor string length exceed VST specification)
 - add VSTTimeInfo functionality
 - add Midi out functionality
 - include necessary Steinberg license stuff

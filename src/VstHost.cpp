@@ -66,8 +66,8 @@ int VSTPlugin::Instance(const char *dllname)
 	FLEXT_ASSERT(ret == 'NvEf');
 
     *_sProductName = 0;
-	Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f);
-    if(_sProductName) {
+	ret = Dispatch( effGetProductString, 0, 0, _sProductName, 0.0f);
+    if(!*_sProductName) {
 		// no product name given by plugin -> extract it from the filename
 
 		std::string str1(dllname);
@@ -91,7 +91,7 @@ int VSTPlugin::Instance(const char *dllname)
 	}
 	
     if(*_sProductName) {
-        char tmp[256];
+        char tmp[512];
         sprintf(tmp,"vst~ - %s",_sProductName);
         title = tmp;
     }
@@ -99,7 +99,7 @@ int VSTPlugin::Instance(const char *dllname)
         title = "vst~";
 
 	*_sVendorName = 0;
-	Dispatch( effGetVendorString, 0, 0, &_sVendorName, 0.0f);
+	Dispatch( effGetVendorString, 0, 0,_sVendorName, 0.0f);
 
 	_sDllName = dllname;
 
@@ -272,6 +272,9 @@ void VSTPlugin::StartEditing(WHandle h)
 {
     FLEXT_ASSERT(h != NULL);
 	Dispatch(effEditOpen,0,0,hwnd = h);
+//	Dispatch(effEditTop);
+
+    TitleEditor(this,title.c_str());
 }
 
 void VSTPlugin::StopEditing() 
@@ -422,7 +425,7 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-#if 0
+#if 1
     audioMasterEnum op = (audioMasterEnum)opcode;
     audioMasterEnumx opx = (audioMasterEnumx)opcode;
 #endif
@@ -434,18 +437,19 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 	switch (opcode) {
     case audioMasterAutomate: // 0
 #ifdef FLEXT_DEBUG
-        post("Automate index=%li value=%li",index,value);
+        post("Automate index=%li value=%li opt=%f",index,value,opt);
 #endif
 		// index, value given
 		//! \todo set effect parameter
         return 0;
     case audioMasterVersion: // 1
         // support VST 2.3
-        return 2300;
+//        return 2300;
+        return 2;
     case audioMasterCurrentId: // 2
         return 0;
 	case audioMasterIdle: // 3
-//		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
+		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
 		return 0;
 	case audioMasterPinConnected: // 4
 		//! \todo set connection state correctly (if possible..)
@@ -492,6 +496,10 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 0; // not supported
 	case audioMasterGetNumAutomatableParameters: // 11
 		return 0; // not supported
+    case audioMasterSizeWindow: // 15
+        return 0;
+//    case audioMasterGetSampleRate: // 16
+//    case audioMasterGetBlockSize: // 17
     case audioMasterGetCurrentProcessLevel: // 23
         // return thread state
         return flext::GetThreadId() == flext::GetSysThreadId()?2:1;
@@ -507,12 +515,44 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 #ifdef FLEXT_DEBUG
     	post("\taudioMasterCanDo PTR = %s",ptr);
 #endif
+        if(!strcmp((char *)ptr,"sendVstEvents"))
+            return 1;
+        else if(!strcmp((char *)ptr,"sendVstMidiEvent"))
+            return 1;
+        else if(!strcmp((char *)ptr,"sendVstTimeInfo"))
+            return 1; // NOT YET
+        else if(!strcmp((char *)ptr,"receiveVstEvents")) 
+            return 1;
+        else if(!strcmp((char *)ptr,"receiveVstMidiEvent"))
+            return 1;
+        else if(!strcmp((char *)ptr,"receiveVstTimeInfo"))
+            return 1; // NOT YET
+        else if(!strcmp((char *)ptr,"reportConnectionChanges"))
+            return 0; // \TODO PD has hard times supporting that...
+        else if(!strcmp((char *)ptr,"acceptIOChanges"))
+            return 0; // \TODO what does this means exactly?
+        else if(!strcmp((char *)ptr,"supplyIdle"))
+            return 1;
+        else if(!strcmp((char *)ptr,"sizeWindow"))
+            return 1;
+        else if(!strcmp((char *)ptr,"supportShell"))
+            return 0; // NOT YET!
+        else if(!strcmp((char *)ptr,"offline"))
+            return 0; // not supported
+        else if(!strcmp((char *)ptr,"asyncProcessing"))
+            return 0; // not supported
+
 		return 0; // not supported
 	case audioMasterGetLanguage: // 38
 		return kVstLangEnglish;
 	case audioMasterGetDirectory: // 41
         // return full path of plugin
 		return 0; // not supported
+    case audioMasterUpdateDisplay: // 42
+#ifdef FLEXT_DEBUG
+        post("UPDATE DISPLAY");
+#endif
+        return 0;
     default:
 #ifdef FLEXT_DEBUG
         post("Unknown opcode %li",opcode);
