@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -21,7 +21,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
 #endif //_WIN32
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -44,18 +43,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "\0"
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "vst~ external\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "vst~\0"
-            VALUE "LegalCopyright", "Copyright (C) 2003\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "vst~.DLL\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "VST plugin object\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "FileDescription", "vst~ external"
+            VALUE "FileVersion", "0,1, 0, 8"
+            VALUE "InternalName", "vst~"
+            VALUE "LegalCopyright", "Copyright (C) 2003-2004 Thomas Grill"
+            VALUE "OriginalFilename", "vst~.DLL"
+            VALUE "ProductName", "VST plugin object"
+            VALUE "ProductVersion", "0, 1, 0, 8"
         END
     END
     BLOCK "VarFileInfo"
@@ -63,8 +57,6 @@ BEGIN
         VALUE "Translation", 0x409, 1200
     END
 END
-
-#endif    // !_MAC
 
 #endif    // Englisch (USA) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -85,18 +77,18 @@ LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_AUSTRIAN
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
     "#define _AFX_NO_OLE_RESOURCES\r\n"

@@ -1,10 +1,18 @@
-#include "stdafx.h"
-#include "EditorThread.h"
+/* 
+vst~ - VST plugin object for PD 
+based on the work of Jarno Seppänen and Mark Williamson
+
+Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
+For information on usage and redistribution, and for a DISCLAIMER OF ALL
+WARRANTIES, see the file, "license.txt," in this distribution.  
+*/
+
+#include "Editor.h"
 #include "VstHost.h"
-#include "PopupWindow.h"
 #include "vst\aeffeditor.h"
 #include "vst\aeffectx.h"
-#include <flext.h>
+
+using namespace std;
 
 VstTimeInfo VSTPlugin::_timeInfo;
 
@@ -16,6 +24,7 @@ float VSTPlugin::sample_rate = 44100;
 /////////////////////
 VSTPlugin::VSTPlugin():
     posx(0),posy(0),
+    hwnd(NULL),
     _editor(false)
 {
 	queue_size=0;
@@ -24,10 +33,8 @@ VSTPlugin::VSTPlugin():
 	instantiated=false;		// Constructin' with no instance
 	overwrite = false;
 //    wantidle = false;
-	 w = GetForegroundWindow();
 //	 show_params = false;
 	 _midichannel = 0;
-	 edited = false;
 }
 
 VSTPlugin::~VSTPlugin()
@@ -38,16 +45,15 @@ VSTPlugin::~VSTPlugin()
  
 int VSTPlugin::Instance( const char *dllname)
 {
-	h_dll=LoadLibrary(dllname);
+	h_dll = LoadLibrary(dllname);
 
-	if(h_dll==NULL)	
-	{
+	if(!h_dll) {
 		return VSTINSTANCE_ERR_NO_VALID_FILE;
 	}
+
 //	post("Loaded library %s" , dllname);
 	PVSTMAIN main = (PVSTMAIN)GetProcAddress(h_dll,"main");
-	if(!main)
-	{	
+	if(!main) {	
 		FreeLibrary(h_dll);
 		_pEffect=NULL;
 		instantiated=false;
@@ -57,8 +63,7 @@ int VSTPlugin::Instance( const char *dllname)
 	//This calls the "main" function and receives the pointer to the AEffect structure.
 	_pEffect = main((audioMasterCallback)&(this->Master));
 	
-	if(!_pEffect)
-	{
+	if(!_pEffect) {
 		post("VST plugin : unable to create effect");
 		FreeLibrary(h_dll);
 		_pEffect=NULL;
@@ -66,8 +71,7 @@ int VSTPlugin::Instance( const char *dllname)
 		return VSTINSTANCE_ERR_REJECTED;
 	}
 	
-	if(  _pEffect->magic!=kEffectMagic)
-	{
+	if(  _pEffect->magic!=kEffectMagic) {
 		post("VST plugin : Instance query rejected by 0x%.8X\n",(int)_pEffect);
 		FreeLibrary(h_dll);
 		_pEffect=NULL;
@@ -90,27 +94,21 @@ int VSTPlugin::Instance( const char *dllname)
 //	Dispatch( effSetBlockSize,  0, STREAM_SIZE, NULL, 0.0f);
 
 	
-	if (!Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f))
-	{
-		CString str1(dllname);
-		CString str2 = str1.Mid(str1.ReverseFind('\\')+1);
-		int snip = str2.Find('.');
-		if ( snip != -1 )
-		{
-			str1 = str2.Left( snip );
-		}
+	if (!Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f)) {
+		string str1(dllname);
+		string str2 = str1.substr(str1.rfind('\\')+1);
+		int snip = str2.find('.');
+        if( snip != string::npos )
+			str1 = str2.substr(0,snip);
 		else
-		{
 			str1 = str2;
-		}
-		strcpy(_sProductName,str1);
-
+		strcpy(_sProductName,str1.c_str());
 	}
 	
-	if (!_pEffect->dispatcher(_pEffect, effGetVendorString, 0, 0, &_sVendorName, 0.0f))
-	{
+	if (!_pEffect->dispatcher(_pEffect, effGetVendorString, 0, 0, &_sVendorName, 0.0f)) {
 		strcpy(_sVendorName, "Unknown vendor");
 	}
+
 	_version = _pEffect->version;
 	_isSynth = (_pEffect->flags & effFlagsIsSynth)?true:false;
 	overwrite = (_pEffect->flags & effFlagsCanReplacing)?true:false;
@@ -121,8 +119,6 @@ int VSTPlugin::Instance( const char *dllname)
 	sprintf(_sDllName,dllname);
 	
 	
-
-
 	//keep plugin name
 	instantiated=true;
 
@@ -164,8 +160,9 @@ void VSTPlugin::Create(VSTPlugin *plug)
 
 void VSTPlugin::Free() // Called also in destruction
 {
-	if(instantiated)
-	{
+    if(IsEdited()) StopEditor(this);
+
+	if(instantiated) {
 		instantiated=false;
 		post("VST plugin : Free query 0x%.8X\n",(int)_pEffect);
 		_pEffect->user = NULL;
@@ -304,7 +301,14 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-#if 0 //def FLEXT_DEBUG
+#if 0
+    if(!effect) {
+        FLEXT_LOG("effect = NULL");
+        return 0;
+    }
+#endif
+
+#ifdef FLEXT_DEBUG
     if(opcode != audioMasterGetTime)
 	post("VST plugin call to host dispatcher: Eff: 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
 	//st( "audioMasterWantMidi %d " , audioMasterWantMidi);
@@ -456,27 +460,23 @@ void VSTPlugin::edit(bool open)
 {	
 	if(instantiated) { 	
         if(open) {
-		    if ( HasEditor() && !edited) {			
-			    edited = true;
-			    b =  new CEditorThread();	
-			    b->SetPlugin( this);
-			    b->CreateThread();			
-		    }
+		    if(HasEditor() && !IsEdited())
+                StartEditor(this);
         }
-        else {
-            if (HasEditor() && edited) b->Close();
-        }
+        else if(IsEdited())
+            StopEditor(this);
 	}
 }
 
 void VSTPlugin::visible(bool vis)
 {	
-	if(instantiated && edited) b->Show(vis);
+	if(instantiated && IsEdited()) ShowEditor(this,vis);
 }
 
 void VSTPlugin::EditorIdle()
 {
-	Dispatch(effEditIdle,0,0, w,0.0f);			
+    FLEXT_ASSERT(hwnd != NULL);
+	Dispatch(effEditIdle,0,0, hwnd,0.0f);			
 }
 
 RECT VSTPlugin::GetEditorRect()
@@ -493,13 +493,20 @@ RECT VSTPlugin::GetEditorRect()
 
 void VSTPlugin::SetEditWindow(HWND h)
 {
-	w = h;	
-	Dispatch(effEditOpen,0,0, w,0.0f);							
+	hwnd = h;	
+    FLEXT_ASSERT(hwnd != NULL);
+	Dispatch(effEditOpen,0,0, hwnd,0.0f);							
 }
 
 void VSTPlugin::OnEditorClose()
 {
-	Dispatch(effEditClose,0,0, w,0.0f);					
+    FLEXT_ASSERT(hwnd != NULL);
+	Dispatch(effEditClose,0,0, hwnd,0.0f);					
+}
+
+void VSTPlugin::StopEditing()
+{
+    hwnd = NULL;
 }
 
 /*
@@ -559,9 +566,4 @@ int VSTPlugin::GetNumCategories()
 		return Dispatch(effGetNumProgramCategories,0,0,NULL,0.0f);
 	else
 		return 0;
-}
-
-void VSTPlugin::StopEditing()
-{
-	edited = false;
 }

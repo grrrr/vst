@@ -1,12 +1,10 @@
 /* 
-
-vst - VST plugin object for PD 
+vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
-
 */
 
 #ifndef __VST_H
@@ -16,12 +14,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 402)
-#error You need at least flext version 0.4.2
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 405)
+#error You need at least flext version 0.4.5
 #endif
 
 #if FLEXT_OS == FLEXT_OS_WIN
-#include "stdafx.h"
+//
 #else
 #error Platform not supported!
 #endif

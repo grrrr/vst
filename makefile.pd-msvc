@@ -15,15 +15,14 @@
 !include config-pd-msvc.txt
 
 # includes
-INCPATH=/I"$(MSVCPATH)\include" /I"$(MSVCPATH)\mfc\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)"
-LIBPATH=/LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)" /LIBPATH:"$(MSVCPATH)\lib" /LIBPATH:"$(MSVCPATH)\mfc\lib" 
-LIBS=pd.lib pthreadVC.lib flext_t-pdwin.lib # DelayImp.lib
+INCPATH=/I"$(MSVCPATH)\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)"
+LIBPATH=/LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)" /LIBPATH:"$(MSVCPATH)\lib"
+LIBS=pd.lib pthreadVC.lib user32.lib flext_t-pdwin.lib
 
 # compiler definitions and flags
-DEFS=/D_USRDLL /D_WINDLL /D_MBCS /DFLEXT_SYS=2 /DFLEXT_THREADS
+DEFS=/DFLEXT_SYS=2 /DFLEXT_THREADS
 
 CFLAGS=/G6 /Ox /MT /EHsc 
-# LDFLAGS=/DELAYLOAD:OleAcc.dll
 
 # the rest can stay untouched
 # ----------------------------------------------

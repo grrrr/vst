@@ -1,8 +1,24 @@
+/* 
+vst~ - VST plugin object for PD 
+based on the work of Jarno Seppänen and Mark Williamson
+
+Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
+For information on usage and redistribution, and for a DISCLAIMER OF ALL
+WARRANTIES, see the file, "license.txt," in this distribution.  
+*/
+
 #ifndef _VSTPLUGIN_HOST
 #define _VSTPLUGIN_HOST
 
 #include "Vst\AEffectx.h"
-#include <afxcoll.h>
+#include <flext.h>
+
+#if FLEXT_OS == FLEXT_OS_WIN
+#include <windows.h>
+#else
+#error Platform not supported!
+#endif
+
 #define MAX_EVENTS		64
 #define MAX_INOUTS		8
 
@@ -23,10 +39,10 @@ typedef AEffect* (*PVSTMAIN)(audioMasterCallback audioMaster);
 typedef HWND (*POPWIN)(void);
 typedef HWND (*GETWIN)(void);
 
-class VSTPlugin 
+class VSTPlugin:
+    public flext
 {
 public:
-	void StopEditing();
 	int GetNumCategories();
 	bool GetProgramName( int cat, int p , char* buf);
 	void AddControlChange( int control , int value );
@@ -35,9 +51,12 @@ public:
 	void AddAftertouch( int value );
 	bool ShowParams();
 	void SetShowParameters( bool s);
-	void OnEditorClose();
+
 	void SetEditWindow( HWND h );
-	CEditorThread* b;
+	void StopEditing();
+	void OnEditorClose();
+    HWND EditorHandle() { return hwnd; }
+
 	RECT GetEditorRect();
 	void EditorIdle();
 
@@ -113,21 +132,20 @@ public:
 	bool instantiated;
 	int _instance;		// Remove when Changing the FileFormat.
 
-	HWND w;
-
-
     void setPos(int x,int y) { posx = x; posy = y; }
     void setX(int x) { posx = x; }
     void setY(int y) { posy = y; }
     int getX() const { return posx; }
     int getY() const { return posy; }
 
-    bool Edited() const { return edited; }
+    bool IsEdited() const { return hwnd != NULL; }
 
 protected:
 
 	HMODULE h_dll;
 	HMODULE h_winddll;
+	HWND hwnd;
+
 
 	char _sProductName[64];
 	char _sVendorName[64];
@@ -145,14 +163,10 @@ protected:
 	int	queue_size;
 	bool overwrite;
 
-
-
 private:
     int posx,posy;
-	bool edited; //,wantidle;
 	bool show_params;
 	static float sample_rate;
 };
-
 
 #endif // _VSTPLUGIN_HOST

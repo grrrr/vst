@@ -1,7 +1,7 @@
 vst~ - VST plugin external for PD
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-04 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -22,8 +22,7 @@ BUILDING:
 
 pd - Windows:
 -------------
-o Microsoft Visual C++ 6: edit the project file "vst.dsp" & build 
-
+o Microsoft Visual C++ 6 or 7 (.NET): edit "config-pd-msvc.txt" & run "build-pd-msvc.bat"
 
 
 NOT YET:
@@ -49,6 +48,7 @@ Version history:
 - make editor window closable by patch
 - plugin can be changed with plug attribute
 - fixed crash on destroying vst~ with open editor window
+- stripped all MFC code
 
 0.0.0:
 - version of mark@junklight.com

@@ -1,4 +1,4 @@
-#N canvas 108 26 874 656 12;
+#N canvas 105 26 852 637 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 444 172 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
@@ -8,7 +8,7 @@
 #X obj 27 451 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 473 vis \$1;
-#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 27 367 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X msg 26 389 edit \$1;
 #X msg 94 389 getedit;
@@ -156,10 +156,10 @@
 #X text 93 582 midi messages for vst synths;
 #X msg 414 442 getprogcats;
 #X text 509 439 get number of program categories;
-#X obj 26 140 vst~ 1 2 SIR;
 #X text 134 33 based on the work of Jarno Seppanen and Mark Williamson
 ;
-#X connect 1 0 55 0;
+#X obj 26 140 vst~ 1 2;
+#X connect 1 0 56 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
 #X connect 5 0 6 0;
@@ -168,7 +168,7 @@
 #X connect 8 0 13 0;
 #X connect 9 0 13 0;
 #X connect 10 0 14 0;
-#X connect 12 0 55 0;
+#X connect 12 0 56 0;
 #X connect 19 0 18 0;
 #X connect 20 0 18 0;
 #X connect 21 0 17 0;
@@ -184,6 +184,5 @@
 #X connect 49 0 50 0;
 #X connect 50 0 48 0;
 #X connect 53 0 18 0;
-#X connect 55 0 0 0;
-#X connect 55 1 0 1;
-#X connect 55 2 4 0;
+#X connect 56 0 0 0;
+#X connect 56 2 4 0;

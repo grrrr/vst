@@ -1,42 +1,27 @@
 /* 
-
-vst - VST plugin object for PD 
+vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
-
 */
 
 #include "main.h"
-#include "vst.h"
 
-#include "EditorThread.h"
+#include "Editor.h"
 #include "VstHost.h"
 
 #include <stdlib.h>
 #include <direct.h>
 #include <io.h>
 
-#define VST_VERSION "0.1.0pre7"
+#include <string>
+using namespace std;
 
-#if 0
-/* ----- MFC stuff ------------- */
 
-BEGIN_MESSAGE_MAP(CVstApp, CWinApp)
-	//{{AFX_MSG_MAP(CVstApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
+#define VST_VERSION "0.1.0pre8"
 
-CVstApp::CVstApp() {}
-
-CVstApp theApp;
-
-/* ----- MFC stuff ------------- */
-#endif
 
 class vst:
 	public flext_dsp
@@ -53,12 +38,12 @@ protected:
 
     BL ms_plug(I argc,const A *argv);
     BL ms_plug(const AtomList &args) { return ms_plug(args.Count(),args.Atoms()); }
-    V mg_plug(AtomList &sym) const { sym(1); SetString(sym[0],plugname); }
+    V mg_plug(AtomList &sym) const { sym(1); SetString(sym[0],plugname.c_str()); }
 
-    V ms_edit(BL on);
-    V mg_edit(BL &ed) { ed = plug && plug->Edited(); }
+    V ms_edit(BL on) { if(plug) plug->edit(on); }
+    V mg_edit(BL &ed) { ed = plug && plug->IsEdited(); }
     V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
-    V ms_vis(BL vis);
+    V ms_vis(BL vis) { if(plug) plug->visible(vis); }
 
     V mg_winx(I &x) const { x = plug?plug->getX():0; }
     V mg_winy(I &y) const { y = plug?plug->getY():0; }
@@ -98,7 +83,7 @@ private:
     V display_parameter(I param,BL showparams);
 
     VSTPlugin *plug;
-    CString plugname;
+    string plugname;
     BL echoparam,visible;
 
     I blsz;
@@ -158,13 +143,8 @@ FLEXT_NEW_DSP_V("vst~",vst);
 
 V vst::Setup(t_classid c)
 {
-#if FLEXT_OS == FLEXT_OS_WIN
-    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-    AfxOleInit( );
-#endif
-
     post("");
-	post("vst~ %s - VST plugin object, (C)2003 Thomas Grill",VST_VERSION);
+	post("vst~ %s - VST plugin object, (C)2003-04 Thomas Grill",VST_VERSION);
 	post("based on the work of Jarno Seppänen and Mark Williamson");
 	post("");
 
@@ -279,11 +259,19 @@ V vst::InitBuf()
     for(i = 0; i < plug->getNumOutputs(); ++i) vstout[i] = new R[Blocksize()];
 }
 
-static const C *findFilePath(const C *path,const C *dllname)
+static string findFilePath(const string &path,const string &dllname)
 {
+	_chdir( path.c_str() );
+#if FLEXT_OS == FLEXT_OS_WIN
+    WIN32_FIND_DATA data;
+    HANDLE fh = FindFirstFile(dllname.c_str(),&data);
+    if(fh != INVALID_HANDLE_VALUE) {
+        FindClose(fh);
+        return path;
+    }
+#endif
+/*
 	CFileFind finder;
-	_chdir( path );
-
 	if(finder.FindFile( dllname ))
 		return path;
 	else {
@@ -301,7 +289,9 @@ static const C *findFilePath(const C *path,const C *dllname)
 			}
 		}
 	}
-	return NULL;
+*/
+   
+    return string();
 }
 
 
@@ -309,15 +299,16 @@ BL vst::ms_plug(I argc,const A *argv)
 {
     ClearPlug();
 
-    plugname.Empty();
+    plugname.clear();
 	C buf[255];	
 	for(I i = 0; i < argc; i++) {
 		if(i > 0) plugname += ' ';
 		GetAString(argv[i],buf,sizeof buf);
+        strlwr(buf);
 		plugname += buf;
 	}
-    plugname.MakeLower();
-    if(!plugname.GetLength()) return false;
+
+    if(!plugname.length()) return false;
 
     plug = new VSTPlugin;
     
@@ -329,14 +320,14 @@ BL vst::ms_plug(I argc,const A *argv)
     int loaderr = VSTINSTANCE_NO_ERROR;
 
 	// try loading the dll from the raw filename 
-	if ((loaderr = plug->Instance(plugname)) == VSTINSTANCE_NO_ERROR) {
+	if ((loaderr = plug->Instance(plugname.c_str())) == VSTINSTANCE_NO_ERROR) {
 		FLEXT_LOG("raw filename loaded fine");
 		lf = true;
 	}
 
     if(!lf) { // try finding it on the PD path
 	    C *name,dir[1024];
-	    I fd = open_via_path("",plugname,".dll",dir,&name,sizeof(dir)-1,0);
+	    I fd = open_via_path("",plugname.c_str(),".dll",dir,&name,sizeof(dir)-1,0);
 	    if(fd > 0) close(fd);
 	    else name = NULL;
 
@@ -345,19 +336,19 @@ BL vst::ms_plug(I argc,const A *argv)
 	        // if dir is current working directory... name points to dir
 	        if(dir == name) strcpy(dir,".");
         
-            CString dllname(dir);
+            string dllname(dir);
             dllname += "\\";
             dllname += name;
 
-	        lf = (loaderr = plug->Instance(dllname)) == VSTINSTANCE_NO_ERROR;
+	        lf = (loaderr = plug->Instance(dllname.c_str())) == VSTINSTANCE_NO_ERROR;
         }
     }
 
     if(!lf) { // try finding it on the VST path
 		C *vst_path = getenv ("VST_PATH");
 
-		CString dllname(plugname);
-		if(dllname.Find(".dll") == -1) dllname += ".dll";			
+		string dllname(plugname);
+		if(dllname.find(".dll") == -1) dllname += ".dll";			
 
 		if(vst_path) {
     		FLEXT_LOG("found VST_PATH env variable");
@@ -365,18 +356,17 @@ BL vst::ms_plug(I argc,const A *argv)
             strcpy( tok_path , vst_path);
 			char *tok = strtok( tok_path , ";" );
 			while( tok != NULL ) {
-				CString abpath( tok );
-				if( abpath.Right( 1 ) != _T("\\") ) abpath += "\\";
+				string abpath( tok );
+				if( abpath[abpath.length()-1] != '\\' ) abpath += "\\";
 
-        		FLEXT_LOG1("trying VST_PATH %s",(const C *)abpath);
+        		FLEXT_LOG1("trying VST_PATH %s",(const C *)abpath.c_str());
 
-				const char * realpath = findFilePath( abpath , dllname );				
+				string realpath = findFilePath( abpath , dllname );				
 				//post( "findFilePath( %s , %s ) = %s\n" , abpath , dllname , realpath );
-				if ( realpath != NULL ) {
-				    CString rpath( realpath );
-					rpath += plugname;
-            		FLEXT_LOG1("trying %s",(const C *)rpath);
-					if((loaderr = plug->Instance( rpath )) == VSTINSTANCE_NO_ERROR ) {
+				if ( realpath.length() ) {
+					realpath += plugname;
+            		FLEXT_LOG1("trying %s",(const C *)realpath.c_str());
+					if((loaderr = plug->Instance( realpath.c_str() )) == VSTINSTANCE_NO_ERROR ) {
                 		FLEXT_LOG("plugin loaded via VST_PATH");
 						lf = true;
 						break;
@@ -598,26 +588,6 @@ V vst::m_print(I ac,const A *av)
 			}
 		}
 	 }
-}
-
-
-//!	display an editor 
-V vst::ms_edit(BL on)
-{
-#if FLEXT_OS == FLEXT_OS_WIN
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-#endif
-
-    if(plug) plug->edit(on);
-}
-
-V vst::ms_vis(BL vis)
-{
-#if FLEXT_OS == FLEXT_OS_WIN
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-#endif
-
-   if(plug) plug->visible(vis);
 }
 
 

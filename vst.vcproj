@@ -18,7 +18,7 @@
 			OutputDirectory=".\pd-msvc/r"
 			IntermediateDirectory=".\pd-msvc/r"
 			ConfigurationType="2"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
@@ -29,7 +29,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\packs\pthreads,f:\prog\max\flext\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;FLEXT_NOGLOBALNEW"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
@@ -84,7 +84,7 @@
 			OutputDirectory=".\pd-msvc/d"
 			IntermediateDirectory=".\pd-msvc/d"
 			ConfigurationType="2"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
@@ -148,7 +148,7 @@
 			OutputDirectory=".\pd-msvc/s"
 			IntermediateDirectory=".\pd-msvc/s"
 			ConfigurationType="2"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
@@ -323,110 +323,13 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="mfc"
-			Filter="">
-			<File
-				RelativePath="src\Resource.h">
-			</File>
-			<File
-				RelativePath="src\StdAfx.cpp">
-				<FileConfiguration
-					Name="PD Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="src\StdAfx.h">
-			</File>
-		</Filter>
-		<Filter
 			Name="host"
 			Filter="">
 			<File
-				RelativePath="src\EditorThread.cpp">
-				<FileConfiguration
-					Name="PD Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
+				RelativePath=".\src\Editor.h">
 			</File>
 			<File
-				RelativePath="src\EditorThread.h">
-			</File>
-			<File
-				RelativePath="src\PopupWindow.cpp">
-				<FileConfiguration
-					Name="PD Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="PD Shared Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="src\PopupWindow.h">
+				RelativePath=".\src\EditorWin.cpp">
 			</File>
 			<File
 				RelativePath="src\vst.rc">
@@ -529,9 +432,6 @@
 		</File>
 		<File
 			RelativePath="src\main.h">
-		</File>
-		<File
-			RelativePath="src\vst.h">
 		</File>
 	</Files>
 	<Globals>
