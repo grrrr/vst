@@ -52,6 +52,7 @@ BUGS:
 - match number of in/out-signals to those of plug
 
 features:
-- allow various window styles
+- allow various window styles and window moving & titling
+- include necessary Steinberg license stuff
 
 

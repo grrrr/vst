@@ -3,7 +3,7 @@
 vst - VST plugin object for PD 
 based on the work of mark@junklight.com
 
-Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <direct.h>
 #include <io.h>
 
-#define VST_VERSION "0.0.0"
+#define VST_VERSION "0.1.0pre"
 
 #if 0
 /* ----- MFC stuff ------------- */
@@ -42,7 +42,7 @@ CVstApp theApp;
 class vst:
 	public flext_dsp
 {
-	FLEXT_HEADER_S(vst,flext_dsp,setup)
+	FLEXT_HEADER_S(vst,flext_dsp,Setup)
 
 public:
 	vst(I argc,const A *argv);
@@ -51,8 +51,6 @@ public:
 protected:
     virtual V m_dsp(I n,t_signalvec const *insigs,t_signalvec const *outsigs);
     virtual V m_signal(I n,R *const *insigs,R *const *outsigs);
-
-    V (VSTPlugin::*dspfun)(R **insigs,R **outsigs,L n);
 
     BL ms_plug(I argc,const A *argv);
     BL ms_plug(const AtomList &args) { return ms_plug(args.Count(),args.Atoms()); }
@@ -80,9 +78,9 @@ protected:
     V m_print(I ac,const A *av);
 
     V ms_program(I p);
-    V mg_program(I &p) const { p = plug?plug->GetCurrentProgram()+1:0; }
+    V mg_program(I &p) const { p = plug?plug->GetCurrentProgram():0; }
     
-    V m_control(const S *ctrl_name,I ctrl_value);
+//    V m_control(const S *ctrl_name,I ctrl_value);
     V m_pitchbend(I ctrl_value);
     V m_programchange(I ctrl_value);
     V m_ctrlchange(I control,I ctrl_value);
@@ -90,6 +88,8 @@ protected:
 
     V ms_param(I pnum,F val);
     V mg_param(I pnum);
+    V m_pname(I pnum);
+    V m_ptext(I pnum);
 
 private:
     V display_parameter(I param,BL showparams);
@@ -98,7 +98,16 @@ private:
     CString plugname;
     BL echoparam,visible;
 
-	static V setup(t_classid);
+    I blsz;
+    V (VSTPlugin::*vstfun)(R **insigs,R **outsigs,L n);
+    BL sigmatch;
+    R **vstin,**vstout,**tmpin,**tmpout;
+
+    V InitPlug();
+    V ClearPlug();
+    V InitBuf();
+    V ClearBuf();
+	static V Setup(t_classid);
 	
 
     FLEXT_CALLBACK_V(m_print)
@@ -109,7 +118,7 @@ private:
     FLEXT_CALLSET_B(ms_vis)
     FLEXT_ATTRGET_B(visible)
 
-    FLEXT_CALLBACK_2(m_control,t_symptr,int)
+//    FLEXT_CALLBACK_2(m_control,t_symptr,int)
     FLEXT_CALLBACK_I(m_pitchbend)
     FLEXT_CALLBACK_I(m_programchange)
     FLEXT_CALLBACK_II(m_ctrlchange)
@@ -117,6 +126,8 @@ private:
     FLEXT_CALLVAR_I(mg_program,ms_program)
     FLEXT_CALLBACK_2(ms_param,int,float)
     FLEXT_CALLBACK_I(mg_param)
+    FLEXT_CALLBACK_I(m_pname)
+    FLEXT_CALLBACK_I(m_ptext)
 
     FLEXT_CALLBACK_II(m_note)
 
@@ -138,7 +149,7 @@ private:
 FLEXT_NEW_DSP_V("vst~",vst);
 
 
-V vst::setup(t_classid c)
+V vst::Setup(t_classid c)
 {
 #if FLEXT_OS == FLEXT_OS_WIN
     AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -146,7 +157,7 @@ V vst::setup(t_classid c)
 #endif
 
     post("");
-	post("vst~ %s - VST plugin object,(C)2003 Thomas Grill",VST_VERSION);
+	post("vst~ %s - VST plugin object, (C)2003 Thomas Grill",VST_VERSION);
 	post("based on the work of mark@junklight.com");
 	post("");
 
@@ -156,7 +167,7 @@ V vst::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"print",m_print);
 
 	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
-	FLEXT_CADDMETHOD_2(c,0,"control",m_control,t_symptr,int);
+//	FLEXT_CADDMETHOD_2(c,0,"control",m_control,t_symptr,int);
 	FLEXT_CADDMETHOD_(c,0,"pitchbend",m_pitchbend);
 	FLEXT_CADDMETHOD_II(c,0,"ctrlchange",m_ctrlchange);
 
@@ -165,10 +176,12 @@ V vst::setup(t_classid c)
 
 	FLEXT_CADDMETHOD_2(c,0,"param",ms_param,int,float);
 	FLEXT_CADDMETHOD_(c,0,"getparam",mg_param);
+	FLEXT_CADDMETHOD_I(c,0,"getpname",m_pname);
+	FLEXT_CADDMETHOD_I(c,0,"getptext",m_ptext);
 
 	FLEXT_CADDATTR_VAR1(c,"echo",echoparam);
-	FLEXT_CADDATTR_VAR(c,"wx",mg_winx,ms_winx);
-	FLEXT_CADDATTR_VAR(c,"wy",mg_winy,ms_winy);
+	FLEXT_CADDATTR_VAR(c,"x",mg_winx,ms_winx);
+	FLEXT_CADDATTR_VAR(c,"y",mg_winy,ms_winy);
 
 	FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
 	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);
@@ -184,7 +197,9 @@ V vst::setup(t_classid c)
 
 vst::vst(I argc,const A *argv):
     plug(NULL),visible(false),
-    dspfun(NULL),echoparam(false)
+    blsz(0),
+    vstfun(NULL),vstin(NULL),vstout(NULL),tmpin(NULL),tmpout(NULL),
+    echoparam(false)
 {
     if(argc >= 2 && CanbeInt(argv[0]) && CanbeInt(argv[1])) {
 	    AddInSignal(GetAInt(argv[0]));
@@ -200,9 +215,57 @@ vst::vst(I argc,const A *argv):
 
 vst::~vst()
 {
-    if(plug) delete plug;
+    ClearPlug();
 }
 
+V vst::ClearPlug()
+{
+    if(plug) {
+        ClearBuf();
+        delete plug; plug = NULL;
+    }
+}
+
+V vst::InitPlug()
+{
+    FLEXT_ASSERT(plug);
+
+    vstfun = plug->replace()?plug->processReplacing:plug->process;
+    sigmatch = plug->getNumInputs() == CntInSig() && plug->getNumOutputs() == CntOutSig();
+
+    InitBuf();
+}
+
+V vst::ClearBuf()
+{
+    if(!plug) return;
+
+    if(vstin) {
+        for(I i = 0; i < plug->getNumInputs(); ++i) delete[] vstin[i];
+        delete[] vstin; vstin = NULL;
+        delete[] tmpin; tmpin = NULL;
+    }
+    if(vstout) {
+        for(I i = 0; i < plug->getNumOutputs(); ++i) delete[] vstout[i];
+        delete[] vstout; vstout = NULL;
+        delete[] tmpout; tmpout = NULL;
+    }
+}
+
+V vst::InitBuf()
+{
+    FLEXT_ASSERT(!vstin && !tmpin && !vstout && !tmpout);
+
+    I i;
+
+    vstin = new R *[plug->getNumInputs()];
+    tmpin = new R *[plug->getNumInputs()];
+    for(i = 0; i < plug->getNumInputs(); ++i) vstin[i] = new R[Blocksize()];
+    
+    vstout = new R *[plug->getNumOutputs()];
+    tmpout = new R *[plug->getNumOutputs()];
+    for(i = 0; i < plug->getNumOutputs(); ++i) vstout[i] = new R[Blocksize()];
+}
 
 static const C *findFilePath(const C *path,const C *dllname)
 {
@@ -232,7 +295,7 @@ static const C *findFilePath(const C *path,const C *dllname)
 
 BL vst::ms_plug(I argc,const A *argv)
 {
-    if(plug) { delete plug; plug = NULL; }
+    ClearPlug();
 
     plugname.Empty();
 	C buf[255];	
@@ -245,7 +308,6 @@ BL vst::ms_plug(I argc,const A *argv)
     if(!plugname.GetLength()) return false;
 
     plug = new VSTPlugin;
-
     
     // now try to load plugin
 
@@ -303,7 +365,7 @@ BL vst::ms_plug(I argc,const A *argv)
 				}
 
 				tok = strtok( NULL , ";" );
-                if(!tok) post("%s - couldn't find dll",thisName());
+                if(!tok) post("%s - couldn't find plugin",thisName());
 			}
 
             delete[] tok_path;
@@ -312,32 +374,74 @@ BL vst::ms_plug(I argc,const A *argv)
 
     if(!lf) { // failed - don't make any ins or outs
 		post("%s - unable to load plugin '%s'",thisName(),plugname);
-		delete plug; plug = NULL;
+		ClearPlug();
 	}
+
+    // re-init dsp stuff 
+    InitPlug();
 
     return lf;
 }
 
-V vst::m_dsp(I n,t_signalvec const *insigs,t_signalvec const *outsigs)
+V vst::m_dsp(I n,t_signalvec const *,t_signalvec const *)
 {
     if(plug) {
-		plug->Init(Samplerate(),Blocksize());	
-        dspfun = plug->replace()?plug->processReplacing:plug->process;
+        plug->Init(Samplerate(),(F)Blocksize());
+        FLEXT_ASSERT(vstfun);
+
+        if(blsz != Blocksize()) {
+            blsz = Blocksize();
+            ClearBuf();
+            InitBuf();
+        }
     }
-    else
-        dspfun = NULL;
 }
 
 V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 {
-    if(dspfun) 
-            (plug->*dspfun)(const_cast<R **>(insigs),const_cast<R **>(outsigs),n);
-    else 
-            flext_dsp::m_signal(n,insigs,outsigs);
+    if(plug) {
+        if(sigmatch)
+            (plug->*vstfun)(const_cast<R **>(insigs),const_cast<R **>(outsigs),n);
+        else {
+            R **inv,**outv;
+
+            if(plug->getNumInputs() <= CntInSig()) 
+                inv = const_cast<R **>(insigs);
+            else { // more plug inputs than inlets
+                I i;
+                for(i = 0; i < CntInSig(); ++i) tmpin[i] = const_cast<R *>(insigs[i]);
+
+                // set dangling inputs to zero
+                // according to mode... (e.g. set zero)
+                for(; i < plug->getNumInputs(); ++i) ZeroSamples(tmpin[i] = vstin[i],n);
+
+                inv = tmpin;
+            }
+
+            const BL more = plug->getNumOutputs() <= CntOutSig();
+            if(more) // more outlets than plug outputs 
+                outv = const_cast<R **>(outsigs);
+            else {
+                I i;
+                for(i = 0; i < CntOutSig(); ++i) tmpout[i] = outsigs[i];
+                for(; i < plug->getNumOutputs(); ++i) tmpout[i] = vstout[i];
+
+                outv = tmpout;
+            }
+
+            (plug->*vstfun)(inv,outv,n);
+
+            if(more) {
+                // according to mode set dangling output vectors
+            }
+        }
+    }
+    else  
+        flext_dsp::m_signal(n,insigs,outsigs);
 }
 
 
-
+#if 0
 
 V vst::m_control(const S *ctrl_name,I ctrl_value)     
 {
@@ -360,6 +464,8 @@ V vst::m_control(const S *ctrl_name,I ctrl_value)
     //}
 }
 
+#endif
+
 V vst::m_pitchbend(I ctrl_value)     
 {
 	if(plug) plug->AddPitchBend(ctrl_value );    
@@ -372,7 +478,7 @@ V vst::m_programchange(I ctrl_value)
 
 V vst::ms_program(I p)
 {
-	if(plug) plug->SetCurrentProgram(p);    
+	if(plug && p >= 0) plug->SetCurrentProgram(p);
 }
 
 V vst::m_ctrlchange(I control,I ctrl_value)     
@@ -499,7 +605,7 @@ V vst::display_parameter(I param,BL showparams)
 	char display[164];
 	float val;
 
-	if(j == 0) post ("Control input/output(s):");
+//	if(j == 0) post ("Control input/output(s):");
 
     memset (name, 0, sizeof(name));
 	memset( display, 0 ,sizeof(display));
@@ -509,11 +615,11 @@ V vst::display_parameter(I param,BL showparams)
 		if (showparams) {
 			plug->DescribeValue( j , display );		
 			val = plug->GetParamValue( j );
-			post ("parameter[#%d], \"%s\" value=%f (%s) ", j + 1, name,  val,display);			
+			post ("parameter[#%d], \"%s\" value=%f (%s) ", j, name,  val,display);			
 		}
 		else {
 			val = plug->GetParamValue( j );
-			post ("parameter[#%d], \"%s\" value=%f ", j + 1, name,  val);			
+			post ("parameter[#%d], \"%s\" value=%f ", j, name,  val);			
 		}
 	}
 }
@@ -522,54 +628,57 @@ V vst::display_parameter(I param,BL showparams)
 // set the value of a parameter
 V vst::ms_param(I pnum,F val)     
 {
-    if(!plug) return;
+    if(!plug || pnum < 0 || pnum >= plug->GetNumParams()) return;
 
-	if( pnum > 0 && pnum <= plug->GetNumParams() ) {		
-		int i = pnum-1;
-/*
-		char name[9];
-		char display[64];
-
-		memset (name, 0, sizeof(name));
-		memset( display, 0 ,sizeof(display));
-		plug->GetParamName(i,name );
-
-		if(*name) 
-*/
-        {
-			F xval = plug->GetParamValue( i );
-			if(xval <= 1.0f) {
-				plug->SetParameter( i , val );
-				if(echoparam) display_parameter(i , true );
-			}		
-		}
-	}
+	F xval = plug->GetParamValue( pnum );
+//    if(xval <= 1.0f) // What's that????
+    if(true)
+    { 
+		plug->SetParameter( pnum, val );
+		if(echoparam) display_parameter(pnum , true );
+	}	
+    else
+        FLEXT_ASSERT(false);
 }
 
 V vst::mg_param(I pnum)
 {
-    if(!plug) return;
+    if(!plug || pnum < 0 || pnum >= plug->GetNumParams()) return;
 
-	if( pnum > 0 && pnum <= plug->GetNumParams() ) {		
-		int i = pnum-1;
-/*
-		char name[9];
-		char display[64];
-//		float xval;
+    A at[2];
+    SetInt(at[0],pnum);
+    SetFloat(at[1],plug->GetParamValue(pnum));
+	ToOutAnything(GetOutAttr(),MakeSymbol("param"),2,at);
+}
 
-		memset (name, 0, sizeof(name));
-		memset( display, 0 ,sizeof(display));
-		plug->GetParamName(i,name );
+V vst::m_pname(I pnum)
+{
+    if(!plug || pnum < 0 || pnum >= plug->GetNumParams()) return;
 
-		if(*name) 
-*/
-        {
-            A at[2];
-            SetInt(at[0],i);
-            SetFloat(at[1],plug->GetParamValue(i));
-			ToOutAnything(GetOutAttr(),MakeSymbol("param"),2,at);
-		}
-	}
+    C name[109]; /* the Steinberg(tm) way... */
+
+    memset(name,0,sizeof(name));
+	plug->GetParamName(pnum,name);
+
+    A at[2];
+    SetInt(at[0],pnum);
+    SetString(at[1],name);
+	ToOutAnything(GetOutAttr(),MakeSymbol("pname"),2,at);
+}
+
+V vst::m_ptext(I pnum)
+{
+    if(!plug || pnum < 0 || pnum >= plug->GetNumParams()) return;
+
+	C display[164];  /* the Steinberg(tm) way... */
+
+	memset(display,0,sizeof(display));
+	plug->DescribeValue(pnum,display);
+
+    A at[2];
+    SetInt(at[0],pnum);
+    SetString(at[1],display);
+	ToOutAnything(GetOutAttr(),MakeSymbol("ptext"),2,at);
 }
 
 V vst::m_note(I note,I velocity)
