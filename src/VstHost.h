@@ -72,6 +72,13 @@ public:
 	void GetParamValue(int numparam,char *parval) const;
 	float GetParamValue(int numparam) const;
 
+    // scan plugin names (can take a _long_ time!!)
+    void ScanParams(int i = -1);
+    // get number of scanned parameters
+    int ScannedParams() const { return paramnamecnt; }
+    // get index of named (scanned) parameter... -1 if not found
+    int GetParamIx(const char *p) const;
+
     bool SetParamFloat(int parameter, float value);
     bool SetParamInt(int parameter, int value) { return SetParamFloat(parameter,value/65535.0f); }
 
@@ -142,6 +149,16 @@ protected:
 	char _sProductName[64];
 	char _sVendorName[64];
     std::string _sDllName;	// Contains dll name
+
+    struct NameCmp:
+        std::less<std::string>
+    {
+        bool operator()(const std::string &a,const std::string &b) const { return a.compare(b) < 0; }
+    };
+
+    typedef std::map<std::string,int,NameCmp> NameMap;
+    int paramnamecnt;
+    NameMap paramnames;
 
 /*
 	float *inputs[MAX_INOUTS];

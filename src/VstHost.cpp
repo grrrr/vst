@@ -11,7 +11,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "VstHost.h"
 #include "AEffectx.h"
 
-using namespace std;
+#include <ctype.h>
 
 static VstTimeInfo _timeInfo;
 
@@ -21,7 +21,8 @@ typedef AEffect *(VSTCALLBACK *PVSTMAIN)(audioMasterCallback audioMaster);
 VSTPlugin::VSTPlugin():
     h_dll(NULL),hwnd(NULL),_pEffect(NULL),
     posx(0),posy(0),
-	_midichannel(0),queue_size(0)
+	_midichannel(0),queue_size(0),
+    paramnamecnt(0)
 {}
 
 VSTPlugin::~VSTPlugin()
@@ -62,39 +63,36 @@ int VSTPlugin::Instance(const char *dllname)
 	ret = Dispatch( effIdentify);
 	FLEXT_ASSERT(ret == 'NvEf');
 
-	if (!Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f)) {
+    *_sProductName = 0;
+	Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f);
+    if(_sProductName) {
 		// no product name given by plugin -> extract it from the filename
 
-		string str1(dllname);
-		string::size_type slpos = str1.rfind('\\');
-		if(slpos == string::npos) {
+		std::string str1(dllname);
+		std::string::size_type slpos = str1.rfind('\\');
+		if(slpos == std::string::npos) {
 			slpos = str1.rfind('/');
-			if(slpos == string::npos)
+			if(slpos == std::string::npos)
 				slpos = 0;
 			else
 				++slpos;
 		}
 		else
 			++slpos;
-		string str2 = str1.substr(slpos);
+		std::string str2 = str1.substr(slpos);
 		int snip = str2.find('.');
-        if( snip != string::npos )
+        if( snip != std::string::npos )
 			str1 = str2.substr(0,snip);
 		else
 			str1 = str2;
 		strcpy(_sProductName,str1.c_str());
 	}
 	
-	if(!Dispatch( effGetVendorString, 0, 0, &_sVendorName, 0.0f))
-		strcpy(_sVendorName, "Unknown vendor");
+	*_sVendorName = 0;
+	Dispatch( effGetVendorString, 0, 0, &_sVendorName, 0.0f);
 
 	_sDllName = dllname;
 
-/*
-	Dispatch( effMainsChanged,  0, 1);
-	Dispatch( effSetSampleRate,  0, 0,NULL,44100.);
-	Dispatch( effSetBlockSize,  0, 64);
-*/
 	return VSTINSTANCE_NO_ERROR;
 }
 
@@ -147,12 +145,21 @@ void VSTPlugin::DspInit(float samplerate,int blocksize)
 	Dispatch(effSetBlockSize,  0, blocksize);
 }
 
+static void striptrail(char *txt)
+{
+    // strip trailing whitespace
+    for(int i = strlen(txt)-1; i >= 0; --i) if(isspace(txt[i])) txt[i] = 0;
+}
+
 void VSTPlugin::GetParamName(int numparam,char *name) const
 {
-	if(numparam < GetNumParams()) 
+    if(numparam < GetNumParams()) {
+        name[0] = 0;
         Dispatch(effGetParamName,numparam,0,name,0.0f);
+        striptrail(name);
+    }
 	else 
-        strcpy(name,"Index out of Range");
+        name[0] = 0;
 }
 
 bool VSTPlugin::SetParamFloat(int parameter,float value)
@@ -169,14 +176,17 @@ void VSTPlugin::GetParamValue(int numparam,char *parval) const
 {
     if(Is()) {
         if(numparam < GetNumParams()) {
-//			char par_name[64];
-			char par_display[64];
-			char par_label[64];
-
-//			Dispatch(effGetParamName,parameter,0,par_name,0.0f);
+            // how many chars needed?
+            char par_display[64]; par_display[0] = 0;
 			Dispatch(effGetParamDisplay,numparam,0,par_display,0.0f);
-			Dispatch(effGetParamLabel,numparam,0,par_label,0.0f);
-//			sprintf(psTxt,"%s:%s%s",par_name,par_display,par_label);
+//            if(par_display[7]) par_display[8] = 0; // set trailing zero
+
+            // how many chars needed?
+			char par_label[64]; par_label[0] = 0;
+            Dispatch(effGetParamLabel,numparam,0,par_label,0.0f);
+            striptrail(par_label);
+//            if(par_label[7]) par_label[8] = 0; // set trailing zero
+
 			sprintf(parval,"%s%s",par_display,par_label);
         }
 	    else 
@@ -192,6 +202,26 @@ float VSTPlugin::GetParamValue(int numparam) const
         return _pEffect->getParameter(_pEffect, numparam);
 	else 
         return -1.0;
+}
+
+void VSTPlugin::ScanParams(int cnt)
+{
+    if(cnt < 0) cnt = GetNumParams();
+    if(paramnamecnt >= cnt) return;
+    if(cnt >= GetNumParams()) cnt = GetNumParams();
+
+    char name[64];
+    for(int i = paramnamecnt; i < cnt; ++i) {
+        GetParamName(i,name);
+        if(*name) paramnames[std::string(name)] = i;
+    }
+    paramnamecnt = cnt;
+}
+
+int VSTPlugin::GetParamIx(const char *p) const
+{
+    NameMap::const_iterator it = paramnames.find(std::string(p));
+    return it == paramnames.end()?-1:it->second;
 }
 
 void VSTPlugin::Edit(bool open)
@@ -308,9 +338,11 @@ void VSTPlugin::AddControlChange(int control, int value)
 
 bool VSTPlugin::GetProgramName( int cat , int p, char *buf) const
 {
+    buf[0] = 0;
 	int parameter = p;
-	if(parameter < GetNumPrograms()) {
+	if(parameter < GetNumPrograms() && cat < GetNumCategories()) {
 		Dispatch(effGetProgramNameIndexed,parameter,cat,buf,0.0f);
+        striptrail(buf);
 		return true;
 	}
 	else

@@ -31,10 +31,6 @@ pd - darwin (MacOSX):
 ---------------------
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
 
-Max/MSP - MacOS9/X:
--------------------
-o CodeWarrior: edit "vst.cw" and build 
-
 
 ----------------------------------------------------------------------------
 
@@ -51,6 +47,7 @@ Version history:
 - stripped all MFC code
 - fixed DSP initialization, zero dangling audio vectors
 - added "bypass" and "mute" attributes
+- with flext 4.7 no more interruptions on window close
 
 0.0.0:
 - version of mark@junklight.com
@@ -62,6 +59,7 @@ features:
 - include necessary Steinberg license stuff
 
 BUGS:
-- Quadrafuzz crashes on closing editor window
 - Waveshell crashes on load
 
+TODO:
+- do name scanning in the background
