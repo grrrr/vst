@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <string>
 
 
-#define VST_VERSION "0.1.0pre13"
+#define VST_VERSION "0.1.0pre14"
 
 
 class vst:
@@ -473,8 +473,27 @@ V vst::m_signal(I n,R *const *insigs,R *const *outsigs)
 
         int i,mx = CntInSig();
         if(mx > CntOutSig()) mx = CntOutSig();
-        for(i = 0; i < mx; ++i)
-            CopySamples(outsigs[i],insigs[i],n);
+        if(mx == 1) {
+            CopySamples(outsigs[0],insigs[0],n);
+            i = 1;
+        }
+        else if(mx == 2) {
+            R *o1 = outsigs[0],*o2 = outsigs[1];
+            const R *i1 = insigs[0],*i2 = insigs[1];
+            for(int s = 0; s < n; ++s) {
+                const R f = *(i1++);
+                *(o2++) = *(i2++);
+                *(o1++) = f;
+            }
+            i = 2;
+        }
+        else
+            for(i = 0; i < mx; ++i) {
+                // must copy via temporary buffer as ordering of output signals can collide with input signals
+                CopySamples(tmpin[i],insigs[i],n);
+                CopySamples(outsigs[i],tmpin[i],n);
+            }
+
         for(; i < CntOutSig(); ++i)
             ZeroSamples(outsigs[i],n);
     }
