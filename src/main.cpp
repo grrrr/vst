@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre20"
+#define VST_VERSION "0.1.0pre21"
 
 
 class vst
@@ -40,10 +40,10 @@ public:
 	~vst();
 
 protected:
-    virtual void m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs);
-    virtual void m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs);
+    virtual bool CbDsp();
+    virtual void CbSignal();
 
-    virtual void m_click() { ms_edit(true); }
+    virtual void CbClick() { ms_edit(true); }
 
     bool ms_plug(int argc,const t_atom *argv);
     bool ms_plug(const AtomList &args) { return ms_plug(args.Count(),args.Atoms()); }
@@ -110,6 +110,8 @@ protected:
     void ms_playing(bool p) { if(plug) plug->SetPlaying(p); }
     void mg_looping(bool &p) { p = plug && plug->GetLooping(); }
     void ms_looping(bool p) { if(plug) plug->SetLooping(p); }
+    void mg_feedback(bool &p) { p = plug && plug->GetFeedback(); }
+    void ms_feedback(bool p) { if(plug) plug->SetFeedback(p); }
     void mg_samplepos(float &p) { p = plug?(float)plug->GetSamplePos():0; }
     void ms_samplepos(float p) { if(plug) plug->SetSamplePos(p); }
     void mg_ppqpos(float &p) { p = plug?(float)plug->GetPPQPos():0; }
@@ -210,6 +212,7 @@ private:
 
     FLEXT_CALLVAR_B(mg_playing,ms_playing)
     FLEXT_CALLVAR_B(mg_looping,ms_looping)
+    FLEXT_CALLVAR_B(mg_feedback,ms_feedback)
     FLEXT_CALLVAR_F(mg_samplepos,ms_samplepos)
     FLEXT_CALLVAR_F(mg_ppqpos,ms_ppqpos)
     FLEXT_CALLVAR_F(mg_tempo,ms_tempo)
@@ -261,7 +264,7 @@ void vst::Setup(t_classid c)
 	FLEXT_CADDMETHOD_I(c,0,"getpname",m_pname);
 	FLEXT_CADDATTR_VAR(c,"pnames",paramnames,ms_paramnames);
 	FLEXT_CADDMETHOD_2(c,0,"param",ms_param,int,float);
-	FLEXT_CADDMETHOD_2(c,0,"param",ms_params,t_symptr,float);
+	FLEXT_CADDMETHOD_(c,0,"param",ms_params);
 	FLEXT_CADDMETHOD_(c,0,"getparam",mg_param);
 	FLEXT_CADDMETHOD_(c,0,"getparam",mg_params);
 	FLEXT_CADDMETHOD_(c,0,"getptext",m_ptext);
@@ -286,6 +289,7 @@ void vst::Setup(t_classid c)
 
 	FLEXT_CADDATTR_VAR(c,"playing",mg_playing,ms_playing);
 	FLEXT_CADDATTR_VAR(c,"looping",mg_looping,ms_looping);
+	FLEXT_CADDATTR_VAR(c,"feedback",mg_feedback,ms_feedback);
 	FLEXT_CADDATTR_VAR(c,"samplepos",mg_samplepos,ms_samplepos);
 	FLEXT_CADDATTR_VAR(c,"ppqpos",mg_ppqpos,ms_ppqpos);
 	FLEXT_CADDATTR_VAR(c,"tempo",mg_tempo,ms_tempo);
@@ -566,7 +570,7 @@ void vst::ms_subplug(int argc,const t_atom *argv)
     LoadPlug();
 }
 
-void vst::m_dsp(int n,t_signalvec const *,t_signalvec const *)
+bool vst::CbDsp()
 {
     if(plug) {
         FLEXT_ASSERT(vstfun);
@@ -579,13 +583,18 @@ void vst::m_dsp(int n,t_signalvec const *,t_signalvec const *)
             InitBuf();
         }
     }
+    return true;
 }
 
-void vst::m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs)
+void vst::CbSignal()
 {
     if(mute)
-        flext_dsp::m_signal(n,insigs,outsigs);
+        flext_dsp::CbSignal();
     else if(bypass) {
+        const int n = Blocksize();
+        t_sample *const *insigs = InSig();
+        t_sample *const *outsigs = OutSig();
+
         // copy as many channels as possible and zero dangling ones
 
         int i,mx = CntInSig();
@@ -615,12 +624,14 @@ void vst::m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs)
             ZeroSamples(outsigs[i],n);
     }
     else if(plug) {
-        const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
-
         if(sigmatch)
-            (plug->*vstfun)(const_cast<t_sample **>(insigs),const_cast<t_sample **>(outsigs),n);
+            (plug->*vstfun)(const_cast<t_sample **>(InSig()),const_cast<t_sample **>(OutSig()),Blocksize());
         else {
+            const int inputs = plug->GetNumInputs(),outputs = plug->GetNumOutputs();
             const int cntin = CntInSig(),cntout = CntOutSig();
+            const int n = Blocksize();
+            t_sample *const *insigs = InSig();
+            t_sample *const *outsigs = OutSig();
             t_sample **inv,**outv;
 
             if(inputs <= cntin) 
@@ -660,7 +671,7 @@ void vst::m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs)
         }
     }
     else  
-        flext_dsp::m_signal(n,insigs,outsigs);
+        flext_dsp::CbSignal();
 }
 
 

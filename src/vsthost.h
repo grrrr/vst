@@ -214,6 +214,8 @@ public:
     bool GetPlaying() const { return playing; }
     void SetLooping(bool p) { if(looping != p) transchg = true,looping = p; }
     bool GetLooping() const { return looping; }
+    void SetFeedback(bool p) { feedback = p; }
+    bool GetFeedback() const { return feedback; }
 
     void SetSamplePos(double p) { if(samplepos != p) transchg = true,samplepos = p; }
     double GetSamplePos() const { return samplepos; }
@@ -240,7 +242,7 @@ public:
 
 private:
 
-    bool playing,looping;
+    bool playing,looping,feedback;
     float samplerate;
     bool transchg;
 
@@ -307,6 +309,7 @@ private:
 
 	static long VSTCALLBACK Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt);
 
+    static const t_symbol *sym_param;
     static const t_symbol *sym_event,*sym_evmidi,*sym_evaudio,*sym_evvideo,*sym_evparam,*sym_evtrigger,*sym_evsysex,*sym_ev_;
     static const t_symbol *sym_midi[8];
 

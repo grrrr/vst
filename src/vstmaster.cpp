@@ -78,11 +78,12 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 
 	switch (opcode) {
     case audioMasterAutomate: // 0
-#ifdef FLEXT_LOGGING
-        post("Automate index=%li value=%li opt=%f",index,value,opt);
-#endif
-		// index, value given
-		//! \todo set effect parameter
+        if(th && th->feedback && th->responder) {
+            t_atom lst[2];
+            SetInt(lst[0],index);
+            SetFloat(lst[1],opt);
+            th->responder->Respond(sym_param,2,lst);
+        }
         return 0;
 
     case audioMasterVersion: // 1
@@ -123,6 +124,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
         if(th->transchg) { time.flags |= kVstTransportChanged; th->transchg = false; }
         if(th->playing) time.flags |= kVstTransportPlaying;
         if(th->looping) time.flags |= kVstTransportCycleActive;
+//        if(th->feedback) time.flags |= kVstAutomationWriting;
             
         time.sampleRate = th->samplerate;
 		time.samplePos = th->samplepos;
@@ -187,6 +189,10 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
     case audioMasterGetCurrentProcessLevel: // 23
         // return thread state
         return flext::GetThreadId() == flext::GetSysThreadId()?2:1;
+
+    case audioMasterGetAutomationState: // 24
+//        return th?(th->feedback?2:1):0;
+        return 0;
 
 	case audioMasterGetVendorString: // 32
 		strcpy((char*)ptr,vendor);

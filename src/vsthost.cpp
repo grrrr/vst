@@ -11,6 +11,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 const t_symbol 
+    *VSTPlugin::sym_param,
     *VSTPlugin::sym_event,
     *VSTPlugin::sym_evmidi,
     *VSTPlugin::sym_evaudio,
@@ -23,6 +24,7 @@ const t_symbol
 
 void VSTPlugin::Setup()
 {
+    sym_param = flext::MakeSymbol("param");
     sym_event = flext::MakeSymbol("event");
     sym_evmidi = flext::MakeSymbol("midi");
     sym_evaudio = flext::MakeSymbol("audio");
@@ -50,7 +52,7 @@ VSTPlugin::VSTPlugin(Responder *resp)
     , midichannel(0),eventqusz(0)
     , paramnamecnt(0)
     , transchg(true)
-    , playing(false),looping(false)
+    , playing(false),looping(false),feedback(false)
     , samplerate(0)
     , samplepos(0),ppqpos(0)
     , tempo(120)
