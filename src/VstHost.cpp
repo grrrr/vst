@@ -45,7 +45,7 @@ int VSTPlugin::Instance( const char *dllname)
 	{
 		return VSTINSTANCE_ERR_NO_VALID_FILE;
 	}
-	post("Loaded library %s" , dllname);
+//	post("Loaded library %s" , dllname);
 	PVSTMAIN main = (PVSTMAIN)GetProcAddress(h_dll,"main");
 	if(!main)
 	{	
@@ -411,61 +411,12 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 
 bool VSTPlugin::AddNoteOn( unsigned char note,unsigned char speed,unsigned char midichannel)
 {
-	if(instantiated)
-	{
-		VstMidiEvent* pevent=&midievent[queue_size];
-
-		pevent->type = kVstMidiType;
-		pevent->byteSize = 24;
-		pevent->deltaFrames = 0;
-		pevent->flags = 0;
-		pevent->detune = 0;
-		pevent->noteLength = 0;
-		pevent->noteOffset = 0;
-		pevent->reserved1 = 0;
-		pevent->reserved2 = 0;
-		pevent->noteOffVelocity = 0;
-		pevent->midiData[0] = (char)MIDI_NOTEON | midichannel; // Midi On
-		pevent->midiData[1] = note;
-		pevent->midiData[2] = speed;
-		pevent->midiData[3] = 0;
-
-		if ( queue_size < MAX_EVENTS ) queue_size++;
-		SendMidi();
-		return true;
-	}
-	else
-        return false;
+    return AddMIDI((char)MIDI_NOTEON | midichannel,note,speed);
 }
 
 bool VSTPlugin::AddNoteOff( unsigned char note,unsigned char midichannel)
 {
-	if (instantiated)
-	{
-		VstMidiEvent* pevent=&midievent[queue_size];
-
-		pevent->type = kVstMidiType;
-		pevent->byteSize = 24;
-		pevent->deltaFrames = 0;
-		pevent->flags = 0;
-		pevent->detune = 0;
-		pevent->noteLength = 0;
-		pevent->noteOffset = 0;
-		pevent->reserved1 = 0;
-		pevent->reserved2 = 0;
-		pevent->noteOffVelocity = 0;
-		pevent->midiData[0] = (char)MIDI_NOTEOFF | midichannel; // Midi Off
-		pevent->midiData[1] = note;
-		pevent->midiData[2] = 0;
-		pevent->midiData[3] = 0;
-
-		if ( queue_size < MAX_EVENTS ) queue_size++;
-
-		SendMidi();
-		return true;
-	}
-	else	
-        return false;
+    return AddMIDI((char)MIDI_NOTEOFF | midichannel,note,0);
 }
 
 
