@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <flext.h>
 
 #if FLEXT_OS == FLEXT_OS_WIN
-// only Windows code is situated in ths file
+// only Windows code is situated in this file
 
 #include <windows.h>
 
@@ -71,6 +71,8 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 
 static void threadfun(flext::thr_params *p)
 {
+    flext::RelPriority(-2);
+
     VSTPlugin *plug = (VSTPlugin *)p;
     HINSTANCE hinstance = (HINSTANCE)GetModuleHandle(NULL);
     flext::thrid_t thrid = flext::GetThreadId();
@@ -108,8 +110,8 @@ static void threadfun(flext::thr_params *p)
         FLEXT_LOG1("wndclass == NULL: %i",GetLastError());
     else
         wnd = CreateWindowEx( 
-            WS_EX_DLGMODALFRAME,wcx.lpszClassName,tmp,
-            WS_CAPTION|/*WS_THICKFRAME|*/WS_POPUP|WS_SYSMENU,
+            0 /*WS_EX_DLGMODALFRAME*/,wcx.lpszClassName,tmp,
+            WS_BORDER|WS_CAPTION|/*WS_THICKFRAME|*/WS_POPUP|WS_SYSMENU|WS_MINIMIZEBOX,
             CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
             NULL,NULL,
             hinstance,NULL
@@ -136,9 +138,9 @@ static void threadfun(flext::thr_params *p)
 
 
 	    RECT r = plug->GetEditorRect();
-	    SetWindowPos(wnd,HWND_TOP,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
+	    SetWindowPos(wnd,HWND_TOPMOST,plug->getX(),plug->getY(),(r.right - r.left) + 6 , r.bottom - r.top + 26 , SWP_SHOWWINDOW);
     //	ShowWindow( SW_SHOW );		
-        BringWindowToTop(wnd);
+    //  BringWindowToTop(wnd);
     //	SetFocus();
 
 
@@ -160,6 +162,7 @@ static void threadfun(flext::thr_params *p)
     }
 
     UnregisterClass(wcx.lpszClassName,hinstance);
+
     mapmutex.Lock();
     wndmap.erase(thrid);
     mapmutex.Unlock();

@@ -23,7 +23,7 @@ OUTPATH=pd-msvc
 
 # where should the external be installed?
 # (leave blank to omit installation)
-INSTDIR=$(PDPATH)\extra
+INSTPATH=$(PDPATH)\extra
 
 
 # user defined compile flags
