@@ -122,6 +122,7 @@ void VSTPlugin::worker(thr_params *)
             // see if editing has stopped
             if(p && p->plug->hwnd == NULL) {
                 // yes, it is now safe to delete the plug
+                post("DELETE %s",p->plug->dllname.c_str());
                 delete p->plug;
                 delete p;
             }
@@ -170,6 +171,17 @@ bool VSTPlugin::NewPlugin(const char *plugname)
 
 #if FLEXT_OS == FLEXT_OS_WIN
     hdll = LoadLibraryEx(dllname.c_str(),NULL,0 /*DONT_RESOLVE_DLL_REFERENCES*/);
+/*
+    char buf[255],*c;
+    strcpy(buf,dllname.c_str());
+    for(c = buf; *c; ++c) 
+        if(*c == '/') 
+            *c = '\\';
+    char *sl = strrchr(buf,'\\');
+    if(sl) *sl = 0;
+    SetCurrentDirectory(buf);
+    hdll = LoadLibrary(dllname.c_str());
+*/
     if(hdll) pluginmain = (PVSTMAIN)GetProcAddress(hdll,"main");
     audiomaster = Master;  
 

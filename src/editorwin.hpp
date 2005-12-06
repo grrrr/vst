@@ -15,7 +15,19 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <map>
 #include <windows.h>
 
-typedef std::map<flext::thrid_t,VSTPlugin *> WndMap;
+class ThrCmp
+{
+public:
+    inline bool operator()(const flext::thrid_t &a,const flext::thrid_t &b) const
+    {
+        if(sizeof(a) == sizeof(size_t))
+            return *(size_t *)&a < *(size_t *)&b;
+        else
+            return memcmp(&a,&b,sizeof(a)) < 0;
+    }
+};
+
+typedef std::map<flext::thrid_t,VSTPlugin *,ThrCmp> WndMap;
 static WndMap wndmap;
 static flext::ThrMutex mapmutex;
 
@@ -56,7 +68,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
         
         case WM_TIMER: // fall through
         case WM_ENTERIDLE:
-//            plug->EditorIdle();		
+            plug->EditorIdle();		
             break; 
 #if 0
         case WM_WINDOWPOSCHANGED: {
@@ -136,7 +148,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
 
         default: 
         #ifdef FLEXT_LOGGING
-            flext::post("WND MSG %i, WP=%i, lp=%i",msg,wp,lp);
+//            flext::post("WND MSG %i, WP=%i, lp=%i",msg,wp,lp);
         #endif
 
             res = DefWindowProc(hwnd,msg,wp,lp); 
