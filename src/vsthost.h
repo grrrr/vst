@@ -146,6 +146,7 @@ public:
     const char *GetTitle() const { return title.c_str(); }
 
     void ToFront();
+    void BelowFront();
 
 	void Edit(bool open);
 

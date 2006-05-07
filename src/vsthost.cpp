@@ -122,7 +122,9 @@ void VSTPlugin::worker(thr_params *)
             // see if editing has stopped
             if(p && p->plug->hwnd == NULL) {
                 // yes, it is now safe to delete the plug
+#ifdef FLEXT_LOGGING
                 post("DELETE %s",p->plug->dllname.c_str());
+#endif
                 delete p->plug;
                 delete p;
             }

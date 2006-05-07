@@ -2,13 +2,13 @@
 vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2003-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
 #if FLEXT_OS != FLEXT_OS_WIN
-// only Windows code is situated in this file
+// only Windows code is located in this file
 #error Wrong implementation
 #endif
 
@@ -325,6 +325,12 @@ void SizeEditor(VSTPlugin *p,int x,int y)
 void FrontEditor(VSTPlugin *p) 
 {
     SetForegroundWindow(p->EditorHandle());
+}
+
+void BelowEditor(VSTPlugin *p) 
+{
+    HWND fg = GetForegroundWindow();
+    if(fg) SetWindowPos(p->EditorHandle(),fg,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
 }
 
 void CaptionEditor(VSTPlugin *plug,bool c)

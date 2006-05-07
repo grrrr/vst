@@ -2,7 +2,7 @@
 vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2003-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-#define VST_VERSION "0.1.0pre26"
+#define VST_VERSION "0.1.0pre27"
 
 
 class vst
@@ -77,6 +77,7 @@ protected:
     void ms_wintitle(const AtomList &t);
     void mg_wintitle(AtomList &t) const { if(plug) { t(1); SetString(t[0],plug->GetTitle()); } }
     void m_winfront() const { if(plug) plug->ToFront(); }
+    void m_winbelow() const { if(plug) plug->BelowFront(); }
 
     void mg_chnsin(int &c) const { c = plug?plug->GetNumInputs():0; }
     void mg_chnsout(int &c) const { c = plug?plug->GetNumOutputs():0; }
@@ -216,6 +217,7 @@ private:
     FLEXT_CALLVAR_B(mg_winhandle,ms_winhandle)
     FLEXT_CALLVAR_V(mg_wintitle,ms_wintitle)
     FLEXT_CALLBACK(m_winfront)
+    FLEXT_CALLBACK(m_winbelow)
 
     FLEXT_CALLGET_I(mg_chnsin)
     FLEXT_CALLGET_I(mg_chnsout)
@@ -299,6 +301,7 @@ void vst::Setup(t_classid c)
 	FLEXT_CADDATTR_VAR(c,"caption",mg_wincaption,ms_wincaption);
 	FLEXT_CADDATTR_VAR(c,"handle",mg_winhandle,ms_winhandle);
 	FLEXT_CADDMETHOD_(c,0,"front",m_winfront);
+	FLEXT_CADDMETHOD_(c,0,"below",m_winbelow);
 
     FLEXT_CADDATTR_GET(c,"ins",mg_chnsin);
 	FLEXT_CADDATTR_GET(c,"outs",mg_chnsout);

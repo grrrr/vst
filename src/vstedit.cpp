@@ -80,3 +80,9 @@ void VSTPlugin::ToFront()
 	    Dispatch(effEditTop,0,0,vendorname);
     }
 }
+
+void VSTPlugin::BelowFront()
+{
+    if(Is() && IsEdited())
+        BelowEditor(this);
+}

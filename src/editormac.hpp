@@ -55,4 +55,8 @@ void FrontEditor(VSTPlugin *p)
 {
 }
 
+void BelowEditor(VSTPlugin *p)
+{
+}
+
 #endif // FLEXT_OS_MAC
