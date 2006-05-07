@@ -188,6 +188,29 @@ bool VSTPlugin::NewPlugin(const char *plugname)
     audiomaster = Master;  
 
 #elif FLEXT_OS == FLEXT_OS_MAC
+
+#if 1
+	CFStringRef fileNameString = CFStringCreateWithCString(NULL, fileName, kCFStringEncodingUTF8);
+	if(fileNameString == 0) goto bail;
+	CFURLRef url = CFURLCreateWithFileSystemPath(NULL, fileNameString, kCFURLPOSIXPathStyle, false);
+	CFRelease(fileNameString);
+	if(url == 0) goto bail;
+	hdll = CFBundleCreate(NULL, url);
+	CFRelease (url);
+	if(hdll && !CFBundleLoadExecutable(hdll)) goto bail;
+
+    PVSTMAIN mainaddr = PluginEntryProc)CFBundleGetFunctionPointerForName(hdll, CFSTR("VSTPluginMain"));
+	if(!mainaddr)
+		mainaddr = (PluginEntryProc)CFBundleGetFunctionPointerForName(hdll, CFSTR("main_macho"));
+#ifdef __CFM__
+    pluginmain = (PVSTMAIN)NewMachOFromCFM(mainaddr);
+    audiomaster = NewCFMFromMachO(Master);
+#else
+    pluginmain = (PVSTMAIN)mainaddr;
+    audiomaster = Master;
+#endif
+
+#else
     short   resFileID;
     FSSpec  spec;
     OSErr err;
@@ -236,10 +259,13 @@ bool VSTPlugin::NewPlugin(const char *plugname)
         Master;
 #endif
 
+#endif
+
 #else
 #error Platform not supported
 #endif    
 
+bail:
     if(pluginmain && audiomaster)
         return true;
     else {
@@ -253,14 +279,15 @@ void VSTPlugin::FreePlugin()
 #if FLEXT_OS == FLEXT_OS_WIN
     if(hdll) { FreeLibrary(hdll); hdll = NULL; }
 #elif FLEXT_OS == FLEXT_OS_MAC
-	
-#ifdef __MACOSX__
 #ifdef __CFM__
     if(audiomaster) DisposeCFMFromMachO(audiomaster);
     if(pluginmain) DisposeMachOFromCFM(pluginmain);
 #endif
-#endif
-
+    if(hdll) {
+	    CFBundleUnloadExecutable(hdll);
+	    CFRelease(hdll);
+        hdll = NULL;
+    }
 #else
 #error Platform not supported
 #endif    

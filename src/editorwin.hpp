@@ -215,7 +215,7 @@ static void threadfun(flext::thr_params *p)
         CaptionEditor(plug,plug->GetCaption());
 
         if(plug->IsVisible()) {
-            SetForegroundWindow(wnd);
+//            SetForegroundWindow(wnd);
             ShowWindow(wnd,1); 
 
             // notify plugin
@@ -330,7 +330,10 @@ void FrontEditor(VSTPlugin *p)
 void BelowEditor(VSTPlugin *p) 
 {
     HWND fg = GetForegroundWindow();
-    if(fg) SetWindowPos(p->EditorHandle(),fg,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+    if(fg) {
+        // obviously the following doesn't really work if the window has been created by a different thread...
+        BOOL ok = SetWindowPos(p->EditorHandle(),fg,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE);
+    }
 }
 
 void CaptionEditor(VSTPlugin *plug,bool c)
