@@ -27,6 +27,9 @@ in the file gpl.txt
 This package uses the flext C++ layer - See its license text below:
 
 
+--- VST technology -------------------------------------
+VST is a trademark of Steinberg Media Technologies GmbH
+
 --- plugin~ by Jarno Seppänen --------------------------
 
 This is a Pd [1] tilde object for hosting LADSPA [2] and VST [3] audio

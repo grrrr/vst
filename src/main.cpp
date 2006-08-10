@@ -259,6 +259,8 @@ void vst::Setup(t_classid c)
 	post("vst~ %s - VST plugin object, (C)2003-05 Thomas Grill",VST_VERSION);
 	post("based on the work of Jarno Seppänen and Mark Williamson");
 	post("");
+    post("VST PlugIn Technology by Steinberg");
+	post("");
 
 	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);
 	FLEXT_CADDATTR_VAR(c,"subplug",mg_subplug,ms_subplug);
