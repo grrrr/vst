@@ -25,7 +25,7 @@ typedef HWND WHandle;
 typedef HMODULE MHandle;
 #elif FLEXT_OS == FLEXT_OS_MAC
 #include <CoreServices/CoreServices.h>
-typedef Handle WHandle;
+typedef WindowRef WHandle;
 typedef CFBundleRef MHandle;
 #else
 #error Platform not supported!
