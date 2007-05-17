@@ -1,3 +1,2 @@
-# where is the VST SDK?
-# (at least version 2.3)
-VSTSDKPATH=c:\data\prog\audio\vstsdk2.3
+# where is the VST SDK, version 2.3?
+VSTSDKPATH=c:\data\vstsdk2.3
