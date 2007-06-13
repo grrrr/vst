@@ -26,7 +26,7 @@ const t_symbol
 
 
 class DelPlugin
-    : public Fifo::Cell
+    : public LifoCell
 {
 public:
     DelPlugin(VSTPlugin *p): plug(p) {}
