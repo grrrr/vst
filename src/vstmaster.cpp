@@ -181,7 +181,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 
     case audioMasterGetCurrentProcessLevel: // 23
         // return thread state
-        return flext::IsSystemThread()?2:1;
+		return flext::IsThreadRegistered()?1:2;
 
     case audioMasterGetAutomationState: // 24
 //        return th?(th->feedback?2:1):0;
