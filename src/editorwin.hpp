@@ -2,7 +2,7 @@
 vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003-2006 Thomas Grill (gr@grrrr.org)
+Copyright (c)2003-2009 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -246,7 +246,7 @@ static void threadfun(flext::thr_params *p)
 
         }
 
-        catch(exception &e) {
+        catch(std::exception &e) {
             flext::post("vst~ - exception caught, exiting: %s",e.what());
         }
         catch(...) {
